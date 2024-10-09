@@ -1,0 +1,33 @@
+image: maven:3.8.5-openjdk-21
+
+cache:
+  key: $CI_COMMIT_REF_SLUG
+  paths:
+    - .m2/repository
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "--no-transfer-progress --batch-mode --errors --fail-at-end --show-version"
+
+stages:
+  - build
+  - test
+
+maven-build:
+  stage: build
+  script:
+    - mvn clean package -DskipTests
+
+maven-test:
+  stage: test
+  services:
+    - name: docker:dind
+      command: [ "--tls=false" ]
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_DRIVER: overlay2
+  script:
+    - mvn clean test
+  artifacts:
+    expire_in: 1 hour

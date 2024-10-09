@@ -1,0 +1,25 @@
+version: "3.9"
+name: time-capsule
+
+services:
+  postgres:
+    extends:
+      service: postgres
+      file: docker-compose-postgresql.yaml
+  car-rental-service:
+    container_name: service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://time-capsule-service-host:5432/time-capsule"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+
