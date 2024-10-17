@@ -3,7 +3,7 @@ package cz.cvut.fel.pm2.carrentalservice.service;
 import cz.cvut.fel.pm2.carrentalservice.exceptions.NotFoundException;
 import cz.cvut.fel.pm2.carrentalservice.mappers.CapsuleMapper;
 import cz.cvut.fel.pm2.carrentalservice.model.CapsuleDto;
-import cz.cvut.fel.pm2.carrentalservice.persistence.CapsuleEntity;
+import cz.cvut.fel.pm2.carrentalservice.persistence.Capsule;
 import cz.cvut.fel.pm2.carrentalservice.repository.CapsuleRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class DiscountService {
     public void updateDiscount(@NonNull CapsuleDto discountDto) {
 
         String discountName = discountDto.name();
-        CapsuleEntity capsuleEntity = capsuleRepository.getDiscountEntityByName(discountName)
+        Capsule capsuleEntity = capsuleRepository.getDiscountEntityByName(discountName)
                 .orElseThrow(() -> new NotFoundException("Requested discount with name: %s could not be found".formatted(discountName)));
         capsuleMapper.updateEntity(discountDto, capsuleEntity);
         capsuleRepository.save(capsuleEntity);

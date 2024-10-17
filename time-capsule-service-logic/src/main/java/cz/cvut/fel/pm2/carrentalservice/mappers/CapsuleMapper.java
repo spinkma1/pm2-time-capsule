@@ -1,7 +1,7 @@
 package cz.cvut.fel.pm2.carrentalservice.mappers;
 
 import cz.cvut.fel.pm2.carrentalservice.model.CapsuleDto;
-import cz.cvut.fel.pm2.carrentalservice.persistence.CapsuleEntity;
+import cz.cvut.fel.pm2.carrentalservice.persistence.Capsule;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -16,7 +16,7 @@ public interface CapsuleMapper {
      * @param capsuleEntity the discount entity to update.
      */
     @Mapping(target = "id", ignore = true)
-    void updateEntity(CapsuleDto capsuleInput, @MappingTarget CapsuleEntity capsuleEntity);
+    void updateEntity(CapsuleDto capsuleInput, @MappingTarget Capsule capsuleEntity);
 
     /**
      * Converts a DiscountEntity to a DiscountDto.
@@ -24,5 +24,5 @@ public interface CapsuleMapper {
      * @param capsuleEntity the discount entity to convert.
      * @return the converted discount DTO.
      */
-    CapsuleDto toDto(CapsuleEntity capsuleEntity);
+    CapsuleDto toDto(Capsule capsuleEntity);
 }
