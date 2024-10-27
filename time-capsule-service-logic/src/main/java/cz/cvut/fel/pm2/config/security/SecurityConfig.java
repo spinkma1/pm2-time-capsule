@@ -1,6 +1,5 @@
 package cz.cvut.fel.pm2.config.security;
 
-import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +7,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -78,12 +76,12 @@ public class SecurityConfig {
      *
      * @return a configured WebSecurityCustomizer
      */
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring()
-                .dispatcherTypeMatchers(DispatcherType.ERROR)
-                .requestMatchers(SecurityEndpoints.PUBLIC_URLS);
-    }
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return web -> web.ignoring()
+//                .dispatcherTypeMatchers(DispatcherType.ERROR)
+//                .requestMatchers(SecurityEndpoints.PUBLIC_URLS);
+//    }
 
     /**
      * Creates a PasswordEncoder bean.

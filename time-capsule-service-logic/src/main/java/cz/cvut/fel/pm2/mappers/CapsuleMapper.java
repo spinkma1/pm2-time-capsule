@@ -25,4 +25,12 @@ public interface CapsuleMapper {
      * @return the converted discount DTO.
      */
     CapsuleDto toDto(Capsule capsuleEntity);
+
+    /**
+     * Converts a DiscountDto to a DiscountEntity.
+     *
+     * @param capsuleDto the discount DTO to convert.
+     * @return the converted discount entity.
+     */
+    Capsule toEntity(CapsuleDto capsuleDto);
 }
