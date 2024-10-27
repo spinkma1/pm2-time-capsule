@@ -14,6 +14,8 @@
         <module>time-capsule-service-logic</module>
     </modules>
 
+
+
     <groupId>cz.cvut.fel.pm2</groupId>
     <artifactId>time-capsule-service</artifactId>
     <version>1.0.0</version>
