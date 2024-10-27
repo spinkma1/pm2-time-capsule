@@ -1,11 +1,12 @@
 package cz.cvut.fel.pm2.model;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+
+import java.util.List;
+
 /**
  * Data transfer object representing a discount.
  */
-public record CapsuleDto (
+public record CapsuleDto(
 
         Long id,
 
@@ -13,11 +14,11 @@ public record CapsuleDto (
 
         String description,
 
-        BigDecimal discount,
+        Boolean teamWork,
 
-        LocalDate startDate,
+        Long userFileLimit,
 
-        LocalDate expirationDate
+        List<UserDto> users
 ) {
 
 }

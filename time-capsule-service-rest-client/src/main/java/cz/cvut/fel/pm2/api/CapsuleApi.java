@@ -14,9 +14,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
@@ -26,13 +29,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @RequestMapping("/capsules")
 public interface CapsuleApi {
 
-    /**
-     * Updates capsule parameters.
-     *
-     * @param capsule the discount data to update
-     */
+
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(name = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @SecurityRequirement(name = "basicAuth")
     @Operation(
 
@@ -61,32 +60,30 @@ public interface CapsuleApi {
                             @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = InvalidBodyException.class))),
             })
-    void updateDiscount(
+    void createCapsule(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Capsule information",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = CapsuleDto.class,
-                            example = """
+                                    example = """
                                     {
                                       "id": "1",
                                       "name": "SUMMER2023",
                                       "description": "Summer Capsule",
-                                      "discount": 0.25,
                                       "startDate": "2023-06-01",
                                       "expirationDate": "2023-09-01"
                                     }
                                     """),
                             examples = {
-                            @ExampleObject(name = "Capsule information",
-                                    summary = "Capsule information body",
-                                    description = "Capsule information body.",
-                                    value = """
+                                    @ExampleObject(name = "Capsule information",
+                                            summary = "Capsule information body",
+                                            description = "Capsule information body.",
+                                            value = """
                                     {
                                       "id": "1",
                                       "name": "SUMMER2023",
                                       "description": "Summer Capsule",
-                                      "discount": 0.25,
                                       "startDate": "2023-06-01",
                                       "expirationDate": "2023-09-01"
                                     }
@@ -94,4 +91,9 @@ public interface CapsuleApi {
                     )
             )
             @RequestBody CapsuleDto capsule);
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    CapsuleDto getCapsule(@RequestParam String email);
 }

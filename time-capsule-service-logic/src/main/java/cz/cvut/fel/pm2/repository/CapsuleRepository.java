@@ -1,6 +1,7 @@
 package cz.cvut.fel.pm2.repository;
 
 import cz.cvut.fel.pm2.persistence.Capsule;
+import cz.cvut.fel.pm2.persistence.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,10 +11,16 @@ import java.util.Optional;
 public interface CapsuleRepository extends JpaRepository<Capsule, Long> {
 
     /**
-     * Retrieves a DiscountEntity by its name.
-     *
-     * @param name the name of the discount entity.
-     * @return an Optional containing the discount entity, if found.
+     * Find capsule by name
+     * @param name name of the capsule
+     * @return capsule with the given name
      */
-    Optional<Capsule> getDiscountEntityByName(String name);
+    Optional<Capsule> getCapsuleByName(String name);
+
+    /**
+     * Find capsule by owner
+     * @param owner owner of the capsule
+     * @return capsule with the given owner
+     */
+    Optional<Capsule> getCapsulesByOwner(User owner);
 }
