@@ -26,7 +26,7 @@ public class MailTest {
 
     @Test
     public void testSendEmail() {
-        mailService.sendEmail("strobad1@fel.cvut.cz", "Test", "Test");
+        mailService.sendEmail("timecapsulepm2@gmail.com", "Test", "Test");
     }
 
 
