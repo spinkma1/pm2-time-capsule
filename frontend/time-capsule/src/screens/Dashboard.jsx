@@ -237,7 +237,7 @@ const Dashboard = ({ setCurrentPage, user, setSelectedCapsule }) => {
                             <div key={capsule.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
                                 <div className="relative">
                                     <img
-                                        src={capsule.thumbnail ? capsule.thumbnail : "src/assets/placeholder.png"}
+                                        src={capsule.thumbnail ? capsule.thumbnail : "/placeholder.png"}
                                         alt={capsule.title}
                                         className="w-full h-48 object-cover"
                                     />

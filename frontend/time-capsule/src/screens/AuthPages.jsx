@@ -19,7 +19,6 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
     });
 
     const [registerForm, setRegisterForm] = useState({
-        name: '',
         email: '',
         password: '',
         confirmPassword: '',
@@ -43,9 +42,6 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
 
     const validateRegisterForm = (formData) => {
         const newErrors = {};
-        if (!formData.name || formData.name.length < 2) {
-            newErrors.name = 'Jméno musí mít alespoň 2 znaky';
-        }
         if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = 'Zadejte platnou e-mailovou adresu';
         }
@@ -128,23 +124,6 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                     </h1>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {!isLogin && (
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Jméno</label>
-                                <div className="relative">
-                                    <User size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        value={registerForm.name}
-                                        onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
-                                        className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 ${registerErrors.name ? 'border-red-500' : 'border-gray-300'}`}
-                                        placeholder="Zadejte své jméno"
-                                    />
-                                </div>
-                                {registerErrors.name && <p className="text-red-500 text-sm mt-1">{registerErrors.name}</p>}
-                            </div>
-                        )}
-
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
                             <div className="relative">
