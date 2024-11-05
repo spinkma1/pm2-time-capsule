@@ -61,12 +61,17 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        const userEmail = isLogin ? loginForm.email : registerForm.email; // Get email based on login state
+        const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase(); // Create initials from email
+
         if (isLogin) {
-            if (validateLoginForm(loginForm)) {;
+            if (validateLoginForm(loginForm)) {
                 setCurrentPage('dashboard');
+                setUser({ email: userEmail, initials });
             }
         } else {
             if (validateRegisterForm(registerForm)) {
+                setUser({ email: userEmail, initials });
                 setCurrentPage('dashboard');
             }
         }
