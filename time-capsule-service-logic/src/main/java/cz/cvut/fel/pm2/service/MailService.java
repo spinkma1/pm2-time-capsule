@@ -1,11 +1,14 @@
 package cz.cvut.fel.pm2.service;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class MailService {
 
@@ -23,11 +26,17 @@ public class MailService {
     public void sendEmail(String to, String subject, String text) {
 
         //todo what if address is not valid?
+        // - do try catch!
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);
-        emailSender.send(message);
+
+        try {
+            emailSender.send(message);
+        } catch (MailException e) {
+            log.warn("the email could not be sent. Error message: {}", e.getMessage());
+        }
     }
 
 }
