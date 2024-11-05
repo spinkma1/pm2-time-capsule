@@ -44,5 +44,6 @@ public class CapsuleService {
             capsule.orElseThrow(() -> new NotFoundException("Capsule not found")).setState(State.EDIT);
         }
         capsuleRepository.save(capsule.get());
+
     }
 }
