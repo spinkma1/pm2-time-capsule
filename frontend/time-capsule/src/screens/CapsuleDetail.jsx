@@ -5,7 +5,7 @@ import {
     Share2,
     Users,
     Calendar,
-    Image as ImageIcon,
+    Image,
     FileText,
     Video,
     Music,
@@ -70,7 +70,7 @@ const CapsuleDetail = ({ setCurrentPage }) => {
 
     const getItemIcon = (type) => {
         switch(type) {
-            case 'image': return <ImageIcon size={20} />;
+            case 'image': return <Image size={20} />;
             case 'video': return <Video size={20} />;
             case 'text': return <FileText size={20} />;
             case 'audio': return <Music size={20} />;
@@ -91,7 +91,7 @@ const CapsuleDetail = ({ setCurrentPage }) => {
             {/* Header */}
             <header className="bg-white shadow-sm">
                 <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex justify-between items-center">
                         <button
                             onClick={() => setCurrentPage('dashboard')}
                             className="flex items-center text-gray-600 hover:text-blue-900"
@@ -99,14 +99,6 @@ const CapsuleDetail = ({ setCurrentPage }) => {
                             <ArrowLeft size={20} className="mr-2" />
                             Zpět na přehled
                         </button>
-                        <div className="flex items-center space-x-4">
-                            <button className="text-gray-600 hover:text-blue-900">
-                                <Share2 size={20} />
-                            </button>
-                            <button className="text-gray-600 hover:text-blue-900">
-                                <MoreVertical size={20} />
-                            </button>
-                        </div>
                     </div>
                 </div>
             </header>
