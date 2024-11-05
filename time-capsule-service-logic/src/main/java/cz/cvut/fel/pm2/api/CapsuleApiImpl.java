@@ -26,4 +26,15 @@ public class CapsuleApiImpl implements CapsuleApi {
     public CapsuleDto getCapsule(String email) {
         return capsuleService.getCapsule(email);
     }
+
+    @Override
+    public void readyCapsule(String capsuleId, boolean ready) {
+        if (capsuleId == null || capsuleId.isEmpty()) {
+            throw new InvalidBodyException("No or wrong body was sent");
+        }
+        capsuleService.readyCapsule(capsuleId, ready);
+    }
+
+
+
 }
