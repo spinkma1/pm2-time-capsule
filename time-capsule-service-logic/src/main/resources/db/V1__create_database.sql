@@ -1,75 +1,70 @@
--- User Table
+-- Enum Types
+CREATE TYPE role AS ENUM ('REGISTERED', 'ADMIN', 'PREMIUM', 'BANNED');
+CREATE TYPE state AS ENUM ('EDIT', 'WAIT', 'OPEN');
+CREATE TYPE type AS ENUM ('PRIVATE', 'PUBLIC');
+CREATE TYPE notification_type AS ENUM ('NEW_ACCESS', 'REMINDER', 'OPENED');
+
+-- Tables
 CREATE TABLE T_USER (
-                        id BIGINT PRIMARY KEY,
+                        id SERIAL PRIMARY KEY,
+                        google_id VARCHAR(255) UNIQUE,
                         email VARCHAR(255) NOT NULL UNIQUE,
-                        password VARCHAR(255) NOT NULL,
-                        role VARCHAR(50),
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                        password VARCHAR(255),
+                        role role DEFAULT 'REGISTERED',
+                        UNIQUE(email)
 );
 
--- Capsule Table
 CREATE TABLE T_CAPSULE (
-                           id BIGINT PRIMARY KEY,
-                           user_id BIGINT NOT NULL,
-                           capsule_size DOUBLE,
+                           id SERIAL PRIMARY KEY,
+                           user_id INTEGER NOT NULL,
+                           capsule_size DOUBLE PRECISION,
                            name VARCHAR(255) NOT NULL UNIQUE,
                            description TEXT NOT NULL,
-                           state VARCHAR(50),
-                           type VARCHAR(50),
-                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                           state state,
+                           type type,
                            FOREIGN KEY (user_id) REFERENCES T_USER(id)
 );
 
--- Notification Table
-CREATE TABLE T_NOTIFICATION (
-                                id BIGINT PRIMARY KEY,
-                                content TEXT,
-                                date_of_creation TIMESTAMP,
-                                notification_type VARCHAR(50),
-                                capsule_id BIGINT,
-                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                FOREIGN KEY (capsule_id) REFERENCES T_CAPSULE(id)
-);
-
--- Content Table
 CREATE TABLE T_CONTENT (
-                           id BIGINT PRIMARY KEY,
-                           data_type VARCHAR(50),
+                           id SERIAL PRIMARY KEY,
+                           data_type VARCHAR(255),  -- Assuming DataType is stored as a VARCHAR, modify if enum
                            date_of_upload TIMESTAMP,
---                            data BLOB,
+                           data BYTEA,
                            name VARCHAR(255),
                            url VARCHAR(255),
-                           capsule_id BIGINT,
-                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                           capsule_id INTEGER,
                            FOREIGN KEY (capsule_id) REFERENCES T_CAPSULE(id)
 );
 
--- Many-to-Many Table for Capsule and User
+CREATE TABLE T_NOTIFICATION (
+                                id SERIAL PRIMARY KEY,
+                                content TEXT,
+                                date_of_creation TIMESTAMP,
+                                notification_type notification_type,
+                                capsule_id INTEGER,
+                                FOREIGN KEY (capsule_id) REFERENCES T_CAPSULE(id)
+);
+
+-- Many-to-Many Relationships
 CREATE TABLE capsule_user (
-                              capsule_id BIGINT,
-                              user_id BIGINT,
+                              capsule_id INTEGER,
+                              user_id INTEGER,
                               PRIMARY KEY (capsule_id, user_id),
                               FOREIGN KEY (capsule_id) REFERENCES T_CAPSULE(id),
                               FOREIGN KEY (user_id) REFERENCES T_USER(id)
 );
 
--- Many-to-Many Table for Notification and User
 CREATE TABLE notification_user (
-                                   notification_id BIGINT,
-                                   user_id BIGINT,
+                                   notification_id INTEGER,
+                                   user_id INTEGER,
                                    PRIMARY KEY (notification_id, user_id),
                                    FOREIGN KEY (notification_id) REFERENCES T_NOTIFICATION(id),
                                    FOREIGN KEY (user_id) REFERENCES T_USER(id)
 );
 
--- Self-referencing Many-to-Many Table for User Followers
 CREATE TABLE user_followers (
-                                user_id BIGINT,
-                                follower_id BIGINT,
+                                user_id INTEGER,
+                                follower_id INTEGER,
                                 PRIMARY KEY (user_id, follower_id),
                                 FOREIGN KEY (user_id) REFERENCES T_USER(id),
                                 FOREIGN KEY (follower_id) REFERENCES T_USER(id)
