@@ -132,7 +132,6 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
 
         <div className="min-h-screen bg-gray-50 flex flex-col relative">
             <div className="bg-white shadow-sm py-4 px-6 flex flex-col md:flex-row md:justify-between relative">
-                <text> THIS IS A TEST  TODO DELETE</text>
                 <button
                     onClick={() => setCurrentPage('landing')}
                     className="absolute top-4 left-6 flex items-center text-gray-600 hover:text-blue-900 md:relative md:top-0 md:left-0"
@@ -159,6 +158,14 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                             className={`flex-1 py-2 rounded-md transition-colors ${!isLogin ? 'bg-white shadow-sm text-blue-900 font-semibold' : 'text-gray-600'}`}
                         >
                             Registrace
+                        </button>
+
+                        {/*TODO DELETE, IS TEST*/}
+                        <button
+                            onClick={() => setIsLogin(false)}
+                            className={`flex-1 py-2 rounded-md transition-colors ${!isLogin ? 'bg-white shadow-sm text-blue-900 font-semibold' : 'text-gray-600'}`}
+                        >
+                            FAKE TLAICKTO
                         </button>
                     </div>
 
