@@ -272,7 +272,7 @@ const Dashboard = ({ setCurrentPage, user, setSelectedCapsule }) => {
                         ))
                     ) : (
                         <div className="text-center py-12">
-                            <div className="text-gray-400 mb-4">Zatím nemáte žádné kapsle</div>
+                            <div className="text-gray-400 mb-4">Zatím nemáte žádné kapsle :(</div>
                             <button className="bg-blue-900 text-white px-6 py-3 rounded-lg flex items-center space-x-2 mx-auto">
                                 <Plus size={20} />
                                 <span>Vytvořit první kapsli</span>

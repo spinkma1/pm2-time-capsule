@@ -122,7 +122,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
 
     // Error handling for Google sign-in
     const handleGoogleError = (error) => {
-        console.error('Google sign-in error:', error);
+        console.error('Google sign-in errors:', error);
         // Zpracování chyby
     };
 
