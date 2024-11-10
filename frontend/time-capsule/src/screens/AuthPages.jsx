@@ -127,8 +127,12 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
     };
 
     return (
+
+        // TEST A GIGANTIC TEXT TO SEE IF MY CHANGES GO THRU
+
         <div className="min-h-screen bg-gray-50 flex flex-col relative">
             <div className="bg-white shadow-sm py-4 px-6 flex flex-col md:flex-row md:justify-between relative">
+                <text> THIS IS A TEST  TODO DELETE</text>
                 <button
                     onClick={() => setCurrentPage('landing')}
                     className="absolute top-4 left-6 flex items-center text-gray-600 hover:text-blue-900 md:relative md:top-0 md:left-0"
