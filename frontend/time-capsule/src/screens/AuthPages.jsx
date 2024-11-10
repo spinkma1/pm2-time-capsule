@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 import { GoogleLogin } from '@react-oauth/google';
-
+import { login, register } from '../api/api';
 
 const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
     const [isLogin, setIsLogin] = useState(currentPage === 'login');
@@ -18,15 +18,15 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
         password: '',
     });
 
+    // Error states
+    const [loginErrors, setLoginErrors] = useState({});
+    const [registerErrors, setRegisterErrors] = useState({});
+
     const [registerForm, setRegisterForm] = useState({
         email: '',
         password: '',
         confirmPassword: '',
     });
-
-    // Error states
-    const [loginErrors, setLoginErrors] = useState({});
-    const [registerErrors, setRegisterErrors] = useState({});
 
     const validateLoginForm = (formData) => {
         const newErrors = {};
@@ -54,29 +54,68 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
         setRegisterErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+    //
+    // const handleSubmit = (e) => {
+    //     e.preventDefault();
+    //     const userEmail = isLogin ? loginForm.email : registerForm.email; // Get email based on login state
+    //     const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase(); // Create initials from email
+    //
+    //     if (isLogin) {
+    //         if (validateLoginForm(loginForm)) {
+    //             setCurrentPage('dashboard');
+    //             setUser({ email: userEmail, initials });
+    //         }
+    //     } else {
+    //         if (validateRegisterForm(registerForm)) {
+    //             setUser({ email: userEmail, initials });
+    //             setCurrentPage('dashboard');
+    //         }
+    //     }
+    // };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const userEmail = isLogin ? loginForm.email : registerForm.email; // Get email based on login state
-        const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase(); // Create initials from email
+        const userEmail = isLogin ? loginForm.email : registerForm.email;
+        const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase();
 
         if (isLogin) {
             if (validateLoginForm(loginForm)) {
-                setCurrentPage('dashboard');
-                setUser({ email: userEmail, initials });
+                try {
+                    const response = await login(loginForm.email, loginForm.password);
+                    if (response.success) {
+                        setUser({ email: userEmail, initials });
+                        setCurrentPage('dashboard');
+                    } else {
+                        setLoginErrors({ api: response.message || 'Login failed' });
+                    }
+                } catch (error) {
+                    setLoginErrors({ api: 'Login failed' });
+                }
             }
         } else {
             if (validateRegisterForm(registerForm)) {
-                setUser({ email: userEmail, initials });
-                setCurrentPage('dashboard');
+                try {
+                    const response = await register(registerForm.email, registerForm.password);
+                    if (response.success) {
+                        setUser({ email: userEmail, initials });
+                        setCurrentPage('dashboard');
+                    } else {
+                        setRegisterErrors({ api: response.message || 'Registration failed' });
+                    }
+                } catch (error) {
+                    setRegisterErrors({ api: 'Registration failed' });
+                }
             }
         }
     };
 
+
+
+    // TODO
     const handleGoogleSignIn = (credentialResponse) => {
-        const decodedToken = jwtDecode(credentialResponse.credential); 
-        const userEmail = decodedToken.email; 
-        const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase(); 
+        const decodedToken = jwtDecode(credentialResponse.credential);
+        const userEmail = decodedToken.email;
+        const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase();
         setUser({ email: userEmail, initials });
         setCurrentPage('dashboard');
     };
