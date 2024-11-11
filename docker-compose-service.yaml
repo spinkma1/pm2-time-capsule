@@ -16,7 +16,12 @@ services:
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://time-capsule-service-host:5432/time-capsule"
+      CORS_ALLOWED_ORIGIN: "*"
+#      SPRING_DATASOURCE_URL: "jdbc:postgresql://time-capsule-service-host:5432/time-capsule"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://ep-plain-snow-a2y3jxg7.eu-central-1.aws.neon.tech/timecapsule?user=timecapsule_owner&password=tLKWQu1FgIP0&sslmode=require"
+
+
+
     deploy:
       restart_policy:
         condition: on-failure
