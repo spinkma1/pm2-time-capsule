@@ -34,7 +34,7 @@ public class SecurityConfig {
     @Value("${admin.password}")
     private String adminPassword;
 
-    @Value("${cors.allowed-origins:#{null}}")
+    @Value("${cors.allowed-origins:#{T(java.util.Collections).emptyList()}}")
     private List<String> corsAllowedOrigins;
 
     /**
