@@ -1,14 +1,17 @@
 import React from 'react';
 import { Container, Typography } from '@mui/material';
 import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 
 const TermsOfUse = ({ setCurrentPage }) => {
+    const navigate = useNavigate();
     return (
         <div className="min-h-screen flex flex-col bg-white text-gray-800">
             {/* Header */}
             <div className="bg-white shadow-sm py-4 px-6 flex flex-col md:flex-row md:justify-between relative">
                 <button
-                    onClick={() => setCurrentPage('register')}
+                    onClick={() => navigate('/register')}
                     className="absolute top-4 left-6 flex items-center text-gray-600 hover:text-blue-900 md:relative md:top-0 md:left-0"
                 >
                     <ArrowLeft size={20} className="mr-2" />

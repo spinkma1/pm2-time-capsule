@@ -1,0 +1,404 @@
+import React, { useState } from 'react';
+import {
+    ArrowLeft,
+    Calendar,
+    Upload,
+    Users,
+    Lock,
+    Check,
+    MapPin,
+    Plus,
+    Copy,
+    QrCode
+} from 'lucide-react';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import Contributor from './Contributor';
+import CopyLinkButton from './CopyLinkButton';
+import InfoBox from './InfoBox';
+import DropdownSelect from './DropdownSelect';
+import QRGenerator from './QRGenerator';
+import { useNavigate } from 'react-router-dom';
+
+const CreateCapsule = ({ setCurrentPage }) => {
+    const navigate = useNavigate();
+    const [step, setStep] = useState(1);
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        openDate: '',
+        isPrivate: true,
+        contributorsLimit: 5,
+        hasGeolocation: false,
+        hasQRCode: false,
+        qrcode: null,
+        geolocation: null, // To store the selected coordinates
+        contributors: [],
+    });
+
+    const contributors = [
+        {
+            id: 1,
+            email: "franta.vomacka@seznam.cz",
+            status: "Čeká na přijetí",
+            initial: "F"
+        },
+        {
+            id: 2,
+            email: "jana.novakova@seznam.cz",
+            status: "Aktivní",
+            initial: "J"
+        },
+        {
+            id: 3,
+            email: "petr.maly@seznam.cz",
+            status: "Čeká na přijetí",
+            initial: "P"
+        }
+    ];
+
+
+    const [errors, setErrors] = useState({});
+
+    const steps = [
+        { number: 1, title: 'Základní informace' },
+        { number: 2, title: 'Přispěvatelé' },
+        { number: 3, title: 'Shrnutí' }
+    ];
+
+    const validateStep = (currentStep) => {
+        const newErrors = {};
+
+        if (currentStep === 1) {
+            if (!formData.title.trim()) {
+                newErrors.title = 'Název kapsle je povinný';
+            }
+            if (!formData.openDate) {
+                newErrors.openDate = 'Datum otevření je povinné';
+            } else if (new Date(formData.openDate) < new Date()) {
+                newErrors.openDate = 'Datum otevření nesmí být starší než dnešní datum';
+            }
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleNext = () => {
+        if (validateStep(step)) {
+            setStep(step + 1);
+        }
+    };
+
+    const handleSubmit = () => {
+        if (validateStep(step)) {
+            console.log('Form submitted', formData);
+            navigate('/dashboard');
+        }
+    };
+
+    const handleDateChange = (e) => {
+        const newDate = e.target.value;
+        setFormData(prev => ({
+            ...prev,
+            openDate: newDate
+        }));
+
+        // Validate the date immediately
+        if (new Date(newDate) < new Date()) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                openDate: 'Datum otevření nesmí být starší než dnešní datum'
+            }));
+        } else {
+            setErrors(prevErrors => {
+                const { openDate, ...rest } = prevErrors; // remove openDate error if exists
+                return rest;
+            });
+        }
+    };
+
+    const handleMapClick = (e) => {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+        console.log('Map clicked', lat, lng);
+        setFormData(prev => ({
+            ...prev,
+            geolocation: { lat, lng }
+        }));
+    };
+
+    const handleMapLoad = () => {
+        if (isFirstLoad) {
+            // Center the map when it is first loaded
+            setIsFirstLoad(false);
+        }
+    };
+
+    const mapCenter = formData.geolocation || { lat: 50.0755, lng: 14.4378 }; // Souřadnice pro Prahu
+
+    // Function to handle toggling geolocation
+    const handleGeolocationToggle = (e) => {
+        const isChecked = e.target.checked;
+        setFormData(prev => ({
+            ...prev,
+            hasGeolocation: isChecked,
+            geolocation: isChecked ? prev.geolocation : null, // Clear geolocation if turned off
+        }));
+    };
+
+    const handleBack = () => {
+        if (step === 1) {
+            // If step is 1 (first step), go back to Dashboard
+            navigate('/dashboard');
+        } else {
+            // previous step
+            setStep(step - 1);
+        }
+    };
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <header className="bg-white shadow-sm">
+                <div className="container mx-auto px-4 py-4">
+                    <button
+                        onClick={() => navigate('/dashboard')} 
+                        className="flex items-center text-gray-600 hover:text-blue-900"
+                    >
+                        <ArrowLeft size={20} className="mr-2" />
+                        Zpět na přehled
+                    </button>
+                </div>
+            </header>
+
+            <main className="container mx-auto px-4 py-8">
+                <div className="max-w-3xl mx-auto">
+                    {/* Progress steps */}
+                    <div className="mb-8 hidden sm:block">
+                        <div className="flex justify-between items-center">
+                            {steps.map((s, index) => (
+                                <div key={s.number} className="flex items-center">
+                                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${step >= s.number ? 'bg-blue-900 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                                        {step > s.number ? <Check size={16} /> : s.number}
+                                    </div>
+                                    <div className="ml-2 text-sm">
+                                        {s.title}
+                                    </div>
+                                    {index < steps.length - 1 && (
+                                        <div className={`w-24 h-1 mx-4 ${step > s.number ? 'bg-blue-900' : 'bg-gray-200'}`}></div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Form content */}
+                    <div className="bg-white rounded-lg shadow-sm p-6">
+                        {step === 1 && (
+                            <div className="space-y-6">
+                                <h2 className="text-2xl font-bold text-gray-900">Základní informace</h2>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Název kapsle*</label>
+                                    <input
+                                        type="text"
+                                        value={formData.title}
+                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 ${errors.title ? 'border-red-500' : 'border-gray-300'}`}
+                                        placeholder="Např. Maturitní vzpomínky 2024"
+                                    />
+                                    {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Popis kapsle</label>
+                                    <textarea
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900"
+                                        rows="3"
+                                        placeholder="Popište, co bude kapsle obsahovat..."
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Datum otevření*</label>
+                                    <div className="relative">
+                                        <Calendar size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                        <input
+                                            type="date"
+                                            value={formData.openDate}
+                                            onChange={handleDateChange}
+                                            className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 ${errors.openDate ? 'border-red-500' : 'border-gray-300'}`}
+                                        />
+                                    </div>
+                                    {errors.openDate && <p className="text-red-500 text-sm mt-1">{errors.openDate}</p>}
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center">
+                                        <Lock size={20} className="text-gray-400 mr-2" />
+                                        <span className="text-sm text-gray-700">Soukromá kapsle</span>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.isPrivate}
+                                            onChange={(e) => setFormData({ ...formData, isPrivate: e.target.checked })}
+                                            className="sr-only peer"
+                                        />
+                                        <div className="w-12 h-6 bg-gray-300 rounded-full peer-checked:bg-blue-500 transition-all duration-300"></div>
+                                        <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:translate-x-6"></div>
+                                    </label>
+                                </div>
+
+                                {/* QR Code */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center">
+                                        <QrCode size={20} className="text-gray-400 mr-2" />
+                                        <span className="text-sm text-gray-700">Otevření QR kódem</span>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.hasQRCode}
+                                            onChange={(e) => setFormData({ ...formData, hasQRCode: e.target.checked })}
+                                            className="sr-only peer"
+                                        />
+                                        <div className="w-12 h-6 bg-gray-300 rounded-full peer-checked:bg-blue-500 transition-all duration-300"></div>
+                                        <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:translate-x-6"></div>
+                                    </label>
+                                </div>
+                                {/* QR Generator */}
+                                {formData.hasQRCode && (
+                                    <div className="flex justify-center mt-6"> 
+                                        <QRGenerator />
+                                    </div>
+                                )}
+                                {/* Geolocation */}
+                                <div className="flex items-center justify-between mt-4">
+                                    <div className="flex items-center">
+                                        <MapPin size={20} className="text-gray-400 mr-2" />
+                                        <span className="text-sm text-gray-700">Otevření geolokací</span>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.hasGeolocation}
+                                            onChange={handleGeolocationToggle} // Handle the toggle change
+                                            className="sr-only peer"
+                                        />
+                                        <div className="w-12 h-6 bg-gray-300 rounded-full peer-checked:bg-blue-500 transition-all duration-300"></div>
+                                        <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:translate-x-6"></div>
+                                    </label>
+                                </div>
+                                <LoadScript googleMapsApiKey="AIzaSyCC-fxRVR03IQn1i5RD9rkyu91uz2eTXuc">
+                                    {/* Google Map - Display only if geolocation is enabled */}
+                                    {formData.hasGeolocation && (
+                                        <div className="mt-4">
+
+                                            <GoogleMap
+                                                mapContainerStyle={{ width: '100%', height: '400px' }}
+                                                center={mapCenter}
+                                                zoom={12}
+                                                onClick={handleMapClick}
+                                                onLoad={handleMapLoad}
+                                            >
+                                                {formData.geolocation && (
+                                                    <Marker position={formData.geolocation} />
+                                                )}
+                                            </GoogleMap>
+                                        </div>
+                                    )}
+                                </LoadScript>
+                            </div>
+                        )}
+                        <div className="bg-white rounded-lg shadow-sm">
+                            {step === 2 && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex flex-col">
+                                            {/* Nadpis "Správa přispěvatelů" */}
+                                            <h2 className="text-2xl font-bold text-gray-900">
+                                                Správa přispěvatelů
+                                            </h2>
+                                        </div>
+
+                                        {/* Tlačítko pro pozvání přispěvatele, zarovnáno na stejnou výšku jako nadpis */}
+                                        <div className="flex items-center space-x-4">
+                                            <button className="flex items-center px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800">
+                                                <Plus size={20} className="mr-2" />
+                                                Pozvat přispěvatele
+                                            </button>
+                                        </div>
+                                    </div>
+
+
+
+
+
+
+
+                                    {contributors.map(contributor => (
+                                        <Contributor
+                                            key={contributor.id}
+                                            id={contributor.id}
+                                            email={contributor.email}
+                                            status={contributor.status}
+                                            initial={contributor.initial}
+                                        />
+                                    ))}
+                                    <InfoBox
+                                        title="Správa přispěvatelů"
+                                        description={`Přispěvatelé mohou přidávat obsah do kapsle až do jejího uzavření. Každý přispěvatel může přidat maximálně ${formData.contributorsLimit} souborů.`}
+                                    />
+                                    <DropdownSelect
+                                        label="Limit přispěvatelů"
+                                        value={formData.contributorsLimit}
+                                        options={['1', '2', '3', '4', '5']}
+                                        onChange={newValue => setFormData(prev => ({ ...prev, contributorsLimit: parseInt(newValue, 10) }))}
+                                    />
+
+                                </div>
+                            )}
+                        </div>
+
+
+
+                        {/* Navigation buttons */}
+                        <div className="flex justify-end mt-6">
+                            {step > 1 && (
+                                <button
+                                    onClick={handleBack}
+                                    className="px-6 py-2 mx-6 text-base text-center text-black bg-white rounded-lg border border-solid border-neutral-700 hover:bg-gray-200"
+                                >
+                                    Zpět
+                                </button>
+                            )}
+                            {step < steps.length && (
+                                <button
+                                    onClick={handleNext}
+                                    className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+                                >
+                                    Pokračovat
+                                </button>
+                            )}
+                            {step === steps.length && (
+                                <button
+                                    onClick={handleSubmit}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500"
+                                >
+                                    Odeslat
+                                </button>
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+            </main >
+        </div >
+    );
+};
+
+export default CreateCapsule;

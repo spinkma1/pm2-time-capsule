@@ -1,71 +1,21 @@
 import React, { useState } from 'react';
 import {
-    Clock,
     Lock,
-    Share2,
-    Users,
+    ArrowLeft,
     Calendar,
+    Users,
+    Plus,
+    MoreVertical,
     Image,
     FileText,
     Video,
     Music,
-    MoreVertical,
-    Plus,
-    Download,
-    Edit,
-    Trash,
-    ArrowLeft
+    Unlock
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const CapsuleDetail = ({ setCurrentPage }) => {
-    // Mock data pro demonstraci
-    const capsule = {
-        id: 1,
-        title: "Maturitní vzpomínky 2024",
-        description: "Společné vzpomínky na poslední rok na střední škole",
-        openDate: "2025-06-30",
-        status: "pending", // pending, opened
-        creator: "Jan Novák",
-        created: "2024-01-15",
-        contributors: [
-            { id: 1, name: "Jan Novák", avatar: null },
-            { id: 2, name: "Marie Svobodová", avatar: null },
-            { id: 3, name: "Petr Dvořák", avatar: null }
-        ],
-        items: [
-            {
-                id: 1,
-                type: "image",
-                title: "Třídní foto",
-                addedBy: "Jan Novák",
-                addedDate: "2024-01-15",
-                thumbnail: "/api/placeholder/400/300"
-            },
-            {
-                id: 2,
-                type: "video",
-                title: "Poslední zvonění",
-                addedBy: "Marie Svobodová",
-                addedDate: "2024-01-16",
-                thumbnail: "/api/placeholder/400/300"
-            },
-            {
-                id: 3,
-                type: "text",
-                title: "Vzkaz pro budoucí já",
-                addedBy: "Petr Dvořák",
-                addedDate: "2024-01-17"
-            },
-            {
-                id: 4,
-                type: "audio",
-                title: "Naše oblíbená písnička",
-                addedBy: "Jan Novák",
-                addedDate: "2024-01-18"
-            }
-        ]
-    };
-
+const CapsuleDetail = ({ setCurrentPage, capsule }) => {
+    const navigate = useNavigate();
     const [showContributors, setShowContributors] = useState(false);
 
     const getItemIcon = (type) => {
@@ -86,6 +36,10 @@ const CapsuleDetail = ({ setCurrentPage }) => {
         return `${days} dní`;
     };
 
+    const handleEarlyOpen = () => {
+        setCapsuleStatus('opened'); 
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
@@ -93,7 +47,7 @@ const CapsuleDetail = ({ setCurrentPage }) => {
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex justify-between items-center">
                         <button
-                            onClick={() => setCurrentPage('dashboard')}
+                            onClick={() => navigate('/dashboard')}
                             className="flex items-center text-gray-600 hover:text-blue-900"
                         >
                             <ArrowLeft size={20} className="mr-2" />
@@ -106,111 +60,145 @@ const CapsuleDetail = ({ setCurrentPage }) => {
             <main className="container mx-auto px-4 py-8">
                 {/* Capsule Header */}
                 <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900 mb-2">{capsule.title}</h1>
                             <p className="text-gray-600 mb-4">{capsule.description}</p>
-                            <div className="flex items-center space-x-4 text-sm text-gray-600">
-                                <div className="flex items-center">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center space-x-0 sm:space-x-4 text-sm text-gray-600">
+                                <div className="flex items-center mb-2 sm:mb-0">
                                     <Calendar size={16} className="mr-1" />
-                                    Vytvořeno {new Date(capsule.created).toLocaleDateString()}
+                                    Vytvořeno {new Date(capsule.createdDate).toLocaleDateString()}
                                 </div>
-                                <div className="flex items-center">
+                                <div className="flex items-center mb-2 sm:mb-0">
                                     <Users size={16} className="mr-1" />
                                     {capsule.contributors.length} přispěvatelů
+                                    {/* Tlačítko pro předčasné otevření */}
+                                    {capsule.status === 'closed' && (
+                                        <button
+                                            onClick={handleEarlyOpen}
+                                            className="ml-4 px-3 py-1 text-white bg-blue-900 rounded-lg hover:bg-blue-600"
+                                        >
+                                            Předčasně otevřít
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
-                        {capsule.status === 'pending' && (
-                            <div className="bg-blue-50 rounded-lg p-4 text-center">
-                                <div className="flex items-center justify-center mb-2">
-                                    <Lock size={20} className="text-blue-900" />
-                                </div>
-                                <div className="text-sm font-medium text-blue-900 mb-1">
-                                    Zbývá {getTimeRemaining(capsule.openDate)}
-                                </div>
-                                <div className="text-xs text-gray-600">
-                                    do otevření
-                                </div>
+                        {capsule.status === 'closed' ? (
+                        <div className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0">
+                            <div className="flex items-center justify-center mb-2">
+                                <Lock size={20} className="text-blue-900" />
                             </div>
-                        )}
+                            <div className="text-sm font-medium text-blue-900 mb-1">
+                                Zbývá {getTimeRemaining(capsule.openDate)}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                                do otevření
+                            </div>
+                        </div>): (<></>)}
+
+                        {capsule.status === 'opened' ? (
+                        <div className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0">
+                            <div className="flex items-center justify-center mb-2">
+                                <Unlock size={20} className="text-blue-900" />
+                            </div>
+                            <div className="text-sm font-medium text-blue-900 mb-1">
+                                Otevřeno
+                            </div>
+                        </div>): (<></>)}
                     </div>
 
                     {/* Progress bar */}
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                        <div
-                            className="bg-blue-900 rounded-full h-2"
-                            style={{ width: '60%' }}
-                        ></div>
-                    </div>
+                    {capsule.status === 'closed' ? (
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                            <div
+                                className="bg-blue-900 rounded-full h-2"
+                                style={{ width: '60%' }}
+                            ></div>
+                        </div>)
+                    : (<></>)}
+
 
                     {/* Action buttons */}
-                    <div className="flex space-x-4">
-                        <button className="flex items-center px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800">
-                            <Plus size={20} className="mr-2" />
-                            Přidat obsah
-                        </button>
-                        <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
-                            <Users size={20} className="mr-2" />
-                            Pozvat přispěvatele
-                        </button>
-                    </div>
-                </div>
+                    {capsule.status === 'editing' ? (
+                    <div className="flex flex-col sm:flex-row sm:space-x-4 mb-6">
+                            <button className="flex items-center mb-4 sm:mb-0 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800">
+                                <Plus size={20} className="mr-2" />
+                                Přidat obsah
+                            </button>
+                            <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                                <Users size={20} className="mr-2" />
+                                Pozvat přispěvatele
+                            </button>
+                            <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                                <Lock size={20} className="mr-2" />
+                                Uzamknout
+                            </button>
+                    </div>): (<></>)}
 
-                {/* Content Grid */}
-                <div className="mb-8">
-                    <h2 className="text-xl font-semibold mb-4">Obsah kapsle</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {capsule.items.map((item) => (
-                            <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-                                {(item.type === 'image' || item.type === 'video') && (
-                                    <div className="relative h-48">
-                                        <img
-                                            src={item.thumbnail}
-                                            alt={item.title}
-                                            className="w-full h-full object-cover"
-                                        />
-                                        {item.type === 'video' && (
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
-                                                <Video size={40} className="text-white" />
+                    {capsule.status === 'closed' ? (
+                        <div className="flex justify-center items-center h-64 bg-blue-50 rounded-lg">
+                            <Lock size={100} className="text-gray-600" />
+                        </div>
+                    ) : (
+                        <>
+                        {/* Content Grid */}
+                            <div className="mb-8">
+                                <h2 className="text-xl font-semibold mb-4">Obsah kapsle</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {capsule.items.map((item) => (
+                                        <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+                                            {(item.type === 'image' || item.type === 'video') && (
+                                                <div className="relative h-48">
+                                                    <img
+                                                        src={item.thumbnail}
+                                                        alt={item.title}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    {item.type === 'video' && (
+                                                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+                                                            <Video size={40} className="text-white" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {(item.type === 'text' || item.type === 'audio') && (
+                                                <div className="h-48 bg-gray-100 flex items-center justify-center">
+                                                    {getItemIcon(item.type)}
+                                                </div>
+                                            )}
+                                            <div className="p-4">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h3 className="font-medium">{item.title}</h3>
+                                                    <button className="text-gray-400 hover:text-gray-600">
+                                                        <MoreVertical size={16} />
+                                                    </button>
+                                                </div>
+                                                <div className="flex items-center justify-between text-sm text-gray-600">
+                                                    <span>Přidal(a) {item.addedBy}</span>
+                                                    <span>{new Date(item.addedDate).toLocaleDateString()}</span>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                )}
-                                {(item.type === 'text' || item.type === 'audio') && (
-                                    <div className="h-48 bg-gray-100 flex items-center justify-center">
-                                        {getItemIcon(item.type)}
-                                    </div>
-                                )}
-                                <div className="p-4">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <h3 className="font-medium">{item.title}</h3>
-                                        <button className="text-gray-400 hover:text-gray-600">
-                                            <MoreVertical size={16} />
-                                        </button>
-                                    </div>
-                                    <div className="flex items-center justify-between text-sm text-gray-600">
-                                        <span>Přidal(a) {item.addedBy}</span>
-                                        <span>{new Date(item.addedDate).toLocaleDateString()}</span>
-                                    </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        </>
+                    )}
                 </div>
 
                 {/* Contributors */}
                 <div className="bg-white rounded-lg shadow-sm p-6">
                     <h2 className="text-xl font-semibold mb-4">Přispěvatelé</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {capsule.contributors.map((contributor) => (
                             <div key={contributor.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                 <div className="flex items-center">
                                     <div className="w-10 h-10 bg-blue-900 text-white rounded-full flex items-center justify-center mr-3">
-                                        {contributor.name.charAt(0)}
+                                        {contributor.avatar}
                                     </div>
                                     <div>
-                                        <div className="font-medium">{contributor.name}</div>
+                                        <div className="font-medium">{contributor.email}</div>
                                         {contributor.id === 1 && (
                                             <div className="text-sm text-gray-600">Tvůrce kapsle</div>
                                         )}
@@ -229,3 +217,4 @@ const CapsuleDetail = ({ setCurrentPage }) => {
 };
 
 export default CapsuleDetail;
+

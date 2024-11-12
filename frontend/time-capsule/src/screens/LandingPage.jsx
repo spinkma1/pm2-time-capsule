@@ -1,7 +1,9 @@
 import React from 'react';
 import { AppBar, Toolbar, Button, Container, Typography, Grid, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = ({ setCurrentPage }) => {
+    const navigate = useNavigate();
     return (
         <div className="min-h-screen flex flex-col">
             <AppBar position="static" color="transparent" elevation={0}>
@@ -12,7 +14,7 @@ const LandingPage = ({ setCurrentPage }) => {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => setCurrentPage('login')}
+                        onClick={() => navigate('/login')}
                         className="mr-2"
                         sx={{ marginRight: 2 }} // Add space between buttons
                     >
@@ -21,7 +23,7 @@ const LandingPage = ({ setCurrentPage }) => {
                     <Button
                         variant="outlined"
                         color="primary"
-                        onClick={() => setCurrentPage('register')}
+                        onClick={() => navigate('/register')}
                     >
                         Vytvořit účet
                     </Button>

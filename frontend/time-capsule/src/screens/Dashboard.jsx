@@ -9,16 +9,26 @@ import {
     Settings,
     User,
     CircleDollarSign,
+    Ban,
+    Pencil
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { Menu, MenuItem, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = ({ setCurrentPage, user, setSelectedCapsule }) => {
+    const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [anchorEl, setAnchorEl] = useState(null); // State for managing menu anchor
 
     console.log(user);
+    if (!user) {
+        user = {
+            email: 'test@gmail.com',
+            initials: 'TT',
+        }
+    }
 
     // Mock data for demonstration
     const stats = {
@@ -31,75 +41,144 @@ const Dashboard = ({ setCurrentPage, user, setSelectedCapsule }) => {
         {
             id: 1,
             title: "Maturitní vzpomínky 2024",
-            openDate: "2025-06-30",
-            status: "pending",
-            contributors: 5,
+            openDate: null,
+            createdDate: "2024-01-01",
+            status: "editing",
+            contributorsAmount: 3,
             thumbnail: null,
-            type: "own"
+            type: "own",
+            contributors: [
+                { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
+                { id: 2, email: "m.svoboda@gmail.com", avatar: "MS" },
+                { id: 3, email: "petr.dvorak420@fel.cvut.cz", avatar: "PD" }
+            ],
+            items: [
+                {
+                    id: 1,
+                    type: "image",
+                    title: "Třídní foto",
+                    addedBy: "Jan Novák",
+                    addedDate: "2024-01-15",
+                    thumbnail: "/api/placeholder/400/300"
+                },
+                {
+                    id: 2,
+                    type: "video",
+                    title: "Poslední zvonění",
+                    addedBy: "Marie Svobodová",
+                    addedDate: "2024-01-16",
+                    thumbnail: "/api/placeholder/400/300"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    title: "Vzkaz pro budoucí já",
+                    addedBy: "Petr Dvořák",
+                    addedDate: "2024-01-17"
+                },
+                {
+                    id: 4,
+                    type: "audio",
+                    title: "Naše oblíbená písnička",
+                    addedBy: "Jan Novák",
+                    addedDate: "2024-01-18"
+                }
+            ]
         },
         {
             id: 2,
             title: "Naše svatba",
             openDate: "2024-12-24",
-            status: "pending",
-            contributors: 8,
+            createdDate: "2024-01-01",
+            status: "closed",
+            contributorsAmount: 3,
             thumbnail: "/api/placeholder/320/180",
-            type: "own"
+            type: "own",
+            contributors: [
+                { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
+                { id: 2, email: "m.svoboda@gmail.com", avatar: "MS" },
+                { id: 3, email: "petr.dvorak420@fel.cvut.cz", avatar: "PD" }
+            ],
+            items: [
+                {
+                    id: 1,
+                    type: "image",
+                    title: "Třídní foto",
+                    addedBy: "Jan Novák",
+                    addedDate: "2024-01-15",
+                    thumbnail: "/api/placeholder/400/300"
+                },
+                {
+                    id: 2,
+                    type: "video",
+                    title: "Poslední zvonění",
+                    addedBy: "Marie Svobodová",
+                    addedDate: "2024-01-16",
+                    thumbnail: "/api/placeholder/400/300"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    title: "Vzkaz pro budoucí já",
+                    addedBy: "Petr Dvořák",
+                    addedDate: "2024-01-17"
+                },
+                {
+                    id: 4,
+                    type: "audio",
+                    title: "Naše oblíbená písnička",
+                    addedBy: "Jan Novák",
+                    addedDate: "2024-01-18"
+                }
+            ]
         },
         {
             id: 3,
             title: "Rodinná historie",
             openDate: "2024-11-15",
+            createdDate: "2024-01-01",
             status: "opened",
-            contributors: 3,
+            contributorsAmount: 3,
             thumbnail: "/api/placeholder/320/180",
-            type: "shared"
+            type: "shared",
+            contributors: [
+                { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
+                { id: 2, email: "m.svoboda@gmail.com", avatar: "MS" },
+                { id: 3, email: "petr.dvorak420@fel.cvut.cz", avatar: "PD" }
+            ],
+            items: [
+                {
+                    id: 1,
+                    type: "image",
+                    title: "Třídní foto",
+                    addedBy: "Jan Novák",
+                    addedDate: "2024-01-15",
+                    thumbnail: "/api/placeholder/400/300"
+                },
+                {
+                    id: 2,
+                    type: "video",
+                    title: "Poslední zvonění",
+                    addedBy: "Marie Svobodová",
+                    addedDate: "2024-01-16",
+                    thumbnail: "/api/placeholder/400/300"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    title: "Vzkaz pro budoucí já",
+                    addedBy: "Petr Dvořák",
+                    addedDate: "2024-01-17"
+                },
+                {
+                    id: 4,
+                    type: "audio",
+                    title: "Naše oblíbená písnička",
+                    addedBy: "Jan Novák",
+                    addedDate: "2024-01-18"
+                }
+            ]
         },
-        {
-            id: 4,
-            title: "Cestování po Evropě",
-            openDate: "2025-05-01",
-            status: "pending",
-            contributors: 4,
-            thumbnail: "/api/placeholder/320/180",
-            type: "own"
-        },
-        {
-            id: 5,
-            title: "Vánoční oslavy 2024",
-            openDate: "2024-12-25",
-            status: "pending",
-            contributors: 6,
-            thumbnail: "/api/placeholder/320/180",
-            type: "own"
-        },
-        {
-            id: 6,
-            title: "Dovolená na Bali",
-            openDate: "2025-02-15",
-            status: "opened",
-            contributors: 7,
-            thumbnail: "/api/placeholder/320/180",
-            type: "shared"
-        },
-        {
-            id: 7,
-            title: "Historie rodiny Nováků",
-            openDate: "2024-10-10",
-            status: "opened",
-            contributors: 2,
-            thumbnail: "/api/placeholder/320/180",
-            type: "shared"
-        },
-        {
-            id: 8,
-            title: "Naše první dítě",
-            openDate: "2025-03-20",
-            status: "pending",
-            contributors: 1,
-            thumbnail: null,
-            type: "own"
-        }
     ];
 
     // Function to filter capsules based on filterStatus and searchQuery
@@ -222,7 +301,7 @@ const Dashboard = ({ setCurrentPage, user, setSelectedCapsule }) => {
                         </select>
                         <button className="bg-blue-900 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
                                 onClick={() => {
-                                    setCurrentPage('createCapsule');
+                                    navigate('/createCapsule');
                                 }}>
                             <Plus size={20} />
                             <span>Nová kapsle</span>
@@ -242,25 +321,40 @@ const Dashboard = ({ setCurrentPage, user, setSelectedCapsule }) => {
                                         className="w-full h-48 object-cover"
                                     />
                                     <div className="absolute top-2 right-2 bg-white rounded-full p-2">
-                                        {capsule.status === 'pending' ? <Lock size={16} /> : <Unlock size={16} />}
+                                        {(() => {
+                                            switch (capsule.status) {
+                                                case 'opened':
+                                                    return <Unlock size={16} />;
+                                                case 'closed':
+                                                    return <Lock size={16} />;
+                                                case 'editing':
+                                                    return <Pencil size={16} />;
+                                                default:
+                                                    return <Ban size={16} />; 
+                                            }
+                                        })()}
                                     </div>
                                 </div>
                                 <div className="p-4">
                                     <h3 className="font-semibold text-lg mb-2">{capsule.title}</h3>
                                     <div className="flex items-center text-gray-600 text-sm mb-3">
-                                        <Clock size={16} className="mr-1" />
-                                        <span>Otevření: {new Date(capsule.openDate).toLocaleDateString()}</span>
+                                        {capsule.openDate !== null ? (
+                                            <>
+                                                <Clock size={16} className="mr-1" />
+                                                <span>Otevření: {new Date(capsule.openDate).toLocaleDateString()}</span>
+                                            </>
+                                        ) : <></>}
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center text-gray-600 text-sm">
                                             <Share2 size={16} className="mr-1" />
-                                            <span>{capsule.contributors} přispěvatelů</span>
+                                            <span>{capsule.contributorsAmount} přispěvatelů</span>
                                         </div>
                                         <button 
                                             className="text-blue-900 hover:text-blue-700 font-medium"
                                             onClick={() => {
                                                 setSelectedCapsule(capsule); 
-                                                setCurrentPage('capsuleDetail');
+                                                navigate('/capsuleDetail');
                                             }}
                                             aria-label={`Zobrazit detail kapsle ${capsule.title}`}
                                         >

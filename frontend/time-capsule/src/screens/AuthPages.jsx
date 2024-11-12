@@ -3,8 +3,10 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 import { GoogleLogin } from '@react-oauth/google';
 import { login, register } from '../api/api';
+import { useNavigate } from 'react-router-dom';
 
 const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
+    const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(currentPage === 'login');
     const [showPassword, setShowPassword] = useState(false);
 
@@ -84,7 +86,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                     const response = await login(loginForm.email, loginForm.password);
                     if (response.success) {
                         setUser({ email: userEmail, initials });
-                        setCurrentPage('dashboard');
+                        navigate('/dashboard');
                     } else {
                         setLoginErrors({ api: response.message || 'Login failed' });
                     }
@@ -98,7 +100,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                     const response = await register(registerForm.email, registerForm.password);
                     if (response.success) {
                         setUser({ email: userEmail, initials });
-                        setCurrentPage('dashboard');
+                        navigate('/dashboard');
                     } else {
                         setRegisterErrors({ api: response.message || 'Registration failed' });
                     }
@@ -117,7 +119,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
         const userEmail = decodedToken.email;
         const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase();
         setUser({ email: userEmail, initials });
-        setCurrentPage('dashboard');
+        navigate('/dashboard');
     };
 
     // Error handling for Google sign-in
@@ -132,7 +134,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
         <div className="min-h-screen bg-gray-50 flex flex-col relative">
             <div className="bg-white shadow-sm py-4 px-6 flex flex-col md:flex-row md:justify-between relative">
                 <button
-                    onClick={() => setCurrentPage('landing')}
+                    onClick={() => navigate('/')}
                     className="absolute top-4 left-6 flex items-center text-gray-600 hover:text-blue-900 md:relative md:top-0 md:left-0"
                 >
                     <ArrowLeft size={20} className="mr-2" />
@@ -236,7 +238,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                                 <button
                                     type="button"
                                     className="text-sm text-blue-900 hover:underline"
-                                    onClick={() => setCurrentPage('passwordRecovery')} 
+                                    onClick={() => navigate('/passwordRecovery')} 
                                 >
                                     Zapomněli jste heslo?
                                 </button>
@@ -269,11 +271,11 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                     {!isLogin && (
                         <p className="mt-4 text-sm text-gray-600 text-center">
                             Registrací souhlasíte s našimi{' '}
-                            <button className="text-blue-900 hover:underline" onClick={() => setCurrentPage('termsOfUse')} >
+                            <button className="text-blue-900 hover:underline" onClick={() => navigate("/termsOfUse")} >
                                 podmínkami použití
                             </button>{' '}
                             a{' '}
-                            <button className="text-blue-900 hover:underline" onClick={() => setCurrentPage('privacyPolicy')} >
+                            <button className="text-blue-900 hover:underline" onClick={() => navigate("/passwordRecovery")} >
                                 zásadami ochrany soukromí
                             </button>
                         </p>
