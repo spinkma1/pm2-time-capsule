@@ -24,7 +24,7 @@ const InfoSection = ({ capsule }) => {
                         <InfoItem
                             label="Otevření QR kódem"
                             value={capsule.hasQRCode
-                                ? <Link to="/qrcode" target="_blank" className="text-blue-500 hover:underline">Ano</Link>
+                                ? <Link to="/qrcode"  className="text-blue-500 hover:underline">Ano</Link>
                                 : "Ne"
                             }
                         />
