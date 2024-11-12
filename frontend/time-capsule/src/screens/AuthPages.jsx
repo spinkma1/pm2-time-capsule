@@ -56,25 +56,27 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
         setRegisterErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-    //
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-    //     const userEmail = isLogin ? loginForm.email : registerForm.email; // Get email based on login state
-    //     const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase(); // Create initials from email
-    //
-    //     if (isLogin) {
-    //         if (validateLoginForm(loginForm)) {
-    //             setCurrentPage('dashboard');
-    //             setUser({ email: userEmail, initials });
-    //         }
-    //     } else {
-    //         if (validateRegisterForm(registerForm)) {
-    //             setUser({ email: userEmail, initials });
-    //             setCurrentPage('dashboard');
-    //         }
-    //     }
-    // };
+    /* MOCKUP*/
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const userEmail = isLogin ? loginForm.email : registerForm.email; 
+        const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase();
 
+        if (isLogin) {
+            if (validateLoginForm(loginForm)) {
+                navigate('/dashboard');
+                setUser({ email: userEmail, initials });
+            }
+        } else {
+            if (validateRegisterForm(registerForm)) {
+                setUser({ email: userEmail, initials });
+                navigate
+            }
+        }
+    }
+
+    /* TODO*/
+/*
     const handleSubmit = async (e) => {
         e.preventDefault();
         const userEmail = isLogin ? loginForm.email : registerForm.email;
@@ -110,7 +112,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
             }
         }
     };
-
+*/
 
 
     // TODO
