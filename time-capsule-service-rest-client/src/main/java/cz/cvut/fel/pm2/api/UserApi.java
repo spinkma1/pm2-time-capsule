@@ -1,11 +1,14 @@
 package cz.cvut.fel.pm2.api;
 
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
+import com.stripe.model.PaymentMethod;
+import com.stripe.model.Product;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -22,4 +25,25 @@ public interface UserApi {
     @GetMapping("/info")
     @ResponseBody
     Map<String, Object> getUserInfo(OidcUser oidcUser);
+
+
+    @Operation(summary = "Register a new user", description = "Registers a new user using Google Single Sign-On.")
+    @PostMapping("/register")
+    @ResponseBody
+    Map<String, Object> register(@AuthenticationPrincipal OidcUser oidcUser);
+
+    @Operation(summary = "Create a new Stripe customer", description = "Creates a new customer in Stripe.")
+    @PostMapping("/stripe/customer")
+    @ResponseBody
+    Customer createCustomer(@RequestParam String name, @RequestParam String email) throws StripeException;
+
+    @Operation(summary = "Attach a payment method to a Stripe customer", description = "Attaches a payment method to an existing Stripe customer.")
+    @PostMapping("/stripe/payment-method")
+    @ResponseBody
+    PaymentMethod attachPaymentMethodToCustomer(@RequestParam String paymentMethodId, @RequestParam String customerId) throws StripeException;
+
+    @Operation(summary = "Create a new Stripe product", description = "Creates a new product in Stripe.")
+    @PostMapping("/stripe/product")
+    @ResponseBody
+    Product createProduct(@RequestParam String productName, @RequestParam String productDescription) throws StripeException;
 }

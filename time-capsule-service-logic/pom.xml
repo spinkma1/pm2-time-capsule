@@ -188,6 +188,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>cz.cvut.fel.pm2.TimeCapsuleApp</mainClass>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -228,6 +231,7 @@
                 </execution>
             </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
