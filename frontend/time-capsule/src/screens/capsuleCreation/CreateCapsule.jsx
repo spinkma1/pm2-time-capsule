@@ -18,8 +18,11 @@ import InfoBox from './InfoBox';
 import DropdownSelect from './DropdownSelect';
 import QRGenerator from './QRGenerator';
 import { useNavigate } from 'react-router-dom';
+import InfoSection from './InfoSection';
+import Warning from './Warning';
+import Confirmation from './Confirmation';
 
-const CreateCapsule = ({ setCurrentPage }) => {
+const CreateCapsule = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [isFirstLoad, setIsFirstLoad] = useState(true);
@@ -33,14 +36,10 @@ const CreateCapsule = ({ setCurrentPage }) => {
         hasQRCode: false,
         qrcode: null,
         geolocation: null, // To store the selected coordinates
-        contributors: [],
-    });
-
-    const contributors = [
-        {
+        contributors: [{
             id: 1,
             email: "franta.vomacka@seznam.cz",
-            status: "Čeká na přijetí",
+            status: "Neaktivní",
             initial: "F"
         },
         {
@@ -52,10 +51,10 @@ const CreateCapsule = ({ setCurrentPage }) => {
         {
             id: 3,
             email: "petr.maly@seznam.cz",
-            status: "Čeká na přijetí",
+            status: "Neaktivní",
             initial: "P"
-        }
-    ];
+        }],
+    });
 
 
     const [errors, setErrors] = useState({});
@@ -147,6 +146,12 @@ const CreateCapsule = ({ setCurrentPage }) => {
         }));
     };
 
+    // Delete contributor with id
+    const handleDelete = (id) => {
+        const updatedContributors = formData.contributors.filter(contributor => contributor.id !== id);
+        setFormData({ ...formData, contributors: updatedContributors });
+    };
+
     const handleBack = () => {
         if (step === 1) {
             // If step is 1 (first step), go back to Dashboard
@@ -156,13 +161,45 @@ const CreateCapsule = ({ setCurrentPage }) => {
             setStep(step - 1);
         }
     };
+
+    const [emailForm, setEmailForm] = useState({ email: '' });
+    const [emailErrors, setEmailErrors] = useState({});
+
+    const validateEmailForm = (emailData) => {
+        const errors = {};
+        if (!emailData.email || !/\S+@\S+\.\S+/.test(emailData.email)) {
+            errors.email = 'Zadejte platnou e-mailovou adresu';
+        }
+        setEmailErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const handleEmailSubmit = (e) => {
+        e.preventDefault();
+        const newEmail = emailForm.email.trim();
+        if (validateEmailForm({ email: newEmail })) {
+            const newContributor = {
+                id: formData.contributors.length + 1,
+                email: newEmail,
+                status: "Neaktivní",
+                initial: newEmail.split('@')[0].slice(0, 2).toUpperCase(),
+            };
+            setFormData((prev) => ({
+                ...prev,
+                contributors: [...prev.contributors, newContributor],
+            }));
+            setEmailForm({ email: '' });
+            setEmailErrors({});
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
             <header className="bg-white shadow-sm">
                 <div className="container mx-auto px-4 py-4">
                     <button
-                        onClick={() => navigate('/dashboard')} 
+                        onClick={() => navigate('/dashboard')}
                         className="flex items-center text-gray-600 hover:text-blue-900"
                     >
                         <ArrowLeft size={20} className="mr-2" />
@@ -271,7 +308,7 @@ const CreateCapsule = ({ setCurrentPage }) => {
                                 </div>
                                 {/* QR Generator */}
                                 {formData.hasQRCode && (
-                                    <div className="flex justify-center mt-6"> 
+                                    <div className="flex justify-center mt-6">
                                         <QRGenerator />
                                     </div>
                                 )}
@@ -316,36 +353,47 @@ const CreateCapsule = ({ setCurrentPage }) => {
                         <div className="bg-white rounded-lg shadow-sm">
                             {step === 2 && (
                                 <div className="space-y-6">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex flex-col">
-                                            {/* Nadpis "Správa přispěvatelů" */}
-                                            <h2 className="text-2xl font-bold text-gray-900">
-                                                Správa přispěvatelů
-                                            </h2>
-                                        </div>
+                                    <div className="flex flex-col space-y-4">
+                                        <h2 className="text-2xl font-bold text-gray-900">
+                                            Správa přispěvatelů
+                                        </h2>
 
-                                        {/* Tlačítko pro pozvání přispěvatele, zarovnáno na stejnou výšku jako nadpis */}
-                                        <div className="flex items-center space-x-4">
-                                            <button className="flex items-center px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800">
-                                                <Plus size={20} className="mr-2" />
-                                                Pozvat přispěvatele
-                                            </button>
+                                        {/* Input a Error zprávy */}
+                                        <div className="flex flex-col space-y-2">
+                                            <input
+                                                type="email"
+                                                placeholder="Zadejte email přispěvatele"
+                                                value={emailForm.email}
+                                                onChange={(e) => setEmailForm({ ...emailForm, email: e.target.value })}
+                                                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+
+                                            {/* Zobrazení případné chyby */}
+                                            {emailErrors.email && (
+                                                <p className="text-red-500 text-sm mt-1">{emailErrors.email}</p>
+                                            )}
+
+                                            {/* Tlačítko pod inputem */}
+                                            <div className="flex items-center justify-start">
+                                                <button
+                                                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500"
+                                                    onClick={handleEmailSubmit}
+                                                >
+                                                    <Check size={20} className="mr-1" />
+                                                    Potvrdit
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-
-
-
-
-
-
-
-                                    {contributors.map(contributor => (
+                                    {formData.contributors.map(contributor => (
                                         <Contributor
                                             key={contributor.id}
                                             id={contributor.id}
                                             email={contributor.email}
                                             status={contributor.status}
                                             initial={contributor.initial}
+                                            canDelete={true}
+                                            onDelete={handleDelete}
                                         />
                                     ))}
                                     <InfoBox
@@ -363,35 +411,74 @@ const CreateCapsule = ({ setCurrentPage }) => {
                             )}
                         </div>
 
+                        <div className="bg-white rounded-lg shadow-sm">
+                            {step === 3 && (
+                                <div className="space-y-6">
+                                    <div className="flex flex-col space-y-4">
+                                        <h2 className="text-2xl font-bold text-gray-900">
+                                            Shrnutí
+                                        </h2>
+                                        <InfoSection capsule={formData}></InfoSection>
+                                        <section className="flex flex-col justify-center mt-6 w-full max-md:max-w-full">
+                                            <div className="flex flex-col p-6 w-full bg-gray-50 rounded-lg min-h-[192px] max-md:px-5 max-md:max-w-full">
+                                                <h3 className="w-full text-base font-semibold text-gray-900 max-md:max-w-full">Přispěvatelé</h3>
+                                                <div className="flex flex-col mt-4 w-full max-md:max-w-full">
+                                                    {formData.contributors.map(contributor => (
+                                                        <Contributor
+                                                            key={contributor.id}
+                                                            id={contributor.id}
+                                                            email={contributor.email}
+                                                            status={contributor.status}
+                                                            initial={contributor.initial}
+                                                            canDelete={false}
+                                                            onDelete={handleDelete}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    <Warning />
+                                    <Confirmation onClick={handleSubmit}/>
+                                </div>
+                            )}
+                        </div>
+
+
+
+
+
+
+
+
+
+
 
 
                         {/* Navigation buttons */}
                         <div className="flex justify-end mt-6">
-                            {step > 1 && (
-                                <button
-                                    onClick={handleBack}
-                                    className="px-6 py-2 mx-6 text-base text-center text-black bg-white rounded-lg border border-solid border-neutral-700 hover:bg-gray-200"
-                                >
-                                    Zpět
-                                </button>
-                            )}
-                            {step < steps.length && (
-                                <button
-                                    onClick={handleNext}
-                                    className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
-                                >
-                                    Pokračovat
-                                </button>
-                            )}
-                            {step === steps.length && (
-                                <button
-                                    onClick={handleSubmit}
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500"
-                                >
-                                    Odeslat
-                                </button>
+                            {steps !== 3 && (
+                                <>
+                                    {step > 1 && (
+                                        <button
+                                            onClick={handleBack}
+                                            className="px-6 py-2 mx-6 text-base text-center text-black bg-white rounded-lg border border-solid border-neutral-700 hover:bg-gray-200"
+                                        >
+                                            Zpět
+                                        </button>
+                                    )}
+                                    {step < steps.length && (
+                                        <button
+                                            onClick={handleNext}
+                                            className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+                                        >
+                                            Pokračovat
+                                        </button>
+                                    )}
+                                </>
                             )}
                         </div>
+
 
                     </div>
 

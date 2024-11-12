@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const CapsuleDetail = ({ setCurrentPage, capsule }) => {
+const CapsuleDetail = ({ capsule }) => {
     const navigate = useNavigate();
     const [showContributors, setShowContributors] = useState(false);
 

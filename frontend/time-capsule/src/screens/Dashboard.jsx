@@ -16,7 +16,7 @@ import React, { useState } from 'react';
 import { Menu, MenuItem, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const Dashboard = ({ setCurrentPage, user, setSelectedCapsule }) => {
+const Dashboard = ({ user, setSelectedCapsule }) => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');

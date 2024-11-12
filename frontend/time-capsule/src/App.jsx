@@ -9,8 +9,9 @@ import Dashboard from './screens/Dashboard';
 import CapsuleDetail from './screens/CapsuleDetail';
 import TermsOfUse from './screens/TermsOfUse';
 import PrivacyPolicy from './screens/PrivacyPolicy';
-import CreateCapsule from './screens/capsule_creation/CreateCapsule';
+import CreateCapsule from './screens/capsuleCreation/CreateCapsule';
 import PasswordRecovery from './screens/PasswordRecovery';
+import QRGenerator from './screens/capsuleCreation/QRGenerator';
 
 const App = () => {
     const [user, setUser] = useState(null); // Any type for user, can be replaced with more specific type
@@ -20,15 +21,16 @@ const App = () => {
         <Router>
             <div className="min-h-screen bg-white text-gray-800">
                 <Routes>
-                    <Route path="/" element={<LandingPage setCurrentPage={() => {}} />} />
-                    <Route path="/login" element={<AuthPages setCurrentPage={() => {}} currentPage="login" setUser={setUser} />} />
-                    <Route path="/register" element={<AuthPages setCurrentPage={() => {}} currentPage="register" setUser={setUser} />} />
-                    <Route path="/termsOfUse" element={<TermsOfUse setCurrentPage={() => {}} />} />
-                    <Route path="/passwordRecovery" element={<PasswordRecovery setCurrentPage={() => {}} />} />
-                    <Route path="/privacyPolicy" element={<PrivacyPolicy setCurrentPage={() => {}} />} />
-                    <Route path="/createCapsule" element={<CreateCapsule setCurrentPage={() => {}} />} />
-                    <Route path="/dashboard" element={<Dashboard setCurrentPage={() => {}} user={user} setSelectedCapsule={setSelectedCapsule} />} />
-                    <Route path="/capsuleDetail" element={<CapsuleDetail setCurrentPage={() => {}} capsule={selectedCapsule} />} />
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/login" element={<AuthPages currentPage="login" setUser={setUser} />} />
+                    <Route path="/register" element={<AuthPages currentPage="register" setUser={setUser} />} />
+                    <Route path="/termsOfUse" element={<TermsOfUse  />} />
+                    <Route path="/passwordRecovery" element={<PasswordRecovery />} />
+                    <Route path="/privacyPolicy" element={<PrivacyPolicy  />} />
+                    <Route path="/createCapsule" element={<CreateCapsule  />} />
+                    <Route path="/dashboard" element={<Dashboard  user={user} setSelectedCapsule={setSelectedCapsule} />} />
+                    <Route path="/capsuleDetail" element={<CapsuleDetail  capsule={selectedCapsule} />} />
+                    <Route path="/qrcode" element={<QRGenerator />} />
                 </Routes>
             </div>
         </Router>
