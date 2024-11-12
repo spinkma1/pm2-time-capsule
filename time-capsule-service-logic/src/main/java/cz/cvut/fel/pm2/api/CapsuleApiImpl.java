@@ -4,13 +4,17 @@ import cz.cvut.fel.pm2.exceptions.InvalidBodyException;
 import cz.cvut.fel.pm2.model.CapsuleDto;
 import cz.cvut.fel.pm2.service.CapsuleService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 public class CapsuleApiImpl implements CapsuleApi {
     private final CapsuleService capsuleService;
 
+    @PostMapping("/capsule/create")
     @Override
     public void createCapsule(CapsuleDto capsule) {
 
@@ -20,21 +24,25 @@ public class CapsuleApiImpl implements CapsuleApi {
             throw new InvalidBodyException("No or wrong body was sent");
         }
         capsuleService.createCapsule(capsule);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Capsule created successfully");
     }
 
-    @Override
-    public CapsuleDto getCapsule(String email) {
+    @GetMapping("/capsule")
+    public CapsuleDto getCapsule(@RequestParam String email) {
         return capsuleService.getCapsule(email);
     }
-
+    @PostMapping("/capsule/ready")
     @Override
-    public void readyCapsule(String capsuleId, boolean ready) {
+    public void readyCapsule(@RequestParam String capsuleId, @RequestParam boolean ready) {
         if (capsuleId == null || capsuleId.isEmpty()) {
             throw new InvalidBodyException("No or wrong body was sent");
         }
-        capsuleService.readyCapsule(capsuleId, ready);
-    }
 
+        capsuleService.readyCapsule(capsuleId, ready);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Capsule status updated successfully");
+    }
 
 
 }

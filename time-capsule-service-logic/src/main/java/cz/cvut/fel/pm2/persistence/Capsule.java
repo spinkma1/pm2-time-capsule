@@ -10,7 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Table(name = "T_CAPSULE")
 @Entity
@@ -55,5 +57,25 @@ public class Capsule extends AbstractEntity {
 
     @OneToMany(mappedBy = "capsule")
     private List<Content> contents;
+
+
+
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Set<UnlockMethod> unlockMethods;
+
+    @Column(name = "unlock_time")
+    private LocalDateTime unlockTime;
+
+    @Column(name = "qr_code_password")
+    private String qrCodePassword;
+
+    @Column(name = "unlock_lat")
+    private Double unlockLat;
+
+    @Column(name = "unlock_longit")
+    private Double unlockLongit;
+
 
 }
