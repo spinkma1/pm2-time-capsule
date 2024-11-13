@@ -6,12 +6,13 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './screens/LandingPage';
 import AuthPages from './screens/AuthPages';
 import Dashboard from './screens/Dashboard';
-import CapsuleDetail from './screens/CapsuleDetail';
+import CapsuleDetail from './screens/capsuleDetail/CapsuleDetail';
 import TermsOfUse from './screens/TermsOfUse';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import CreateCapsule from './screens/capsuleCreation/CreateCapsule';
 import PasswordRecovery from './screens/PasswordRecovery';
 import QRGenerator from './screens/capsuleCreation/QRGenerator';
+import FilesInput from './screens/capsuleDetail/FilesInput';
 
 const App = () => {
     const [user, setUser] = useState(null); // Any type for user, can be replaced with more specific type
@@ -31,6 +32,7 @@ const App = () => {
                     <Route path="/dashboard" element={<Dashboard  user={user} setSelectedCapsule={setSelectedCapsule} />} />
                     <Route path="/capsuleDetail" element={<CapsuleDetail  capsule={selectedCapsule} />} />
                     <Route path="/qrcode" element={<QRGenerator />} />
+                    <Route path="/addFiles" element={<FilesInput capsule={selectedCapsule} setSelectedCapsule={setSelectedCapsule}/>} />
                 </Routes>
             </div>
         </Router>

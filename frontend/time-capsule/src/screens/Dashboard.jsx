@@ -46,6 +46,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
             status: "editing",
             contributorsAmount: 3,
             thumbnail: null,
+            maxItems: 5,
             type: "own",
             contributors: [
                 { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
@@ -56,7 +57,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 {
                     id: 1,
                     type: "image",
-                    title: "Třídní foto",
+                    title: "tridnifoto.jpg",
                     addedBy: "Jan Novák",
                     addedDate: "2024-01-15",
                     thumbnail: "/api/placeholder/400/300"
@@ -64,7 +65,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 {
                     id: 2,
                     type: "video",
-                    title: "Poslední zvonění",
+                    title: "posledni_zvoneni.mp4",
                     addedBy: "Marie Svobodová",
                     addedDate: "2024-01-16",
                     thumbnail: "/api/placeholder/400/300"
@@ -72,14 +73,14 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 {
                     id: 3,
                     type: "text",
-                    title: "Vzkaz pro budoucí já",
+                    title: "vzkaz_pro_budouci_ja.txt",
                     addedBy: "Petr Dvořák",
                     addedDate: "2024-01-17"
                 },
                 {
                     id: 4,
                     type: "audio",
-                    title: "Naše oblíbená písnička",
+                    title: "nase_oblibena_pisnicka.mp3",
                     addedBy: "Jan Novák",
                     addedDate: "2024-01-18"
                 }
@@ -93,6 +94,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
             status: "closed",
             contributorsAmount: 3,
             thumbnail: "/api/placeholder/320/180",
+            maxItems: 3,
             type: "own",
             contributors: [
                 { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
@@ -103,7 +105,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 {
                     id: 1,
                     type: "image",
-                    title: "Třídní foto",
+                    title: "tridnifoto.jpg",
                     addedBy: "Jan Novák",
                     addedDate: "2024-01-15",
                     thumbnail: "/api/placeholder/400/300"
@@ -111,7 +113,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 {
                     id: 2,
                     type: "video",
-                    title: "Poslední zvonění",
+                    title: "posledni_zvoneni.mp4",
                     addedBy: "Marie Svobodová",
                     addedDate: "2024-01-16",
                     thumbnail: "/api/placeholder/400/300"
@@ -119,14 +121,14 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 {
                     id: 3,
                     type: "text",
-                    title: "Vzkaz pro budoucí já",
+                    title: "vzkaz_pro_budouci_ja.txt",
                     addedBy: "Petr Dvořák",
                     addedDate: "2024-01-17"
                 },
                 {
                     id: 4,
                     type: "audio",
-                    title: "Naše oblíbená písnička",
+                    title: "nase_oblibena_pisnicka.mp3",
                     addedBy: "Jan Novák",
                     addedDate: "2024-01-18"
                 }
@@ -140,6 +142,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
             status: "opened",
             contributorsAmount: 3,
             thumbnail: "/api/placeholder/320/180",
+            maxItems: 3,
             type: "shared",
             contributors: [
                 { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
@@ -150,7 +153,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 {
                     id: 1,
                     type: "image",
-                    title: "Třídní foto",
+                    title: "tridnifoto.jpg",
                     addedBy: "Jan Novák",
                     addedDate: "2024-01-15",
                     thumbnail: "/api/placeholder/400/300"
@@ -158,7 +161,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 {
                     id: 2,
                     type: "video",
-                    title: "Poslední zvonění",
+                    title: "posledni_zvoneni.mp4",
                     addedBy: "Marie Svobodová",
                     addedDate: "2024-01-16",
                     thumbnail: "/api/placeholder/400/300"
@@ -166,14 +169,14 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 {
                     id: 3,
                     type: "text",
-                    title: "Vzkaz pro budoucí já",
+                    title: "vzkaz_pro_budouci_ja.txt",
                     addedBy: "Petr Dvořák",
                     addedDate: "2024-01-17"
                 },
                 {
                     id: 4,
                     type: "audio",
-                    title: "Naše oblíbená písnička",
+                    title: "nase_oblibena_pisnicka.mp3",
                     addedBy: "Jan Novák",
                     addedDate: "2024-01-18"
                 }

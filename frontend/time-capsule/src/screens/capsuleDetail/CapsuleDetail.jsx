@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const CapsuleDetail = ({ capsule }) => {
+const CapsuleDetail = ({ capsule, setSelectedCapsule }) => {
     const navigate = useNavigate();
     const [showContributors, setShowContributors] = useState(false);
 
@@ -122,10 +122,13 @@ const CapsuleDetail = ({ capsule }) => {
                     {/* Action buttons */}
                     {capsule.status === 'editing' ? (
                     <div className="flex flex-col sm:flex-row sm:space-x-4 mb-6">
-                            <button className="flex items-center mb-4 sm:mb-0 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800">
-                                <Plus size={20} className="mr-2" />
-                                Přidat obsah
-                            </button>
+                            {capsule.status === 'editing' && capsule.items.length < capsule.maxItems ? (
+                                <button 
+                                className="flex items-center mb-4 sm:mb-0 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+                                onClick={() =>{navigate('/addFiles')}}>
+                                    <Plus size={20} className="mr-2" />
+                                    Přidat obsah
+                                </button>) : (<></>)}
                             <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
                                 <Users size={20} className="mr-2" />
                                 Pozvat přispěvatele
