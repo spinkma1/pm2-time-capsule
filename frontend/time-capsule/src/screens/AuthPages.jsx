@@ -257,12 +257,29 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
 
                     {/*Google Sign-In button*/}
                     {isLogin && (
-                        <div className="flex justify-center items-center mt-4">
-                            <div className="max-w-lg w-full">
-                                <GoogleLogin
-                                    onSuccess={handleGoogleSignIn}
-                                    onError={handleGoogleError}
-                                />
+                        <div className="mt-4">
+                            <div className="relative flex items-center justify-center w-full">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-gray-300" />
+                                </div>
+                                <div className="relative px-4 text-sm">
+                                    <span className="px-2 text-gray-500 bg-white">nebo</span>
+                                </div>
+                            </div>
+                            <div className="mt-4 flex justify-center">
+                                <div style={{ width: '100%', maxWidth: '320px' }}>
+                                    <GoogleLogin
+                                        onSuccess={handleGoogleSignIn}
+                                        onError={handleGoogleError}
+                                        size="large"
+                                        width="320"
+                                        type="standard"
+                                        theme="outline"
+                                        text="continue_with"
+                                        shape="rectangular"
+                                        locale="cs"
+                                    />
+                                </div>
                             </div>
                         </div>
                     )}

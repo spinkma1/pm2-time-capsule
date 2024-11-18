@@ -10,17 +10,18 @@ import {
     User,
     CircleDollarSign,
     Ban,
-    Pencil
+    Pencil, UserSearch
 } from 'lucide-react';
 import React, { useState } from 'react';
-import { Menu, MenuItem, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+
+
 
 const Dashboard = ({ user, setSelectedCapsule }) => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
-    const [anchorEl, setAnchorEl] = useState(null); // State for managing menu anchor
+    const [anchorEl] = useState(null); // State for managing menu anchor
 
     console.log(user);
     if (!user) {
@@ -34,7 +35,9 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
     const stats = {
         totalCapsules: 8,
         pendingOpen: 4,
-        sharedWithMe: 2
+        sharedWithMe: 2,
+        subscribed: 3,
+        subscribing: 2
     };
 
     const capsules = [
@@ -191,66 +194,36 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
         return matchesStatus && matchesSearch;
     });
 
-    // Menu items
-    const menuItems = [
-        { title: 'Profil', icon: <User size={16} /> },
-        { title: 'Nastavení', icon: <Settings size={16} /> },
-        { title: 'Odhlásit se', icon: <Lock size={16} /> }
-    ];
-
-    const handleClick = (event) => {
-        if (anchorEl) {
-            // If menu is open, close it
-            setAnchorEl(null);
-        } else {
-            // If menu is closed, open it
-            setAnchorEl(event.currentTarget);
-        }
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
 
     return (
-        <div className="min-h-screen bg-gray-50" >
-            {/* Header */}
+        <div className="min-h-screen bg-gray-50">
             <header className="bg-white shadow-sm">
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex justify-between items-center">
                         <div className="text-2xl font-bold text-blue-900">MemoryCapsule</div>
                         <div className="flex items-center space-x-4">
-                            <button className="p-2 text-gray-600 hover:text-blue-900" aria-label="Notifications">
-                                <CircleDollarSign size={24} />
-                            </button>
-                            <div className="flex items-center space-x-2 relative">
-                                <div className="w-8 h-8 rounded-full bg-blue-900 text-white flex items-center justify-center">
-                                    {user.initials}
-                                </div>
-                                <Button
-                                    onClick={handleClick}
-                                    aria-controls={Boolean(anchorEl) ? 'user-menu' : undefined}
+                            <div className="relative">
+                                <button
+                                    onClick={() => navigate('/settings', {state: {activeTab: 'connections'}})}
+                                    className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                                    title="Spravovat sledující"
+                                >
+                                    <UserSearch size={16} className="text-blue-900"/>
+                                </button>
+                            </div>
+                            <div className="relative">
+                                <button
+                                    onClick={() => navigate('/settings')}
+                                    className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                                    aria-controls={anchorEl ? 'user-menu' : undefined}
                                     aria-haspopup="true"
-                                    aria-expanded={Boolean(anchorEl) ? 'true' : undefined}
+                                    aria-expanded={anchorEl ? 'true' : undefined}
                                 >
-                                    <ChevronDown size={16} />
-                                </Button>
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={Boolean(anchorEl)}
-                                    onClose={handleClose}
-                                    MenuListProps={{
-                                        'aria-labelledby': 'basic-button',
-                                    }}
-                                    className="transform -translate-x-10" // Posun menu vlevo
-                                >
-                                    {menuItems.map((item, index) => (
-                                        <MenuItem key={index} onClick={handleClose} className="flex items-center">
-                                            {item.icon}
-                                            <span className="ml-2">{item.title}</span>
-                                        </MenuItem>
-                                    ))}
-                                </Menu>
+                                    <div
+                                        className="w-8 h-8 rounded-full bg-blue-900 text-white flex items-center justify-center">
+                                        {user.initials}
+                                    </div>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -281,9 +254,10 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 </div>
 
                 {/* Search and Filters */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+                <div
+                    className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
                     <div className="relative flex-grow max-w-md">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20}/>
                         <input
                             type="text"
                             placeholder="Hledat kapsle..."
@@ -306,7 +280,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                 onClick={() => {
                                     navigate('/createCapsule');
                                 }}>
-                            <Plus size={20} />
+                            <Plus size={20}/>
                             <span>Nová kapsle</span>
                         </button>
                     </div>
@@ -327,13 +301,13 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                         {(() => {
                                             switch (capsule.status) {
                                                 case 'opened':
-                                                    return <Unlock size={16} />;
+                                                    return <Unlock size={16}/>;
                                                 case 'closed':
-                                                    return <Lock size={16} />;
+                                                    return <Lock size={16}/>;
                                                 case 'editing':
-                                                    return <Pencil size={16} />;
+                                                    return <Pencil size={16}/>;
                                                 default:
-                                                    return <Ban size={16} />; 
+                                                    return <Ban size={16}/>;
                                             }
                                         })()}
                                     </div>
@@ -343,20 +317,20 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                     <div className="flex items-center text-gray-600 text-sm mb-3">
                                         {capsule.openDate !== null ? (
                                             <>
-                                                <Clock size={16} className="mr-1" />
+                                                <Clock size={16} className="mr-1"/>
                                                 <span>Otevření: {new Date(capsule.openDate).toLocaleDateString()}</span>
                                             </>
                                         ) : <></>}
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center text-gray-600 text-sm">
-                                            <Share2 size={16} className="mr-1" />
+                                            <Share2 size={16} className="mr-1"/>
                                             <span>{capsule.contributorsAmount} přispěvatelů</span>
                                         </div>
-                                        <button 
+                                        <button
                                             className="text-blue-900 hover:text-blue-700 font-medium"
                                             onClick={() => {
-                                                setSelectedCapsule(capsule); 
+                                                setSelectedCapsule(capsule);
                                                 navigate('/capsuleDetail');
                                             }}
                                             aria-label={`Zobrazit detail kapsle ${capsule.title}`}
@@ -370,8 +344,9 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                     ) : (
                         <div className="text-center py-12">
                             <div className="text-gray-400 mb-4">Zatím nemáte žádné kapsle :(</div>
-                            <button className="bg-blue-900 text-white px-6 py-3 rounded-lg flex items-center space-x-2 mx-auto">
-                                <Plus size={20} />
+                            <button
+                                className="bg-blue-900 text-white px-6 py-3 rounded-lg flex items-center space-x-2 mx-auto">
+                                <Plus size={20}/>
                                 <span>Vytvořit první kapsli</span>
                             </button>
                         </div>
@@ -383,9 +358,3 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
 };
 
 export default Dashboard;
-
-
-
-
-
-
