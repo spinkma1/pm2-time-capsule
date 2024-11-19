@@ -13,6 +13,8 @@ import CreateCapsule from './screens/capsuleCreation/CreateCapsule';
 import PasswordRecovery from './screens/PasswordRecovery';
 import QRGenerator from './screens/capsuleCreation/QRGenerator';
 import FilesInput from './screens/capsuleDetail/FilesInput';
+import Payment from './screens/stripe/Payment';
+
 
 const App = () => {
     const [user, setUser] = useState(null); // Any type for user, can be replaced with more specific type
@@ -33,6 +35,7 @@ const App = () => {
                     <Route path="/capsuleDetail" element={<CapsuleDetail  capsule={selectedCapsule} />} />
                     <Route path="/qrcode" element={<QRGenerator />} />
                     <Route path="/addFiles" element={<FilesInput capsule={selectedCapsule} setSelectedCapsule={setSelectedCapsule}/>} />
+                    <Route path="/payment" element={<Payment />} />
                 </Routes>
             </div>
         </Router>

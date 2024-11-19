@@ -213,14 +213,15 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50" >
+        <div className="min-h-screen bg-gray-50 overflow-x-hidden max-w-full" >
             {/* Header */}
             <header className="bg-white shadow-sm">
-                <div className="container mx-auto px-4 py-4">
+                <div className="container px-4 py-4">
                     <div className="flex justify-between items-center">
                         <div className="text-2xl font-bold text-blue-900">MemoryCapsule</div>
                         <div className="flex items-center space-x-4">
-                            <button className="p-2 text-gray-600 hover:text-blue-900" aria-label="Notifications">
+                            <button className="p-2 text-gray-600 hover:text-blue-900" aria-label="Notifications"
+                                onClick={() => { navigate("/payment") }}>
                                 <CircleDollarSign size={24} />
                             </button>
                             <div className="flex items-center space-x-2 relative">
@@ -257,10 +258,13 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 </div>
             </header>
 
-            <main className="container mx-auto px-4 py-8">
+            <main className="container px-4 py-8 overflow-x-hidden max-w-full" >
                 {/* Welcome Section */}
                 <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900">Vítejte zpět, {user.email}!</h1>
+                    <div className="text-2xl font-bold text-grey-900 truncate max-w-[250px]">
+                        {user.email}
+                    </div>
+
                     <p className="text-gray-600">Máte {stats.pendingOpen} kapslí čekajících na otevření</p>
                 </div>
 
@@ -303,9 +307,9 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                             <option value="opened">Otevřené</option>
                         </select>
                         <button className="bg-blue-900 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-                                onClick={() => {
-                                    navigate('/createCapsule');
-                                }}>
+                            onClick={() => {
+                                navigate('/createCapsule');
+                            }}>
                             <Plus size={20} />
                             <span>Nová kapsle</span>
                         </button>
@@ -333,7 +337,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                                 case 'editing':
                                                     return <Pencil size={16} />;
                                                 default:
-                                                    return <Ban size={16} />; 
+                                                    return <Ban size={16} />;
                                             }
                                         })()}
                                     </div>
@@ -353,10 +357,10 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                             <Share2 size={16} className="mr-1" />
                                             <span>{capsule.contributorsAmount} přispěvatelů</span>
                                         </div>
-                                        <button 
+                                        <button
                                             className="text-blue-900 hover:text-blue-700 font-medium"
                                             onClick={() => {
-                                                setSelectedCapsule(capsule); 
+                                                setSelectedCapsule(capsule);
                                                 navigate('/capsuleDetail');
                                             }}
                                             aria-label={`Zobrazit detail kapsle ${capsule.title}`}
