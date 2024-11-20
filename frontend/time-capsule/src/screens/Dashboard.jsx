@@ -15,8 +15,6 @@ import {
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
-
 const Dashboard = ({ user, setSelectedCapsule }) => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
@@ -196,9 +194,10 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
 
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 overflow-x-hidden max-w-full" >
+            {/* Header */}
             <header className="bg-white shadow-sm">
-                <div className="container mx-auto px-4 py-4">
+                <div className="container px-4 py-4">
                     <div className="flex justify-between items-center">
                         <div className="text-2xl font-bold text-blue-900">MemoryCapsule</div>
                         <div className="flex items-center space-x-4">
@@ -230,10 +229,13 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 </div>
             </header>
 
-            <main className="container mx-auto px-4 py-8">
+            <main className="container px-4 py-8 overflow-x-hidden max-w-full" >
                 {/* Welcome Section */}
                 <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900">Vítejte zpět, {user.email}!</h1>
+                    <div className="text-2xl font-bold text-grey-900 truncate max-w-[250px]">
+                        {user.email}
+                    </div>
+
                     <p className="text-gray-600">Máte {stats.pendingOpen} kapslí čekajících na otevření</p>
                 </div>
 
@@ -254,10 +256,9 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                 </div>
 
                 {/* Search and Filters */}
-                <div
-                    className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
                     <div className="relative flex-grow max-w-md">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20}/>
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                         <input
                             type="text"
                             placeholder="Hledat kapsle..."
@@ -280,7 +281,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                 onClick={() => {
                                     navigate('/createCapsule');
                                 }}>
-                            <Plus size={20}/>
+                            <Plus size={20} />
                             <span>Nová kapsle</span>
                         </button>
                     </div>
@@ -301,13 +302,13 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                         {(() => {
                                             switch (capsule.status) {
                                                 case 'opened':
-                                                    return <Unlock size={16}/>;
+                                                    return <Unlock size={16} />;
                                                 case 'closed':
-                                                    return <Lock size={16}/>;
+                                                    return <Lock size={16} />;
                                                 case 'editing':
-                                                    return <Pencil size={16}/>;
+                                                    return <Pencil size={16} />;
                                                 default:
-                                                    return <Ban size={16}/>;
+                                                    return <Ban size={16} />; 
                                             }
                                         })()}
                                     </div>
@@ -317,20 +318,20 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                     <div className="flex items-center text-gray-600 text-sm mb-3">
                                         {capsule.openDate !== null ? (
                                             <>
-                                                <Clock size={16} className="mr-1"/>
+                                                <Clock size={16} className="mr-1" />
                                                 <span>Otevření: {new Date(capsule.openDate).toLocaleDateString()}</span>
                                             </>
                                         ) : <></>}
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center text-gray-600 text-sm">
-                                            <Share2 size={16} className="mr-1"/>
+                                            <Share2 size={16} className="mr-1" />
                                             <span>{capsule.contributorsAmount} přispěvatelů</span>
                                         </div>
-                                        <button
+                                        <button 
                                             className="text-blue-900 hover:text-blue-700 font-medium"
                                             onClick={() => {
-                                                setSelectedCapsule(capsule);
+                                                setSelectedCapsule(capsule); 
                                                 navigate('/capsuleDetail');
                                             }}
                                             aria-label={`Zobrazit detail kapsle ${capsule.title}`}
@@ -344,9 +345,8 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                     ) : (
                         <div className="text-center py-12">
                             <div className="text-gray-400 mb-4">Zatím nemáte žádné kapsle :(</div>
-                            <button
-                                className="bg-blue-900 text-white px-6 py-3 rounded-lg flex items-center space-x-2 mx-auto">
-                                <Plus size={20}/>
+                            <button className="bg-blue-900 text-white px-6 py-3 rounded-lg flex items-center space-x-2 mx-auto">
+                                <Plus size={20} />
                                 <span>Vytvořit první kapsli</span>
                             </button>
                         </div>
@@ -358,3 +358,9 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
 };
 
 export default Dashboard;
+
+
+
+
+
+
