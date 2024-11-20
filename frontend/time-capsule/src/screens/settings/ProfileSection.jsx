@@ -21,7 +21,7 @@ const ProfileSection = ({ user, onUpdate }) => {
         if (!formData.newEmail) {
             newErrors.newEmail = 'Zadejte nový e-mail';
         } else if (!/\S+@\S+\.\S+/.test(formData.newEmail)) {
-            newErrors.newEmail = 'Zadejte platnou e-mailovou adresu';
+            newErrors.newEmail = 'Zadejte platný e-mail';
         }
         if (formData.newEmail === formData.currentEmail) {
             newErrors.newEmail = 'Nový e-mail musí být jiný než současný';
