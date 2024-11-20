@@ -203,11 +203,15 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                         <div className="flex items-center space-x-4">
                             <div className="relative">
                                 <button
-                                    onClick={() => navigate('/settings', {state: {activeTab: 'connections'}})}
-                                    className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                                    onClick={() => navigate('/settings', { state: { activeTab: 'connections' } })}
+                                    className="p-1 hover:bg-gray-100 rounded-full transition-colors  mx-1"
                                     title="Spravovat sledující"
                                 >
-                                    <UserSearch size={16} className="text-blue-900"/>
+                                    <UserSearch size={24} className="text-blue-900" />
+                                </button>
+                                <button className="p-1 hover:bg-gray-100 rounded-full transition-colors  mx-1" title="Předplatné"
+                                    onClick={() => { navigate("/payment") }}>
+                                    <CircleDollarSign size={24} className="text-blue-900" />
                                 </button>
                             </div>
                             <div className="relative">
@@ -278,9 +282,9 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                             <option value="opened">Otevřené</option>
                         </select>
                         <button className="bg-blue-900 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-                                onClick={() => {
-                                    navigate('/createCapsule');
-                                }}>
+                            onClick={() => {
+                                navigate('/createCapsule');
+                            }}>
                             <Plus size={20} />
                             <span>Nová kapsle</span>
                         </button>
@@ -308,7 +312,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                                 case 'editing':
                                                     return <Pencil size={16} />;
                                                 default:
-                                                    return <Ban size={16} />; 
+                                                    return <Ban size={16} />;
                                             }
                                         })()}
                                     </div>
@@ -328,10 +332,10 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                             <Share2 size={16} className="mr-1" />
                                             <span>{capsule.contributorsAmount} přispěvatelů</span>
                                         </div>
-                                        <button 
+                                        <button
                                             className="text-blue-900 hover:text-blue-700 font-medium"
                                             onClick={() => {
-                                                setSelectedCapsule(capsule); 
+                                                setSelectedCapsule(capsule);
                                                 navigate('/capsuleDetail');
                                             }}
                                             aria-label={`Zobrazit detail kapsle ${capsule.title}`}
