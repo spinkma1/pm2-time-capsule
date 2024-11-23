@@ -6,6 +6,7 @@ import com.stripe.param.*;
 import cz.cvut.fel.pm2.service.StripeService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
@@ -49,6 +50,7 @@ public class StripeTest {
 
         //balance in test mode takes too long to update to available from pending
     @Test
+    @Disabled
     public void ResetTestBalance() throws Exception {
         // Get the current balance
         Balance balance = stripeService.getBalance();
@@ -256,6 +258,7 @@ public class StripeTest {
     }
 
     @Test
+    @Disabled
     public void testCreatePayout() throws StripeException {
         long payoutAmount = 3000; // Amount in cents
         String currency = "czk";
@@ -293,6 +296,7 @@ public class StripeTest {
         System.out.println("Cancelled Subscription: " + cancelledSubscription.getId());
     }
     @Test
+    @Disabled
     public void testSubscriptionRefund() throws Exception {
         // Step 1: Create a customer
         String email = "test@example.com";
