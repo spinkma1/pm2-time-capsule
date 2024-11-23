@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import cz.cvut.fel.pm2.enums.State;
 import cz.cvut.fel.pm2.enums.Type;
+import cz.cvut.fel.pm2.enums.UnlockMethod;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -62,8 +65,14 @@ public class Capsule extends AbstractEntity {
 
     @ElementCollection
     @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "unlock_methods", joinColumns = @JoinColumn(name = "capsule_id"))
     @Column(nullable = false)
-    private Set<UnlockMethod> unlockMethods;
+    //time is set true by default, others false
+    private HashMap<UnlockMethod, Boolean> unlockMethods = new HashMap<UnlockMethod, Boolean>() {{
+        put(UnlockMethod.TIME, true);
+        put(UnlockMethod.QR_CODE, false);
+        put(UnlockMethod.GEOLOCATION, false);
+    }};
 
     @Column(name = "unlock_time")
     private LocalDateTime unlockTime;
