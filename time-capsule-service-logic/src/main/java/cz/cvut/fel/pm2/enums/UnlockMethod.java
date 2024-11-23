@@ -1,7 +1,8 @@
-package cz.cvut.fel.pm2.persistence;
+package cz.cvut.fel.pm2.enums;
 
 public enum UnlockMethod {
     PASSWORD,
     GEOLOCATION,
-    TIME
+    TIME,
+    QR_CODE
 }
