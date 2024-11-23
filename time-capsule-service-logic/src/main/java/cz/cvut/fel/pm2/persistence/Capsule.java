@@ -70,10 +70,10 @@ public class Capsule extends AbstractEntity {
     @Column(nullable = false)
     //time is set true by default, others false
     private HashMap<UnlockMethod, UnlockMethodState> unlockMethods = new HashMap<UnlockMethod, UnlockMethodState>() {{
-        put(UnlockMethod.TIME, new UnlockMethodState());
-        put(UnlockMethod.QR_CODE, new UnlockMethodState());
-        put(UnlockMethod.GEOLOCATION, new UnlockMethodState());
-        put(UnlockMethod.PASSWORD, new UnlockMethodState());
+        unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, false));  // Time unlock method enabled, not complete
+        unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(false, false)); // QR method disabled, not complete
+        unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(false, false)); // Geolocation method disabled, not complete
+        unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(false, false)); // Password method disabled, not complete
     }};
 
     @Column(name = "unlock_time")

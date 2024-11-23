@@ -23,4 +23,21 @@ public interface CapsuleRepository extends JpaRepository<Capsule, Long> {
      * @return capsule with the given owner
      */
     Optional<Capsule> getCapsulesByOwner(User owner);
+
+
+    /**
+     * Find capsule by id
+     * @param id id of the capsule
+     * @return capsule with the given id
+     */
+    Optional<Capsule> getCapsuleById(Integer id);
+
+    /**
+     * Find capsule by qr code password
+     * @param password qr code password
+     * @return capsule with the given qr code password
+     */
+    Optional<Capsule> findByQrCodePassword(String password);
+
+
 }

@@ -15,6 +15,11 @@ public class UnlockMethodState {
         this.complete = false;
     }
 
+    public UnlockMethodState(boolean enabled, boolean complete) {
+        this.enabled = enabled;
+        this.complete = complete;
+    }
+
     // Getters and Setters
     public boolean isEnabled() {
         return enabled;

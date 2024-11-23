@@ -14,7 +14,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 /**
  * API interface for discount-related operations.
@@ -84,7 +88,7 @@ public interface CapsuleApi {
                                     """)}
                     )
             )
-            @RequestBody CapsuleDto capsule);
+            @RequestBody CapsuleDto capsule) throws NoSuchAlgorithmException;
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,4 +99,10 @@ public interface CapsuleApi {
     @PutMapping(value = "/{capsuleId}")
     @ResponseBody
     void readyCapsule(@PathVariable String capsuleId, @RequestParam boolean ready);
+
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping(value = "/openviaqr")
+    @ResponseBody
+    ResponseEntity<Map<String, String>> openViaQr(@RequestParam String capsuleId, @RequestParam String qrCode) throws NoSuchAlgorithmException;
 }

@@ -17,6 +17,7 @@ public class StripeService {
 
     public StripeService() {
         Stripe.apiKey = "sk_test_51QBYEjLFUGYLkGp3vZAXtts3h3xJEKqA8SWpL8BueEFOJIxK6nZA137Zh2lZk65Td2rINkRdiK9xXXvfO6TH2oDG00pFCPEh3o";
+        // secret key = pk_test_51QBYEjLFUGYLkGp3LhYWs61r3Zf4aEhPxVbmOYOrOMAf5x5HRwNII7UH2syHlAV6OCk28NOm5UYz0u7L9chrGjYz00hjNE2fQa
     }
 
 
