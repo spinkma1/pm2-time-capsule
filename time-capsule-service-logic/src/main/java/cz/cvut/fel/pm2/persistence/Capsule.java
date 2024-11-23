@@ -2,6 +2,7 @@ package cz.cvut.fel.pm2.persistence;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import cz.cvut.fel.pm2.UnlockMethodState;
 import cz.cvut.fel.pm2.enums.State;
 import cz.cvut.fel.pm2.enums.Type;
 import cz.cvut.fel.pm2.enums.UnlockMethod;
@@ -68,10 +69,11 @@ public class Capsule extends AbstractEntity {
     @CollectionTable(name = "unlock_methods", joinColumns = @JoinColumn(name = "capsule_id"))
     @Column(nullable = false)
     //time is set true by default, others false
-    private HashMap<UnlockMethod, Boolean> unlockMethods = new HashMap<UnlockMethod, Boolean>() {{
-        put(UnlockMethod.TIME, true);
-        put(UnlockMethod.QR_CODE, false);
-        put(UnlockMethod.GEOLOCATION, false);
+    private HashMap<UnlockMethod, UnlockMethodState> unlockMethods = new HashMap<UnlockMethod, UnlockMethodState>() {{
+        put(UnlockMethod.TIME, new UnlockMethodState());
+        put(UnlockMethod.QR_CODE, new UnlockMethodState());
+        put(UnlockMethod.GEOLOCATION, new UnlockMethodState());
+        put(UnlockMethod.PASSWORD, new UnlockMethodState());
     }};
 
     @Column(name = "unlock_time")
