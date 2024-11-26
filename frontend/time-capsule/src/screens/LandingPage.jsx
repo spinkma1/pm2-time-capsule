@@ -43,7 +43,7 @@ const LandingPage = ({ setCurrentPage }) => {
                             <Button
                                 variant="contained"
                                 color="primary"
-                                onClick={() => setCurrentPage('register')}
+                                onClick={() => navigate('/register')}
                                 className="text-lg"
                                 sx={{ marginTop: 2 }} // Add marginTop
                             >
