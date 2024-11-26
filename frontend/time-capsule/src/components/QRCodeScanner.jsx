@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import QrScanner from 'react-qr-scanner';
 
 class QRCodeScanner extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             delay: 300, 
             result: 'Žádný', 
-            camera: 'rear', 
             scanError: '', 
         };
 
@@ -32,19 +31,16 @@ class QRCodeScanner extends Component {
     }
 
     render() {
-        const { result, camera, scanError, delay } = this.state;
+        const { result, scanError, delay } = this.state;
         
         return (
             <div className="space-y-6">
-            
-
                 <div className="w-full justify-end">
-                  
+                    {/* Always use rear camera */}
                     <QrScanner
-                        key={camera}  
                         delay={delay} 
                         style={{ width: '75%' }}
-                        facingMode={"rear"}  
+                        facingMode="rear"  // Ensures only the rear camera is used
                         onError={this.handleError} 
                         onScan={this.handleScan}
                     />
