@@ -40,6 +40,7 @@ class QRCodeScanner extends Component {
 
     render() {
         const { result, camera, scanError, delay } = this.state;
+        
         return (
             <div className="space-y-6">
             
@@ -49,8 +50,11 @@ class QRCodeScanner extends Component {
                 >
                     Přepnout kameru
                 </button>
+
                 <div className="w-full justify-end">
+                  
                     <QrScanner
+                        key={camera}  
                         delay={delay} 
                         style={{ width: '75%' }}
                         facingMode={camera}  
@@ -58,6 +62,7 @@ class QRCodeScanner extends Component {
                         onScan={this.handleScan}
                     />
                 </div>
+
                 {scanError && <p className="text-red-500 text-sm">{scanError}</p>}
                 <p>Výsledený kód: {result}</p> 
             </div>
@@ -66,4 +71,5 @@ class QRCodeScanner extends Component {
 }
 
 export default QRCodeScanner;
+
 
