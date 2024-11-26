@@ -7,9 +7,9 @@ import cz.cvut.fel.pm2.model.CapsuleDto;
 import cz.cvut.fel.pm2.repository.CapsuleRepository;
 import cz.cvut.fel.pm2.service.CapsuleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,30 +23,18 @@ public class CapsuleApiImpl implements CapsuleApi {
     private final CapsuleRepository capsuleRepository;
 
     @Override
-    public void createCapsule(CapsuleDto capsule) throws NoSuchAlgorithmException {
-
-        if (capsule.name() == null || capsule.description() == null ||
-                capsule.teamWork() == null ||
-                capsule.userFileLimit() == null) {
-            throw new InvalidBodyException("No or wrong body was sent");
-        }
-        capsuleService.createCapsule(capsule);
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Capsule created successfully");
+    public ResponseEntity<CapsuleDto> createCapsule(CapsuleDto capsuleDto) throws NoSuchAlgorithmException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(capsuleService.createCapsule(capsuleDto));
     }
 
-    public CapsuleDto getCapsule(@RequestParam String email) {
-        return capsuleService.getCapsule(email);
-    }
     @Override
-    public void readyCapsule(@RequestParam String capsuleId, @RequestParam boolean ready) {
-        if (capsuleId == null || capsuleId.isEmpty()) {
-            throw new InvalidBodyException("No or wrong body was sent");
-        }
+    public ResponseEntity<CapsuleDto> getCapsule(@RequestParam String email) {
+        return ResponseEntity.ok(capsuleService.getCapsule(email));
+    }
 
-        capsuleService.readyCapsule(capsuleId, ready);
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Capsule status updated successfully");
+    @Override
+    public ResponseEntity<CapsuleDto> readyCapsule(@RequestParam String capsuleId, @RequestParam boolean ready) {
+        return ResponseEntity.ok(capsuleService.readyCapsule(capsuleId, ready));
     }
 
     @Override

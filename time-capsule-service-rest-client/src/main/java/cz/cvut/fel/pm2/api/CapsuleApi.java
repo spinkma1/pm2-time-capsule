@@ -38,8 +38,8 @@ public interface CapsuleApi {
     @ApiResponses(
             value = {
                     @ApiResponse(
-                            responseCode = "200",
-                            description = "OK"),
+                            responseCode = "210",
+                            description = "CREATED"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Specified capsule not found",
@@ -58,7 +58,7 @@ public interface CapsuleApi {
                             @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = InvalidBodyException.class))),
             })
-    void createCapsule(
+    ResponseEntity<CapsuleDto> createCapsule(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Capsule information",
                     content = @Content(
@@ -93,13 +93,12 @@ public interface CapsuleApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    CapsuleDto getCapsule(@RequestParam String email);
+    ResponseEntity<CapsuleDto> getCapsule(@RequestParam String email);
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{capsuleId}")
     @ResponseBody
-    void readyCapsule(@PathVariable String capsuleId, @RequestParam boolean ready);
-
+    ResponseEntity<CapsuleDto> readyCapsule(@PathVariable String capsuleId, @RequestParam boolean ready);
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/openviaqr")

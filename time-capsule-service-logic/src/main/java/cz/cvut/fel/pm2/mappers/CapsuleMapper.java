@@ -10,27 +10,27 @@ import org.mapstruct.MappingTarget;
 public interface CapsuleMapper {
 
     /**
-     * Updates a DiscountEntity with values from a DiscountDto.
+     * Updates a CapsuleEntity with values from a CapsuleDto.
      *
-     * @param capsuleInput the discount DTO containing updated values.
-     * @param capsuleEntity the discount entity to update.
+     * @param capsuleInput the capsule DTO containing updated values.
+     * @param capsuleEntity the capsule entity to update.
      */
     @Mapping(target = "id", ignore = true)
     void updateEntity(CapsuleDto capsuleInput, @MappingTarget Capsule capsuleEntity);
 
     /**
-     * Converts a DiscountEntity to a DiscountDto.
+     * Converts a CapsuleEntity to a CapsuleDto.
      *
-     * @param capsuleEntity the discount entity to convert.
-     * @return the converted discount DTO.
+     * @param capsuleEntity the capsule entity to convert.
+     * @return the converted capsule DTO.
      */
     CapsuleDto toDto(Capsule capsuleEntity);
 
     /**
-     * Converts a DiscountDto to a DiscountEntity.
+     * Converts a CapsuleDto to a CapsuleEntity.
      *
-     * @param capsuleDto the discount DTO to convert.
-     * @return the converted discount entity.
+     * @param capsuleDto the capsule DTO to convert.
+     * @return the converted capsule entity.
      */
     Capsule toEntity(CapsuleDto capsuleDto);
 }
