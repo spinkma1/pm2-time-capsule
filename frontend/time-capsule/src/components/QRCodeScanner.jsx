@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import QrScanner from 'react-qr-scanner';
+import QrReader  from 'react-qr-scanner';
 
 class QRCodeScanner extends Component {
     constructor(props) {
@@ -37,10 +37,10 @@ class QRCodeScanner extends Component {
             <div className="space-y-6">
                 <div className="w-full justify-end">
                     {/* Always use rear camera */}
-                    <QrScanner
+                    <QrReader 
                         delay={delay} 
                         style={{ width: '75%' }}
-                        facingMode="environment"  // Ensures only the rear camera is used
+                        facingMode="rear"  // Ensures only the rear camera is used
                         onError={this.handleError} 
                         onScan={this.handleScan}
                     />
