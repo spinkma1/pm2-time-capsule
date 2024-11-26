@@ -7,13 +7,12 @@ class QRCodeScanner extends Component {
         this.state = {
             delay: 300, 
             result: 'Žádný', 
-            camera: 'front', 
+            camera: 'rear', 
             scanError: '', 
         };
 
         this.handleScan = this.handleScan.bind(this);
         this.handleError = this.handleError.bind(this);
-        this.toggleCamera = this.toggleCamera.bind(this);
     }
 
     handleScan(data) {
@@ -32,24 +31,12 @@ class QRCodeScanner extends Component {
         });
     }
 
-    toggleCamera() {
-        this.setState((prevState) => ({
-            camera: prevState.camera === 'front' ? 'rear' : 'front', 
-        }));
-    }
-
     render() {
         const { result, camera, scanError, delay } = this.state;
         
         return (
             <div className="space-y-6">
             
-                <button 
-                    className="p-2 bg-blue-900 text-white rounded-md" 
-                    onClick={this.toggleCamera} 
-                >
-                    Přepnout kameru
-                </button>
 
                 <div className="w-full justify-end">
                   
@@ -57,7 +44,7 @@ class QRCodeScanner extends Component {
                         key={camera}  
                         delay={delay} 
                         style={{ width: '75%' }}
-                        facingMode={camera}  
+                        facingMode={"rear"}  
                         onError={this.handleError} 
                         onScan={this.handleScan}
                     />
