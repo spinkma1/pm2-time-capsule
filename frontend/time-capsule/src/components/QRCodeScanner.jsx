@@ -1,51 +1,69 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 import QrScanner from 'react-qr-scanner';
 
-const QRCodeScanner = ({ onScanSuccess }) => {
-    const [scanError, setScanError] = useState(null);
-    const [camera, setCamera] = useState('user'); // Stav pro výběr kamery
+class QRCodeScanner extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            delay: 300, 
+            result: 'Žádný', 
+            camera: 'front', 
+            scanError: '', 
+        };
 
-    const handleScan = (data) => {
+        this.handleScan = this.handleScan.bind(this);
+        this.handleError = this.handleError.bind(this);
+        this.toggleCamera = this.toggleCamera.bind(this);
+    }
+
+    handleScan(data) {
         if (data) {
-            console.log('Načtený QR kód:', data.text);
-            alert(data.text);
-            if (onScanSuccess) {
-                onScanSuccess(data.text);
-            }
+            this.setState({
+                result: data.text, 
+                scanError: '',
+            });
         }
-    };
+    }
 
-    const handleError = (err) => {
-        console.error('Chyba při čtení QR kódu:', err);
-        setScanError('Chyba při čtení QR kódu.');
-    };
+    handleError(err) {
+        console.error(err);
+        this.setState({
+            scanError: 'Failed to scan QR code. Please try again.'
+        });
+    }
 
-    const toggleCamera = () => {
-        setCamera((prevCamera) => (prevCamera === 'user' ? 'environment' : 'user')); // Přepnutí mezi přední a zadní kamerou
-    };
+    toggleCamera() {
+        this.setState((prevState) => ({
+            camera: prevState.camera === 'front' ? 'rear' : 'front', 
+        }));
+    }
 
-    return (
-        <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Naskenujte QR kód pomocí kamery</h2>
-            <button 
-                className="p-2 bg-blue-500 text-white rounded-md" 
-                onClick={toggleCamera}
-            >
-                Přepnout kameru
-            </button>
-            <div className="w-full">
-                <QrScanner
-                    delay={300}
-                    style={{ width: '100%' }}
-                    facingMode={camera}  // Nastavení kamery podle stavu
-                    onError={handleError}
-                    onScan={handleScan}
-                />
+    render() {
+        const { result, camera, scanError, delay } = this.state;
+        return (
+            <div className="space-y-6">
+            
+                <button 
+                    className="p-2 bg-blue-900 text-white rounded-md" 
+                    onClick={this.toggleCamera} 
+                >
+                    Přepnout kameru
+                </button>
+                <div className="w-full justify-end">
+                    <QrScanner
+                        delay={delay} 
+                        style={{ width: '75%' }}
+                        facingMode={camera}  
+                        onError={this.handleError} 
+                        onScan={this.handleScan}
+                    />
+                </div>
+                {scanError && <p className="text-red-500 text-sm">{scanError}</p>}
+                <p>Výsledený kód: {result}</p> 
             </div>
-            {scanError && <p className="text-red-500 text-sm">{scanError}</p>}
-        </div>
-    );
-};
+        );
+    }
+}
 
 export default QRCodeScanner;
 
