@@ -18,7 +18,7 @@ const LandingPage = ({ setCurrentPage }) => {
                         className="mr-2"
                         sx={{ marginRight: 2 }} // Add space between buttons
                     >
-                        Přihlásit se
+                        Přihlásit
                     </Button>
                     <Button
                         variant="outlined"

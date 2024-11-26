@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 import { GoogleLogin } from '@react-oauth/google';
-import { login, register } from '../api/api';
+import { login, register } from '../../api/api';
 import { useNavigate } from 'react-router-dom';
 
 const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {

@@ -182,6 +182,53 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                     addedDate: "2024-01-18"
                 }
             ]
+        },{
+            id: 4,
+            title: "Výročí od maturity",
+            openDate: "2024-11-15",
+            createdDate: "2024-01-01",
+            status: "closed",
+            contributorsAmount: 3,
+            thumbnail: null,
+            maxItems: 3,
+            type: "own",
+            contributors: [
+                { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
+                { id: 2, email: "m.svoboda@gmail.com", avatar: "MS" },
+                { id: 3, email: "petr.dvorak420@fel.cvut.cz", avatar: "PD" }
+            ],
+            items: [
+                {
+                    id: 1,
+                    type: "image",
+                    title: "tridnifoto.jpg",
+                    addedBy: "Jan Novák",
+                    addedDate: "2024-01-15",
+                    thumbnail: "/api/placeholder/400/300"
+                },
+                {
+                    id: 2,
+                    type: "video",
+                    title: "posledni_zvoneni.mp4",
+                    addedBy: "Marie Svobodová",
+                    addedDate: "2024-01-16",
+                    thumbnail: "/api/placeholder/400/300"
+                },
+                {
+                    id: 3,
+                    type: "text",
+                    title: "vzkaz_pro_budouci_ja.txt",
+                    addedBy: "Petr Dvořák",
+                    addedDate: "2024-01-17"
+                },
+                {
+                    id: 4,
+                    type: "audio",
+                    title: "nase_oblibena_pisnicka.mp3",
+                    addedBy: "Jan Novák",
+                    addedDate: "2024-01-18"
+                }
+            ]
         },
     ];
 
@@ -236,7 +283,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
             <main className="container px-4 py-8 overflow-x-hidden max-w-full" >
                 {/* Welcome Section */}
                 <div className="mb-8">
-                    <div className="text-2xl font-bold text-grey-900 truncate max-w-[250px]">
+                    <div className="text-2xl font-bold text-grey-900 break-all">
                         {user.email}
                     </div>
 
@@ -302,17 +349,17 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                         alt={capsule.title}
                                         className="w-full h-48 object-cover"
                                     />
-                                    <div className="absolute top-2 right-2 bg-white rounded-full p-2">
+                                    <div className="absolute top-2 right-2 bg-blue-900 rounded-full p-2">
                                         {(() => {
                                             switch (capsule.status) {
                                                 case 'opened':
-                                                    return <Unlock size={16} />;
+                                                    return <Unlock size={16} color='white' />;
                                                 case 'closed':
-                                                    return <Lock size={16} />;
+                                                    return <Lock size={16}  color='white'/>;
                                                 case 'editing':
-                                                    return <Pencil size={16} />;
+                                                    return <Pencil size={16} color='white'/>;
                                                 default:
-                                                    return <Ban size={16} />;
+                                                    return <Ban size={16} color='white'/>;
                                             }
                                         })()}
                                     </div>

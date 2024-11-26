@@ -10,7 +10,7 @@ function Contributor({ id, email, status, initial, canDelete, onDelete }) {
     return (
         <div key={id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div className="flex items-center">
-                <div className="w-10 h-10 bg-blue-900 text-white rounded-full flex items-center justify-center mr-3 hidden sm:flex">
+                <div className="w-10 h-10 bg-blue-900 text-white rounded-full flex items-center justify-center mr-3  sm:flex">
                     {initial}
                 </div>
                 <div className="font-small text-sm sm:text-lg">

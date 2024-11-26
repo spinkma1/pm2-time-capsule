@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { User, UserMinus, Search } from 'lucide-react';
+import { User, UserMinus, Search, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 
 const ConnectionsSection = ({ user }) => {
+    const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -60,6 +63,10 @@ const ConnectionsSection = ({ user }) => {
             setIsSearching(false);
             setSearchResults([]);
         }
+    };
+
+    const handleNavigateToFollower = (id) => {
+        navigate(`/user/${id}`);
     };
 
 
@@ -134,6 +141,10 @@ const ConnectionsSection = ({ user }) => {
                                     <div className="text-sm text-gray-500">{follower.email}</div>
                                 </div>
                             </div>
+                            <button className="text-gray-400 hover:text-gray-600"
+                                onClick={() => handleNavigateToFollower(follower.id)} >
+                                <ChevronRight size={16} />
+                            </button>
                         </div>
                     ))}
                 </div>

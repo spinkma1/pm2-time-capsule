@@ -4,22 +4,26 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Screens
 import LandingPage from './screens/LandingPage';
-import AuthPages from './screens/AuthPages';
+import AuthPages from './screens/authentication/AuthPages';
 import Dashboard from './screens/Dashboard';
 import CapsuleDetail from './screens/capsuleDetail/CapsuleDetail';
-import TermsOfUse from './screens/TermsOfUse';
-import PrivacyPolicy from './screens/PrivacyPolicy';
+import TermsOfUse from './screens/gdpr/TermsOfUse';
+import PrivacyPolicy from './screens/gdpr/PrivacyPolicy';
 import CreateCapsule from './screens/capsuleCreation/CreateCapsule';
-import PasswordRecovery from './screens/PasswordRecovery';
+import PasswordRecovery from './screens/authentication/PasswordRecovery';
 import QRGenerator from './screens/capsuleCreation/QRGenerator';
 import FilesInput from './screens/capsuleDetail/FilesInput';
 import Settings from './screens/settings/Settings';
 import Payment from './screens/stripe/Payment';
+import AddContributors from './screens/capsuleCreation/AddContributors';
+import User from './screens/authentication/User';
+import OpenCapsule from './screens/capsuleCreation/OpenCapsule';
+
 
 
 const App = () => {
-    const [user, setUser] = useState(null); // Any type for user, can be replaced with more specific type
-    const [selectedCapsule, setSelectedCapsule] = useState(null); // Any type for selectedCapsule
+    const [user, setUser] = useState(null);
+    const [selectedCapsule, setSelectedCapsule] = useState(null); 
 
     return (
         <Router>
@@ -38,6 +42,9 @@ const App = () => {
                     <Route path="/qrcode" element={<QRGenerator />} />
                     <Route path="/addFiles" element={<FilesInput capsule={selectedCapsule} setSelectedCapsule={setSelectedCapsule}/>} />
                     <Route path="/payment" element={<Payment />} />
+                    <Route path="/addContributors" element={<AddContributors capsule={selectedCapsule}/>} />
+                    <Route path="/user/:id" element={<User />} />
+                    <Route path="/capsule/open/:id" element={<OpenCapsule />} />
                 </Routes>
             </div>
         </Router>

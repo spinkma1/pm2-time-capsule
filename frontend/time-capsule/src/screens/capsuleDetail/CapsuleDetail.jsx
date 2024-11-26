@@ -5,21 +5,28 @@ import {
     Calendar,
     Users,
     Plus,
-    MoreVertical,
     Image,
     FileText,
     Video,
     Music,
-    Unlock
+    Unlock,
+    ChevronRight
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import ConfirmPopup from './ConfirmPopup';
+
 
 const CapsuleDetail = ({ capsule, setSelectedCapsule }) => {
     const navigate = useNavigate();
     const [showContributors, setShowContributors] = useState(false);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+    const handleNavigateToFollower = (id) => {
+        navigate(`/user/${id}`);
+    };
 
     const getItemIcon = (type) => {
-        switch(type) {
+        switch (type) {
             case 'image': return <Image size={20} />;
             case 'video': return <Video size={20} />;
             case 'text': return <FileText size={20} />;
@@ -33,11 +40,19 @@ const CapsuleDetail = ({ capsule, setSelectedCapsule }) => {
         const open = new Date(openDate);
         const diff = open - now;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        if (days <= 0) {
+            return "Otevřít";
+        }
         return `${days} dní`;
     };
 
+
     const handleEarlyOpen = () => {
-        setCapsuleStatus('opened'); 
+        setCapsuleStatus('opened');
+    };
+    const handleLockCapsule = () => {
+        console.log('Capsule locked!');
+        setIsPopupOpen(false); // Zavřít popup po potvrzení
     };
 
     return (
@@ -72,40 +87,41 @@ const CapsuleDetail = ({ capsule, setSelectedCapsule }) => {
                                 <div className="flex items-center mb-2 sm:mb-0">
                                     <Users size={16} className="mr-1" />
                                     {capsule.contributors.length} přispěvatelů
-                                    {/* Tlačítko pro předčasné otevření */}
-                                    {capsule.status === 'closed' && (
-                                        <button
-                                            onClick={handleEarlyOpen}
-                                            className="ml-4 px-3 py-1 text-white bg-blue-900 rounded-lg hover:bg-blue-600"
-                                        >
-                                            Předčasně otevřít
-                                        </button>
-                                    )}
+
                                 </div>
                             </div>
                         </div>
                         {capsule.status === 'closed' ? (
-                        <div className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0">
-                            <div className="flex items-center justify-center mb-2">
-                                <Lock size={20} className="text-blue-900" />
-                            </div>
-                            <div className="text-sm font-medium text-blue-900 mb-1">
-                                Zbývá {getTimeRemaining(capsule.openDate)}
-                            </div>
-                            <div className="text-xs text-gray-600">
-                                do otevření
-                            </div>
-                        </div>): (<></>)}
+                            <div
+                                className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0 cursor-pointer" // Přidání cursor-pointer pro indikaci kliknutí
+                                onClick={() => navigate(`/capsule/open/${capsule.id}`)}
+                            >
+                                <div className="flex items-center justify-center mb-2">
+                                    <Lock size={20} className="text-blue-900" />
+                                </div>
+                                <div className="text-sm font-medium text-blue-900 mb-1">
+                                    {getTimeRemaining(capsule.openDate) === "Otevřít"
+                                        ? "Otevřít"
+                                        : `Zbývá ${getTimeRemaining(capsule.openDate)}`}
+                                </div>
+
+                                <div className="text-sm font-medium text-blue-900 mb-1">
+                                    {getTimeRemaining(capsule.openDate) === "Otevřít"
+                                        ? <></>
+                                        : `Zbývá ${getTimeRemaining(capsule.openDate)}`}
+                                </div>
+
+                            </div>) : (<></>)}
 
                         {capsule.status === 'opened' ? (
-                        <div className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0">
-                            <div className="flex items-center justify-center mb-2">
-                                <Unlock size={20} className="text-blue-900" />
-                            </div>
-                            <div className="text-sm font-medium text-blue-900 mb-1">
-                                Otevřeno
-                            </div>
-                        </div>): (<></>)}
+                            <div className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0">
+                                <div className="flex items-center justify-center mb-2">
+                                    <Unlock size={20} className="text-blue-900" />
+                                </div>
+                                <div className="text-sm font-medium text-blue-900 mb-1">
+                                    Otevřeno
+                                </div>
+                            </div>) : (<></>)}
                     </div>
 
                     {/* Progress bar */}
@@ -116,28 +132,50 @@ const CapsuleDetail = ({ capsule, setSelectedCapsule }) => {
                                 style={{ width: '60%' }}
                             ></div>
                         </div>)
-                    : (<></>)}
+                        : (<></>)}
 
 
                     {/* Action buttons */}
                     {capsule.status === 'editing' ? (
-                    <div className="flex flex-col sm:flex-row sm:space-x-4 mb-6">
+                        <div className="flex flex-col sm:flex-row sm:space-x-4 mb-6">
                             {capsule.status === 'editing' && capsule.items.length < capsule.maxItems ? (
-                                <button 
-                                className="flex items-center mb-4 sm:mb-0 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
-                                onClick={() =>{navigate('/addFiles')}}>
+                                <button
+                                    className="flex items-center mb-4 sm:mb-0 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+                                    onClick={() => { navigate('/addFiles') }}>
                                     <Plus size={20} className="mr-2" />
                                     Přidat obsah
                                 </button>) : (<></>)}
-                            <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                            <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                onClick={() => navigate('/addContributors')}>
                                 <Users size={20} className="mr-2" />
                                 Pozvat přispěvatele
                             </button>
-                            <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                            <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                onClick={() => setIsPopupOpen(true)}>
                                 <Lock size={20} className="mr-2" />
                                 Uzamknout
                             </button>
-                    </div>): (<></>)}
+                        </div>) : (
+                        <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-6">
+                            <button
+                                className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                onClick={() => navigate('/addContributors')}
+                            >
+                                <Users size={20} className="mr-2" />
+                                Pozvat přispěvatele
+                            </button>
+                            {capsule.status === 'closed' && (
+                                <button
+                                    onClick={handleEarlyOpen}
+                                    className="px-3 py-1 text-white bg-blue-900 rounded-lg hover:bg-blue-600"
+                                >
+                                    Předčasně otevřít
+                                </button>
+                            )}
+                        </div>
+
+                    )}
+
 
                     {capsule.status === 'closed' ? (
                         <div className="flex justify-center items-center h-64 bg-blue-50 rounded-lg">
@@ -145,7 +183,7 @@ const CapsuleDetail = ({ capsule, setSelectedCapsule }) => {
                         </div>
                     ) : (
                         <>
-                        {/* Content Grid */}
+                            {/* Content Grid */}
                             <div className="mb-8">
                                 <h2 className="text-xl font-semibold mb-4">Obsah kapsle</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -173,9 +211,6 @@ const CapsuleDetail = ({ capsule, setSelectedCapsule }) => {
                                             <div className="p-4">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <h3 className="font-medium">{item.title}</h3>
-                                                    <button className="text-gray-400 hover:text-gray-600">
-                                                        <MoreVertical size={16} />
-                                                    </button>
                                                 </div>
                                                 <div className="flex items-center justify-between text-sm text-gray-600">
                                                     <span>Přidal(a) {item.addedBy}</span>
@@ -207,15 +242,23 @@ const CapsuleDetail = ({ capsule, setSelectedCapsule }) => {
                                         )}
                                     </div>
                                 </div>
-                                <button className="text-gray-400 hover:text-gray-600">
-                                    <MoreVertical size={16} />
+                                <button className="text-gray-400 hover:text-gray-600"
+                                    onClick={() => handleNavigateToFollower(contributor.id)} >
+                                    <ChevronRight size={16} />
                                 </button>
                             </div>
                         ))}
                     </div>
                 </div>
-            </main>
-        </div>
+            </main >
+            {/* Confirm Popup */}
+            < ConfirmPopup
+                isOpen={isPopupOpen}
+                onClose={() => setIsPopupOpen(false)}
+                onConfirm={handleLockCapsule}
+                text="Opravdu chcete uzamknout kapsli?"
+            />
+        </div >
     );
 };
 
