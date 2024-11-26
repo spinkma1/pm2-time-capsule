@@ -1,9 +1,4 @@
 package cz.cvut.fel.pm2.service;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
 import cz.cvut.fel.pm2.UnlockMethodState;
 import cz.cvut.fel.pm2.enums.State;
 import cz.cvut.fel.pm2.exceptions.InvalidBodyException;
@@ -19,20 +14,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-import static cz.cvut.fel.pm2.enums.UnlockMethod.GEOLOCATION;
-import static cz.cvut.fel.pm2.enums.UnlockMethod.PASSWORD;
 
 @Slf4j
 @Service
@@ -45,11 +34,14 @@ public class CapsuleService {
     private final UserRepository userRepository;
     private final SecureRandom secureRandom = new SecureRandom();
 
-    public void createCapsule(@NonNull CapsuleDto capsuleDto) throws NoSuchAlgorithmException {
+    public CapsuleDto createCapsule(@NonNull CapsuleDto capsuleDto) throws NoSuchAlgorithmException {
+        validateCapsule(capsuleDto);
         Capsule capsule = capsuleMapper.toEntity(capsuleDto);
 
         generateAndHashQrPassword(capsule.getId());
-        capsuleRepository.save(capsule);
+        capsule = capsuleRepository.save(capsule);
+
+        return capsuleMapper.toDto(capsule);
     }
 
     public CapsuleDto getCapsule(String email) {
@@ -60,19 +52,30 @@ public class CapsuleService {
     }
 
 
+    public void validateCapsule(CapsuleDto capsuleDto) {
+        if (capsuleDto.name() == null ||
+                capsuleDto.description() == null ||
+                capsuleDto.teamWork() == null ||
+                capsuleDto.userFileLimit() == null) {
+            throw new InvalidBodyException("No or wrong body was sent");
+        }
+    }
 
+    public CapsuleDto readyCapsule(String capsuleId, boolean ready) {
+        if (capsuleId == null || capsuleId.isEmpty()) {
+            throw new InvalidBodyException("No or wrong body was sent");
+        }
 
+        Optional<Capsule> capsule = capsuleRepository.getCapsuleByName(capsuleId);
 
-
-    public void readyCapsule(String capsuleId, boolean ready) {
-        var capsule = capsuleRepository.getCapsuleByName(capsuleId);
-        if(ready) {
+        if (ready) {
             capsule.orElseThrow(() -> new NotFoundException("Capsule not found")).setState(State.WAIT);
         }
         else {
             capsule.orElseThrow(() -> new NotFoundException("Capsule not found")).setState(State.EDIT);
         }
-        capsuleRepository.save(capsule.get());
+
+        return capsuleMapper.toDto(capsuleRepository.save(capsule.get()));
     }
 
 
