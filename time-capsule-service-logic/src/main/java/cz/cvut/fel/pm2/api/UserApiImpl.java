@@ -20,7 +20,6 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
 public class UserApiImpl implements UserApi {
     private UserRepository userRepository;
     private CapsuleRepository capsuleRepository;

@@ -4,7 +4,7 @@ package cz.cvut.fel.pm2.model;
 import java.util.List;
 
 /**
- * Data transfer object representing a discount.
+ * Data transfer object representing capsule.
  */
 public record CapsuleDto(
 
