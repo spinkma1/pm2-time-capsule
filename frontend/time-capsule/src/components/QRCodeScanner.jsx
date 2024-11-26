@@ -1,57 +1,35 @@
-import React, { Component } from 'react';
-import QrReader  from 'react-qr-scanner';
+import React, { useState } from 'react';
+import { QrReader } from 'react-qr-reader';
 
-class QRCodeScanner extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            delay: 300, 
-            result: 'Žádný', 
-            scanError: '', 
-        };
+const QRCodeScanner = () => {
+  const [result, setResult] = useState('Žádný');
+  const [scanError, setScanError] = useState('');
 
-        this.handleScan = this.handleScan.bind(this);
-        this.handleError = this.handleError.bind(this);
-    }
+  return (
+    <div className="space-y-6">
+      <div className="w-full justify-end">
+        <QrReader
+          onResult={(data, error) => {
+            if (!!data) {
+              setResult(data?.text);
+              setScanError(''); 
+            }
 
-    handleScan(data) {
-        if (data) {
-            this.setState({
-                result: data.text, 
-                scanError: '',
-            });
-        }
-    }
+            if (!!error) {
+              console.error(error);
+              setScanError('Nepodařilo se naskenovat QR kód. Zkuste to znovu.');
+            }
+          }}
+          constraints={{ facingMode: 'environment' }} 
+          style={{ width: '75%' }}
+        />
+      </div>
 
-    handleError(err) {
-        console.error(err);
-        this.setState({
-            scanError: 'Failed to scan QR code. Please try again.'
-        });
-    }
-
-    render() {
-        const { result, scanError, delay } = this.state;
-        
-        return (
-            <div className="space-y-6">
-                <div className="w-full justify-end">
-                    {/* Always use rear camera */}
-                    <QrReader 
-                        delay={delay} 
-                        style={{ width: '75%' }}
-                        facingMode="rear"  // Ensures only the rear camera is used
-                        onError={this.handleError} 
-                        onScan={this.handleScan}
-                    />
-                </div>
-
-                {scanError && <p className="text-red-500 text-sm">{scanError}</p>}
-                <p>Výsledený kód: {result}</p> 
-            </div>
-        );
-    }
-}
+      {scanError && <p className="text-red-500 text-sm">{scanError}</p>}
+      <p>Výsledený kód: {result}</p>
+    </div>
+  );
+};
 
 export default QRCodeScanner;
 
