@@ -2,7 +2,7 @@ import React from 'react';
 import { AppBar, Toolbar, Button, Container, Typography, Grid, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const LandingPage = ({ setCurrentPage }) => {
+const LandingPage = () => {
     const navigate = useNavigate();
     return (
         <div className="min-h-screen flex flex-col">
@@ -43,7 +43,7 @@ const LandingPage = ({ setCurrentPage }) => {
                             <Button
                                 variant="contained"
                                 color="primary"
-                                onClick={() => setCurrentPage('register')}
+                                onClick={() => navigate('/register')}
                                 className="text-lg"
                                 sx={{ marginTop: 2 }} // Add marginTop
                             >
@@ -87,7 +87,7 @@ const LandingPage = ({ setCurrentPage }) => {
                             <Button
                                 variant="contained"
                                 color="white"
-                                onClick={() => setCurrentPage('create-capsule')}
+                                onClick={() => navigate('/adminDashboard')}
                                 sx={{ marginTop: 2, 
                                     backgroundColor: 'white',
                                     color: "#1e3a8a", }} 

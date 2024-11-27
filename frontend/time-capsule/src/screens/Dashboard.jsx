@@ -244,7 +244,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
         <div className="min-h-screen bg-gray-50 overflow-x-hidden max-w-full" >
             {/* Header */}
             <header className="bg-white shadow-sm">
-                <div className="container px-4 py-4">
+                <div className="container mx-auto px-4 py-4">
                     <div className="flex justify-between items-center">
                         <div className="text-2xl font-bold text-blue-900">MemoryCapsule</div>
                         <div className="flex items-center space-x-4">

@@ -19,11 +19,15 @@ import AddContributors from './screens/capsuleCreation/AddContributors';
 import User from './screens/authentication/User';
 import OpenCapsule from './screens/capsuleCreation/OpenCapsule';
 
+import AdminDashboard from './screens/admin/AdminDashboardComponent.jsx';
+import AdminUserDetail from './screens/admin/AdminUserDetail.jsx';
+import AdminCapsuleDetail from './screens/admin/AdminCapsuleDetail.jsx';
+
 
 
 const App = () => {
     const [user, setUser] = useState(null);
-    const [selectedCapsule, setSelectedCapsule] = useState(null); 
+    const [selectedCapsule, setSelectedCapsule] = useState(null);
 
     return (
         <Router>
@@ -42,6 +46,9 @@ const App = () => {
                     <Route path="/qrcode" element={<QRGenerator />} />
                     <Route path="/addFiles" element={<FilesInput capsule={selectedCapsule} setSelectedCapsule={setSelectedCapsule}/>} />
                     <Route path="/payment" element={<Payment />} />
+                    <Route path="/adminDashboard" element={<AdminDashboard />} />
+                    <Route path="/admin/user/:userId" element={<AdminUserDetail />} />
+                    <Route path="/admin/capsule/:capsuleId" element={<AdminCapsuleDetail />} />
                     <Route path="/addContributors" element={<AddContributors capsule={selectedCapsule}/>} />
                     <Route path="/user/:id" element={<User />} />
                     <Route path="/capsule/open/:id" element={<OpenCapsule />} />
