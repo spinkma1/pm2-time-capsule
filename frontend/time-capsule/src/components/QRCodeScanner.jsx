@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import QrScanner from 'react-qr-scanner';
+import QrReader from 'react-qr-scanner';
 
 class QRCodeScanner extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            delay: 300, 
-            result: 'Žádný', 
-            camera: 'rear', 
-            scanError: '', 
+            delay: 300,
+            result: 'Žádný',
+            scanError: '',
         };
 
         this.handleScan = this.handleScan.bind(this);
@@ -18,7 +17,7 @@ class QRCodeScanner extends Component {
     handleScan(data) {
         if (data) {
             this.setState({
-                result: data.text, 
+                result: data.text,
                 scanError: '',
             });
         }
@@ -32,26 +31,20 @@ class QRCodeScanner extends Component {
     }
 
     render() {
-        const { result, camera, scanError, delay } = this.state;
-        
+        const { result, scanError, delay } = this.state;
+
         return (
             <div className="space-y-6">
-            
-
                 <div className="w-full justify-end">
-                  
-                    <QrScanner
-                        key={camera}  
-                        delay={delay} 
-                        style={{ width: '75%' }}
-                        facingMode={"rear"}  
-                        onError={this.handleError} 
-                        onScan={this.handleScan}
-                    />
+                    {/* Always use rear camera */}
+                    <QrReader delay={delay}  style={{ width: '75%' }} onError={this.componentDidUpdatehandleError} onScan={this.handleScan} constraints={{
+                        audio: true,
+                        video: { facingMode: "environment" }
+                    }} />
                 </div>
 
                 {scanError && <p className="text-red-500 text-sm">{scanError}</p>}
-                <p>Výsledený kód: {result}</p> 
+                <p>Výsledený kód: {result}</p>
             </div>
         );
     }
