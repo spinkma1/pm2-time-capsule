@@ -13,6 +13,8 @@ public class ContentApiImpl implements ContentApi{
 
     @Override
     public ResponseEntity<ContentDto> uploadContent(Long capsuleId, ContentDto contentDto) {
-        return ResponseEntity.ok(contentService.uploadContent(capsuleId, contentDto));
+        //TODO ANALYTIK
+//        return ResponseEntity.ok(contentService.uploadContent(capsuleId, contentDto));
+        return null;
     }
 }

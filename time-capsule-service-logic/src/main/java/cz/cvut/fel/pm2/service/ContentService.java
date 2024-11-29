@@ -15,17 +15,18 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ContentService {
-    private final CapsuleRepository capsuleRepository;
-    private final ContentRepository contentRepository;
-    private final ContentMapper contentMapper;
-
-    public ContentDto uploadContent(Long capsuleId, ContentDto contentDto) {
-        Capsule capsule = capsuleRepository.findById(capsuleId)
-                .orElseThrow(() -> new NotFoundException("Capsule not found with id: " + capsuleId));
-
-        Content content = contentMapper.toEntity(contentDto);
-        content.setCapsule(capsule);
-
-        return contentMapper.toDto(contentRepository.save(content));
-    }
+    //TODO ANALYTIK
+//    private final CapsuleRepository capsuleRepository;
+//    private final ContentRepository contentRepository;
+//    private final ContentMapper contentMapper;
+//
+//    public ContentDto uploadContent(Long capsuleId, ContentDto contentDto) {
+//        Capsule capsule = capsuleRepository.findById(capsuleId)
+//                .orElseThrow(() -> new NotFoundException("Capsule not found with id: " + capsuleId));
+//
+//        Content content = contentMapper.toEntity(contentDto);
+//        content.setCapsule(capsule);
+//
+//        return contentMapper.toDto(contentRepository.save(content));
+//    }
 }
