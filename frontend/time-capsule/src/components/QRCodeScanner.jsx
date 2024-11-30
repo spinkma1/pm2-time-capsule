@@ -34,11 +34,11 @@ class QRCodeScanner extends Component {
         const { result, scanError, delay } = this.state;
 
         return (
-            <div className="space-y-6">
-                <div className="w-full justify-end">
+            <div>
+                <div className="w-full">
                     {/* Always use rear camera */}
-                    <QrReader delay={delay}  style={{ width: '75%' }} onError={this.componentDidUpdatehandleError} onScan={this.handleScan} constraints={{
-                        audio: true,
+                    <QrReader delay={delay} style={{ width: '75%' }} onError={this.componentDidUpdatehandleError} onScan={this.handleScan} constraints={{
+                        audio: false,
                         video: { facingMode: "environment" }
                     }} />
                 </div>

@@ -77,13 +77,13 @@ const AdminCapsuleDetail = () => {
     };
 
     const handleDeleteCapsule = () => {
-        // Implementace smazání kapsle
+        // TODO
         console.log('Deleting capsule');
         navigate('/admin');
     };
 
     const handleNotifyContributors = () => {
-        // Implementace notifikace přispěvatelů
+        // TODO
         console.log('Notifying contributors');
     };
 

@@ -22,7 +22,7 @@ const AdminUserDetail = () => {
     const { userId } = useParams();
     const navigate = useNavigate();
 
-    // Mock data pro demonstraci
+    // Mock data
     const user = {
         id: 1,
         email: "jan.novak@email.cz",

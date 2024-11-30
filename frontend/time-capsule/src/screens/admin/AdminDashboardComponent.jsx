@@ -7,7 +7,7 @@ const AdminDashboard = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
-    // Mock data pro demonstraci
+    // Mock data
     const mockUsers = [
         {
             id: 1,
