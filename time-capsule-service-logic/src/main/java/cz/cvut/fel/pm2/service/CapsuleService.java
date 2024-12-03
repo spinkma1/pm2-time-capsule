@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @Slf4j
 @Service
@@ -33,6 +34,7 @@ public class CapsuleService {
     private final CapsuleMapper capsuleMapper;
     private final UserRepository userRepository;
     private final SecureRandom secureRandom = new SecureRandom();
+    private final MailService mailService;
 
     public CapsuleDto createCapsule(@NonNull CapsuleDto capsuleDto) throws NoSuchAlgorithmException {
         validateCapsule(capsuleDto);
@@ -206,9 +208,106 @@ public class CapsuleService {
         if (allMethodsSatisfied) {
             capsule.setState(State.OPEN);
             capsuleRepository.save(capsule); // Don't forget to persist the change
+
+            // Send email notification
+            sendOpenNotifications(capsule);
+
             return true;
         }
         return false;
     }
+
+    public void subscribeToCapsule(String capsuleId, String userEmail) {
+        Capsule capsule = capsuleRepository.getCapsuleByName(capsuleId)
+                .orElseThrow(() -> new NotFoundException("Capsule not found"));
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (capsule.getUsers().contains(user)) {
+            throw new InvalidBodyException("User is already subscribed to this capsule");
+        }
+
+        capsule.getUsers().add(user);
+        capsuleRepository.save(capsule);
+
+        // Notify the user, that he was subscribed to a capsule, through email
+        mailService.sendEmail(
+                user.getEmail(),
+                "Subscription Successful",
+                "You have successfully subscribed to the capsule: " + capsule.getName()
+        );
+    }
+
+
+
+    // Scheduled task to notify users 1 day before the capsule becomes openable
+    @Scheduled(cron = "0 0 8 * * *") // 8:00 Everyday
+    public void notifyBeforeOpening() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime tomorrow = now.plusDays(1);
+
+        // Find capsules with unlock times within the next 24 hours
+        var capsulesToNotify = capsuleRepository.findByUnlockTimeBetween(now, tomorrow);
+
+        for (Capsule capsule : capsulesToNotify) {
+            sendUpcomingOpenNotification(capsule);
+        }
+    }
+
+    //Notify the owner and subscribed users about a new opened capsule through email
+    private void sendOpenNotifications(Capsule capsule) {
+        String subject = "Capsule Now Openable!";
+        String message = String.format(
+                "Hello,\n\nThe capsule '%s' is now openable! You can access it at your convenience.\n\nBest regards,\nMemory Capsule",
+                capsule.getName()
+        );
+
+        // Notify owner
+        String ownerEmail = capsule.getOwner().getEmail();
+        if (ownerEmail != null) {
+            mailService.sendEmail(ownerEmail, subject, message);
+        } else {
+            log.warn("Capsule owner email is null for capsule ID: {}", capsule.getId());
+        }
+
+        // Notify all subscribed users
+        capsule.getUsers().forEach(user -> {
+            String userEmail = user.getEmail();
+            if (userEmail != null) {
+                mailService.sendEmail(userEmail, subject, message);
+            } else {
+                log.warn("Subscribed user email is null for capsule ID: {}", capsule.getId());
+            }
+        });
+    }
+
+    //Notify the owner and subscribed users about an capsule, that will open soon, through email
+    private void sendUpcomingOpenNotification(Capsule capsule) {
+        String subject = "Capsule Will Be Openable Soon!";
+        String message = String.format(
+                "Hello,\n\nThe capsule '%s' will be openable tomorrow! Get ready to access its contents.\n\nBest regards,\nMemory Capsule",
+                capsule.getName()
+        );
+
+        // Notify the owner
+        String ownerEmail = capsule.getOwner().getEmail();
+        if (ownerEmail != null) {
+            mailService.sendEmail(ownerEmail, subject, message);
+        } else {
+            log.warn("Capsule owner email is null for capsule ID: {}", capsule.getId());
+        }
+
+        // Notify all subscribed users
+        capsule.getUsers().forEach(user -> {
+            String userEmail = user.getEmail();
+            if (userEmail != null) {
+                mailService.sendEmail(userEmail, subject, message);
+            } else {
+                log.warn("Subscribed user email is null for capsule ID: {}", capsule.getId());
+            }
+        });
+    }
+
 
 }

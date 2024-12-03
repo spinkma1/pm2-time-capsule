@@ -5,6 +5,8 @@ import cz.cvut.fel.pm2.persistence.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -38,6 +40,15 @@ public interface CapsuleRepository extends JpaRepository<Capsule, Long> {
      * @return capsule with the given qr code password
      */
     Optional<Capsule> findByQrCodePassword(String password);
+
+    /**
+     * Finds capsules with an unlock time between the specified start and end times.
+     *
+     * @param startTime the starting point of the unlock time range.
+     * @param endTime the ending point of the unlock time range.
+     * @return a list of capsules whose unlock time falls between the given range.
+     */
+    List<Capsule> findByUnlockTimeBetween(LocalDateTime startTime, LocalDateTime endTime);
 
 
 }

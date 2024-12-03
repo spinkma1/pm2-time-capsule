@@ -70,5 +70,14 @@ public class CapsuleApiImpl implements CapsuleApi {
         }
     }
 
+    @PostMapping("/capsules/{capsuleId}/subscribe")
+    public ResponseEntity<String> subscribeToCapsule(
+            //TODO
+            @PathVariable String capsuleId,
+            @RequestParam String userEmail) {
+        capsuleService.subscribeToCapsule(capsuleId, userEmail);
+        return ResponseEntity.ok(userEmail + "successfully subscribed to the capsule: " + capsuleId);
+    }
+
 
 }
