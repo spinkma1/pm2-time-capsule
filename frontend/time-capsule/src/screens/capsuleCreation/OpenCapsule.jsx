@@ -15,15 +15,15 @@ import {
     LockOpen
 } from 'lucide-react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-import Contributor from './Contributor';
-import CopyLinkButton from './CopyLinkButton';
-import InfoBox from './InfoBox';
-import DropdownSelect from './DropdownSelect';
+import Contributor from '../../components/capsulecreation/Contributor';
+import CopyLinkButton from '../../components/capsulecreation/CopyLinkButton';
+import InfoBox from '../../components/capsulecreation/InfoBox';
+import DropdownSelect from '../../components/capsulecreation/DropdownSelect';
 import QRGenerator from './QRGenerator';
 import { useNavigate } from 'react-router-dom';
-import InfoSection from './InfoSection';
-import Warning from './Warning';
-import Confirmation from './Confirmation';
+import InfoSection from '../../components/capsulecreation/InfoSection';
+import Warning from '../../components/capsulecreation/Warning';
+import Confirmation from '../../components/capsulecreation/Confirmation';
 import { format } from 'date-fns';
 import { cs } from 'date-fns/locale';
 import { useParams } from 'react-router-dom';
@@ -43,12 +43,12 @@ const OpenCapsule = () => {
             createdDate: "2024-01-01",
             status: "closed",
             contributorsAmount: 3,
-            thumbnail: null,
             hasGeolocation: true,
             hasQRCode: true,
+            geolocation: { lat: 50.086451, lng: 14.411482 },
+            thumbnail: null,
             maxItems: 5,
             type: "own",
-            geolocation: { lat: 50.0755, lng: 14.4378 },
             contributors: [
                 { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
                 { id: 2, email: "m.svoboda@gmail.com", avatar: "MS" },
@@ -251,7 +251,7 @@ const OpenCapsule = () => {
                     </div>
 
                     {/* Form content */}
-                    <div className="bg-white rounded-lg shadow-sm p-6">
+                    <div className="bg-white rounded-lg p-6">
                         {step === 1 && (
                             <div className="space-y-6">
                                 <h2 className="text-2xl font-bold text-gray-900">Čas</h2>
@@ -278,7 +278,7 @@ const OpenCapsule = () => {
                                 </div>
                             </div>
                         )}
-                        <div className="bg-white rounded-lg shadow-sm">
+                        <div className="bg-white rounded-lg">
                             {step === 2 && (
                                 <div className="space-y-6">
                                     <div className="flex flex-col space-y-4">
@@ -286,14 +286,20 @@ const OpenCapsule = () => {
                                             Geolokace
                                         </h2>
                                         <p className="text-gray-700">
-                                            Pro pokračování ověříme vaši aktuální polohu. Klikněte na tlačítko níže pro povolení přístupu k vaší GPS.
+                                            Pro pokračování ověříme vaši aktuální polohu. Klikněte na tlačítko níže pro povolení přístupu k vaší GPS.{' '}
+                                            {capsule[0]?.geolocation
+                                                ? `Šířka: ${capsule[0].geolocation.lat}, Délka: ${capsule[0].geolocation.lng}`
+                                                : 'Geolokace není k dispozici.'}
                                         </p>
-                                        <button
-                                            onClick={() => handleGeolocationCheck()}
-                                            className="px-4 py-2  bg-blue-900 text-white rounded-lg hover:bg-blue-800"
-                                        >
-                                            Získat aktuální polohu
-                                        </button>
+
+                                        <div className="flex items-center justify-center">
+                                            <button
+                                                onClick={() => handleGeolocationCheck()}
+                                                className="px-4 py-2  bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+                                            >
+                                                Získat aktuální polohu
+                                            </button>
+                                        </div>
                                         {errors.geolocation && (
                                             <p className="text-red-500 text-sm mt-1">{errors.geolocation}</p>
                                         )}
@@ -303,7 +309,7 @@ const OpenCapsule = () => {
                         </div>
 
 
-                        <div className="bg-white rounded-lg shadow-sm">
+                        <div className="bg-white rounded-lg">
                             {step === 3 && (
                                 <div className="space-y-6">
                                     <div className="flex flex-col space-y-4">
@@ -311,7 +317,7 @@ const OpenCapsule = () => {
                                             QR kód
                                         </h2>
                                         <p className="text-gray-700">
-                                            Nahrajte kód z QR kódu nebo jej načtěte pomocí kamery. Kód bude ověřen.
+                                            Nahrajte kód z QR kódu nebo jej načtěte pomocí zadní kamery. Kód bude ověřen.
                                         </p>
 
                                         {/* Input pro zadání QR kódu ručně */}
@@ -335,7 +341,7 @@ const OpenCapsule = () => {
                                             <QRCodeScanner
                                                 onScanSuccess={(scannedCode) => {
                                                     console.log('Naskenovaný kód:', scannedCode);
-                                                    verifyQRCode(scannedCode); 
+                                                    verifyQRCode(scannedCode);
                                                 }}
                                             />
                                         </div>
@@ -354,26 +360,32 @@ const OpenCapsule = () => {
 
                         {/* Navigation buttons */}
                         <div className="flex justify-end mt-6">
-                            {steps !== 3 && (
-                                <>
-                                    {step > 1 && (
-                                        <button
-                                            onClick={handleBack}
-                                            className="px-6 py-2 mx-6 text-base text-center text-black bg-white rounded-lg border border-solid border-neutral-700 hover:bg-gray-200"
-                                        >
-                                            Zpět
-                                        </button>
-                                    )}
-                                    {step < steps.length && (
-                                        <button
-                                            onClick={handleNext}
-                                            className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
-                                        >
-                                            Pokračovat
-                                        </button>
-                                    )}
-                                </>
-                            )}
+                            <>
+                                {step > 1 && (
+                                    <button
+                                        onClick={handleBack}
+                                        className="px-6 py-2 mx-6 text-base text-center text-black bg-white rounded-lg border border-solid border-neutral-700 hover:bg-gray-200"
+                                    >
+                                        Zpět
+                                    </button>
+                                )}
+                                {step < steps.length && (
+                                    <button
+                                        onClick={handleNext}
+                                        className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+                                    >
+                                        Pokračovat
+                                    </button>
+                                )}
+                                {step === steps.length && (
+                                    <button
+                                        onClick={handleSubmit}
+                                        className="px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-600"
+                                    >
+                                        Dokončit
+                                    </button>
+                                )}
+                            </>
                         </div>
 
 

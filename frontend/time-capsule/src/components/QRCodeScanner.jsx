@@ -37,7 +37,7 @@ class QRCodeScanner extends Component {
             <div>
                 <div className="w-full">
                     {/* Always use rear camera */}
-                    <QrReader delay={delay} style={{ width: '75%' }} onError={this.componentDidUpdatehandleError} onScan={this.handleScan} constraints={{
+                    <QrReader delay={delay} style={{ width: '50%' }} onError={this.componentDidUpdatehandleError} onScan={this.handleScan} constraints={{
                         audio: false,
                         video: { facingMode: "environment" }
                     }} />

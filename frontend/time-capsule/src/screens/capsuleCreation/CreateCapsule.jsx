@@ -12,20 +12,22 @@ import {
     QrCode
 } from 'lucide-react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-import Contributor from './Contributor';
-import CopyLinkButton from './CopyLinkButton';
-import InfoBox from './InfoBox';
-import DropdownSelect from './DropdownSelect';
+import Contributor from '../../components/capsulecreation/Contributor';
+import CopyLinkButton from '../../components/capsulecreation/CopyLinkButton';
+import InfoBox from '../../components/capsulecreation/InfoBox';
+import DropdownSelect from '../../components/capsulecreation/DropdownSelect';
 import QRGenerator from './QRGenerator';
 import { useNavigate } from 'react-router-dom';
-import InfoSection from './InfoSection';
-import Warning from './Warning';
-import Confirmation from './Confirmation';
+import InfoSection from '../../components/capsulecreation/InfoSection';
+import Warning from '../../components/capsulecreation/Warning';
+import Confirmation from '../../components/capsulecreation/Confirmation';
+import { useGoogleMaps } from '../../components/context/GoogleProvider';
 
 const CreateCapsule = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [isFirstLoad, setIsFirstLoad] = useState(true);
+    const scriptLoaded = useGoogleMaps();
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -118,13 +120,21 @@ const CreateCapsule = () => {
     };
 
     const handleMapClick = (e) => {
-        const lat = e.latLng.lat();
-        const lng = e.latLng.lng();
-        console.log('Map clicked', lat, lng);
-        setFormData(prev => ({
-            ...prev,
-            geolocation: { lat, lng }
-        }));
+        if (e.latLng) {
+            const lat = e.latLng.lat();
+            const lng = e.latLng.lng();
+            console.log('Map clicked', lat, lng);
+
+            // Nastavení geolokace do formData
+            setFormData(prev => ({
+                ...prev,
+                hasGeolocation: true,
+                geolocation: { lat, lng }
+            }));
+            console.log('Geolocation set', formData.geolocation);
+        } else {
+            console.log('No latLng data available.');
+        }
     };
 
     const handleMapLoad = () => {
@@ -134,7 +144,7 @@ const CreateCapsule = () => {
         }
     };
 
-    const mapCenter = formData.geolocation || { lat: 50.0755, lng: 14.4378 }; // Souřadnice pro Prahu
+    const mapCenter = formData.geolocation || { lat: 50.0755, lng: 14.4378 };
 
     // Function to handle toggling geolocation
     const handleGeolocationToggle = (e) => {
@@ -142,7 +152,7 @@ const CreateCapsule = () => {
         setFormData(prev => ({
             ...prev,
             hasGeolocation: isChecked,
-            geolocation: isChecked ? prev.geolocation : null, // Clear geolocation if turned off
+            geolocation: isChecked ? prev.geolocation : null,
         }));
     };
 
@@ -329,25 +339,21 @@ const CreateCapsule = () => {
                                         <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:translate-x-6"></div>
                                     </label>
                                 </div>
-                                <LoadScript googleMapsApiKey="AIzaSyCC-fxRVR03IQn1i5RD9rkyu91uz2eTXuc">
-                                    {/* Google Map - Display only if geolocation is enabled */}
-                                    {formData.hasGeolocation && (
-                                        <div className="mt-4">
+                                {/* Google Map - Display only if geolocation is enabled */}
+                                {formData.hasGeolocation && (
+                                    <div className="mt-4">
 
-                                            <GoogleMap
-                                                mapContainerStyle={{ width: '100%', height: '400px' }}
-                                                center={mapCenter}
-                                                zoom={12}
-                                                onClick={handleMapClick}
-                                                onLoad={handleMapLoad}
-                                            >
-                                                {formData.geolocation && (
-                                                    <Marker position={formData.geolocation} />
-                                                )}
-                                            </GoogleMap>
-                                        </div>
-                                    )}
-                                </LoadScript>
+                                        <GoogleMap
+                                            mapContainerStyle={{ width: '100%', height: '400px' }}
+                                            center={mapCenter}
+                                            zoom={12}
+                                            onClick={handleMapClick}
+                                            onLoad={handleMapLoad}
+                                        >
+                                            <Marker position={formData.geolocation} />
+                                        </GoogleMap>
+                                    </div>
+                                )}
                             </div>
                         )}
                         <div className="bg-white rounded-lg shadow-sm">
@@ -439,7 +445,7 @@ const CreateCapsule = () => {
                                         </section>
                                     </div>
                                     <Warning />
-                                    <Confirmation onClick={handleSubmit}/>
+                                    <Confirmation onClick={handleSubmit} />
                                 </div>
                             )}
                         </div>

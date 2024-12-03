@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Contributor from "./Contributor";
-import InfoBox from "./InfoBox";
-import DropdownSelect from "./DropdownSelect";
+import Contributor from "../../components/capsulecreation/Contributor";
+import InfoBox from "../../components/capsulecreation/InfoBox";
+import DropdownSelect from "../../components/capsulecreation/DropdownSelect";
 
 const AddContributor = ({ capsule }) => {
     const navigate = useNavigate();

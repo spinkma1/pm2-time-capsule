@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { useLocation } from 'react-router-dom'; // Pro kontrolu URL
+import { useLocation, useNavigate } from 'react-router-dom'; 
 
 const QRGenerator = () => {
     const randomString = "https://www.google.com/";
-    const location = useLocation(); // Získání aktuální URL
+    const location = useLocation();
+    const navigate = useNavigate();
 
-    // Zkontrolujeme, jestli je komponenta otevřená samostatně
     const isFullScreen = location.pathname === '/qrcode';
+
+    const handleBack = () => {
+        navigate(-1);  
+    };
 
     return (
         <div 
@@ -15,14 +19,23 @@ const QRGenerator = () => {
                 isFullScreen ? 'w-full h-screen flex justify-center items-center' : 'w-[200px] h-[200px] mx-auto'
             }`}
         >
+            {isFullScreen && (
+                <button
+                    onClick={handleBack}
+                    className="absolute top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-md"
+                >
+                    Zpět
+                </button>
+            )}
+
             {randomString ? (
                 <QRCodeSVG 
-                value={randomString} 
-                height="100%" 
-                width="100%" 
-            />
+                    value={randomString} 
+                    height="100%" 
+                    width="100%" 
+                />
             ) : (
-                <p>Načítání...</p>
+                <div className="loader"></div>
             )}
         </div>
     );

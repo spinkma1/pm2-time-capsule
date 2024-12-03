@@ -383,7 +383,7 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                                             className="text-blue-900 hover:text-blue-700 font-medium"
                                             onClick={() => {
                                                 setSelectedCapsule(capsule);
-                                                navigate('/capsuleDetail');
+                                                navigate(`/capsuleDetail/${capsule.id}`);
                                             }}
                                             aria-label={`Zobrazit detail kapsle ${capsule.title}`}
                                         >

@@ -14,9 +14,11 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ConfirmPopup from './ConfirmPopup';
+import { useParams } from 'react-router-dom';
 
 
 const CapsuleDetail = ({ capsule, setSelectedCapsule }) => {
+    const { id } = useParams();
     const navigate = useNavigate();
     const [showContributors, setShowContributors] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
