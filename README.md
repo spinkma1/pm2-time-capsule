@@ -1,8 +1,8 @@
-#### Time Capsules
+## Time Capsules
 Time Capsules je moderní webová aplikace, která uživatelům umožňuje vytvářet, sdílet a objevovat časové kapsle. Uživatelé mohou ke svým kapslím přiřazovat geolokace, zobrazovat je na mapě a interagovat s kapslemi ostatních uživatelů v dynamickém a intuitivním rozhraní.
 
 
-### Struktura projektu
+## Struktura projektu
 Projekt je postaven na moderním technologickém stacku, který zajišťuje škálovatelnost, výkon a snadnou údržbu. Níže je přehled struktury projektu:
 
 ## Frontend
