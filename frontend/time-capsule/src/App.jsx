@@ -24,6 +24,7 @@ import AdminUserDetail from './screens/admin/AdminUserDetail.jsx';
 import AdminCapsuleDetail from './screens/admin/AdminCapsuleDetail.jsx';
 
 import { GoogleMapsProvider } from './components/context/GoogleProvider';
+import HealthCheck from './components/HealthCheck';
 
 const App = () => {
     const [user, setUser] = useState(null);
@@ -35,6 +36,7 @@ const App = () => {
                 <div className="min-h-screen bg-white text-gray-800">
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
+                        <Route path="/health" element={<HealthCheck />} />
                         <Route path="/login" element={<AuthPages currentPage="login" setUser={setUser} />} />
                         <Route path="/register" element={<AuthPages currentPage="register" setUser={setUser} />} />
                         <Route path="/termsOfUse" element={<TermsOfUse />} />

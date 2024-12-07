@@ -5,18 +5,21 @@ import com.stripe.model.Customer;
 import com.stripe.model.PaymentMethod;
 import com.stripe.model.Product;
 import cz.cvut.fel.pm2.model.CapsuleDto;
+import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.CapsuleRepository;
 import cz.cvut.fel.pm2.repository.UserRepository;
 import cz.cvut.fel.pm2.service.CapsuleService;
 import cz.cvut.fel.pm2.service.StripeService;
 import cz.cvut.fel.pm2.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +34,7 @@ public class UserApiImpl implements UserApi {
 
 
     @Override
-    @PostMapping("/login")
+    @PostMapping("/login/sso")
     public Map<String, String> login(@AuthenticationPrincipal OidcUser oidcUser) {
         Map<String, String> response = new HashMap<>();
         if (oidcUser != null) {
@@ -63,7 +66,7 @@ public class UserApiImpl implements UserApi {
     }
 
 
-    @PostMapping("/register")
+    @PostMapping("/register/sso")
     public Map<String, Object> register(@AuthenticationPrincipal OidcUser oidcUser) {
         Map<String, Object> response = new HashMap<>();
         if (oidcUser != null) {
@@ -73,6 +76,32 @@ public class UserApiImpl implements UserApi {
             response.put("message", "User not authenticated");
         }
         return response;
+    }
+
+    @Override
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String password = request.get("password");
+        Optional<User> user = userService.loginUser(email, password);
+        if (user.isPresent()) {
+            return ResponseEntity.ok(Map.of("message", "Login successful"));
+        } else {
+            return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
+        }
+    }
+
+    @Override
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> request) {
+        String password = request.get("password");
+        String email = request.get("email");
+        try {
+            userService.registerUser(password, email);
+            return ResponseEntity.ok(Map.of("message", "Registration successful"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 
     @PostMapping("/stripe/customer")

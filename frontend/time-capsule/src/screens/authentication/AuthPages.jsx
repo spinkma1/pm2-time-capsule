@@ -3,6 +3,7 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
+import { ApiService } from "../../api/api.js";
 
 const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
     const navigate = useNavigate();
@@ -56,6 +57,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
         return Object.keys(newErrors).length === 0;
     };
     /* MOCKUP*/
+    /*
     const handleSubmit = (e) => {
         e.preventDefault();
         const userEmail = isLogin ? loginForm.email : registerForm.email; 
@@ -74,8 +76,10 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
         }
     }
 
+     */
+
     /* TODO*/
-/*
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const userEmail = isLogin ? loginForm.email : registerForm.email;
@@ -84,34 +88,34 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
         if (isLogin) {
             if (validateLoginForm(loginForm)) {
                 try {
-                    const response = await login(loginForm.email, loginForm.password);
-                    if (response.success) {
+                    const data = await ApiService.login(loginForm.email, loginForm.password);
+                    console.log('Login response:', data);
+                    if (data) {
                         setUser({ email: userEmail, initials });
                         navigate('/dashboard');
-                    } else {
-                        setLoginErrors({ api: response.message || 'Login failed' });
                     }
                 } catch (error) {
-                    setLoginErrors({ api: 'Login failed' });
+                    console.error('Login error:', error);
+                    setLoginErrors({ api: 'Přihlášení selhalo' });
                 }
             }
         } else {
             if (validateRegisterForm(registerForm)) {
                 try {
-                    const response = await register(registerForm.email, registerForm.password);
-                    if (response.success) {
+                    const data = await ApiService.register(registerForm.email, registerForm.password);
+                    console.log('Registration response:', data);
+                    if (data) {
                         setUser({ email: userEmail, initials });
                         navigate('/dashboard');
-                    } else {
-                        setRegisterErrors({ api: response.message || 'Registration failed' });
                     }
                 } catch (error) {
-                    setRegisterErrors({ api: 'Registration failed' });
+                    console.error('Registration error:', error);
+                    setRegisterErrors({ api: 'Registrace selhala' });
                 }
             }
         }
     };
-*/
+
 
 
     // TODO

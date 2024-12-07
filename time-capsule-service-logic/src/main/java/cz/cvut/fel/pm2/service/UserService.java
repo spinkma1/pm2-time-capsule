@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<Capsule> getCapsules(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"))
@@ -55,4 +57,21 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
+    public User registerUser(String password, String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("User already exists");
+        }
+        User user = new User();
+        user.setPassword(passwordEncoder.encode(password));
+        user.setEmail(email);
+        return userRepository.save(user);
+    }
+
+    public Optional<User> loginUser(String username, String password) {
+        Optional<User> user = userRepository.findByEmail(username);
+        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
+            return user;
+        }
+        return Optional.empty();
+    }
 }

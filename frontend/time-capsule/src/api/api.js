@@ -70,7 +70,7 @@ const refreshTokenApi = async (refreshToken) => {
 export const ApiService = {
   login: async (email, password) => {
     try {
-      const response = await fetchWithConfig("/auth/login", {
+      const response = await fetchWithConfig("/user/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -88,7 +88,7 @@ export const ApiService = {
 
   register: async (email, password) => {
     try {
-      const response = await fetchWithConfig("/auth/register", {
+      const response = await fetchWithConfig("/user/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -100,8 +100,18 @@ export const ApiService = {
     }
   },
 
-  logout: () => {
-    handleLogout();
-  },
+  loginWithGoogle: async (token) => {
+    try {
+      const response = await fetchWithConfig("/user/login/sso", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      return response;
+    } catch (error) {
+      console.error("Google login failed:", error);
+      throw error;
+    }
+  }
 };
-

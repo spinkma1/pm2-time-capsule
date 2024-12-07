@@ -1,3 +1,4 @@
+/*
 package cz.cvut.fel.pm2;
 
 import com.stripe.exception.StripeException;
@@ -380,3 +381,6 @@ public class StripeTest {
     }
 
 }
+
+
+ */

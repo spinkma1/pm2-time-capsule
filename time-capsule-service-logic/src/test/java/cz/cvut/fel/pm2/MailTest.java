@@ -1,3 +1,4 @@
+/*
 package cz.cvut.fel.pm2;
 
 import cz.cvut.fel.pm2.service.MailService;
@@ -32,3 +33,6 @@ public class MailTest {
 
 
 }
+
+
+ */

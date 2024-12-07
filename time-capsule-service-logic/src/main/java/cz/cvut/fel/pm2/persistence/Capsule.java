@@ -22,7 +22,6 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class Capsule extends AbstractEntity {
 
@@ -68,13 +67,7 @@ public class Capsule extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "unlock_methods", joinColumns = @JoinColumn(name = "capsule_id"))
     @Column(nullable = false)
-    //time is set true by default, others false
-    private HashMap<UnlockMethod, UnlockMethodState> unlockMethods = new HashMap<UnlockMethod, UnlockMethodState>() {{
-        unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, false));  // Time unlock method enabled, not complete
-        unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(false, false)); // QR method disabled, not complete
-        unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(false, false)); // Geolocation method disabled, not complete
-        unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(false, false)); // Password method disabled, not complete
-    }};
+    private HashMap<UnlockMethod, UnlockMethodState> unlockMethods;
 
     @Column(name = "unlock_time")
     private LocalDateTime unlockTime;
@@ -88,5 +81,12 @@ public class Capsule extends AbstractEntity {
     @Column(name = "unlock_longit")
     private Double unlockLongit;
 
-
+    // Constructor to initialize unlockMethods
+    public Capsule() {
+        this.unlockMethods = new HashMap<>();
+        this.unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, false));  // Time unlock method enabled, not complete
+        this.unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(false, false)); // QR method disabled, not complete
+        this.unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(false, false)); // Geolocation method disabled, not complete
+        this.unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(false, false)); // Password method disabled, not complete
+    }
 }
