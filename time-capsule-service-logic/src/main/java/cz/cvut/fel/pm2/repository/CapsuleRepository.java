@@ -24,7 +24,7 @@ public interface CapsuleRepository extends JpaRepository<Capsule, Long> {
      * @param owner owner of the capsule
      * @return capsule with the given owner
      */
-    Optional<Capsule> getCapsulesByOwner(User owner);
+    Optional<List<Capsule>> getCapsulesByOwner(User owner);
 
 
     /**

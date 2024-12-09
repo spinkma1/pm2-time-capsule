@@ -37,7 +37,7 @@ public class SecurityConfig {
         final CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true); // Required for OAuth
         // Match all origins dynamically, it is definitely not safe for production.
-        configuration.setAllowedOriginPatterns(List.of("*/*")); // TODO add specific vercel website before PROD release
+        configuration.setAllowedOriginPatterns(List.of("*")); // TODO add specific vercel website before PROD release
 //        configuration.setAllowedOriginPatterns(List.of("vercel.app/blabla capsule")) ;
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(List.of("*"));

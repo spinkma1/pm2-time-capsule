@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static cz.cvut.fel.pm2.service.CapsuleService.hashPassword;
@@ -28,8 +29,8 @@ public class CapsuleApiImpl implements CapsuleApi {
     }
 
     @Override
-    public ResponseEntity<CapsuleDto> getCapsule(@RequestParam String email) {
-        return ResponseEntity.ok(capsuleService.getCapsule(email));
+    public ResponseEntity<List<CapsuleDto>> getCapsules(@RequestParam String email) {
+        return ResponseEntity.ok(capsuleService.getCapsules(email));
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -92,8 +93,7 @@ public interface CapsuleApi {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    ResponseEntity<CapsuleDto> getCapsule(@RequestParam String email);
+    ResponseEntity<List<CapsuleDto>> getCapsules(@RequestParam String email);
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{capsuleId}")
