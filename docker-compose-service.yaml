@@ -6,7 +6,7 @@ services:
     extends:
       service: postgres
       file: docker-compose-postgresql.yaml
-  car-rental-service:
+  time-capsule-service:
     container_name: service
     build:
       context: .
