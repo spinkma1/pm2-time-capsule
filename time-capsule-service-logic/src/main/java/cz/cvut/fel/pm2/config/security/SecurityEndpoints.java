@@ -31,7 +31,7 @@ public class SecurityEndpoints {
      */
     final RequestMatcher MEMBER_URLS = new OrRequestMatcher(
             antMatcher(HttpMethod.POST, "/capsules/register"),
-            antMatcher(HttpMethod.POST, "/vehicles/unregister")
+            antMatcher(HttpMethod.POST, "/capsules/unregister")
     );
 
     /**

@@ -1,7 +1,6 @@
 package cz.cvut.fel.pm2.config.security;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -28,15 +27,6 @@ import java.util.List;
 public class SecurityConfig {
     private final ClientRegistrationRepository clientRegistrationRepository;
 
-    @Value("${admin.username}")
-    private String adminUsername;
-
-    @Value("${admin.password}")
-    private String adminPassword;
-
-    @Value("${cors.allowed-origins:#{T(java.util.Collections).emptyList()}}")
-    private List<String> corsAllowedOrigins;
-
     /**
      * Configures CORS settings.
      *
@@ -44,9 +34,11 @@ public class SecurityConfig {
      */
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-        corsAllowedOriginSet();
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(corsAllowedOrigins);
+        configuration.setAllowCredentials(true); // Required for OAuth
+        // Match all origins dynamically, it is definitely not safe for production.
+        configuration.setAllowedOriginPatterns(List.of("*/*")); // TODO add specific vercel website before PROD release
+//        configuration.setAllowedOriginPatterns(List.of("vercel.app/blabla capsule")) ;
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(List.of("*"));
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -107,14 +99,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    /**
-     * Validates the CORS allowed origins configuration.
-     */
-    private void corsAllowedOriginSet() {
-        if (corsAllowedOrigins == null || corsAllowedOrigins.isEmpty()) {
-            throw new IllegalArgumentException("${cors.allowed-origin} property must be configured");
-        }
     }
 }

@@ -14,9 +14,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Table(name = "T_CAPSULE")
 @Entity
@@ -69,12 +67,13 @@ public class Capsule extends AbstractEntity {
     @CollectionTable(name = "unlock_methods", joinColumns = @JoinColumn(name = "capsule_id"))
     @Column(nullable = false)
     //time is set true by default, others false
-    private HashMap<UnlockMethod, UnlockMethodState> unlockMethods = new HashMap<UnlockMethod, UnlockMethodState>() {{
-        unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, false));  // Time unlock method enabled, not complete
-        unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(false, false)); // QR method disabled, not complete
-        unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(false, false)); // Geolocation method disabled, not complete
-        unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(false, false)); // Password method disabled, not complete
-    }};
+    // todo zakomentoval jsem to, protoze s tim nejde spustit aplikace. Pred pushem vzdy zkontrolovat clean package run
+    private HashMap<UnlockMethod, UnlockMethodState> unlockMethods = new HashMap<>() {
+        //unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, false));  // Time unlock method enabled, not complete
+        //unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(false, false)); // QR method disabled, not complete
+        //unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(false, false)); // Geolocation method disabled, not complete
+        //unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(false, false)); // Password method disabled, not complete
+    };
 
     @Column(name = "unlock_time")
     private LocalDateTime unlockTime;
