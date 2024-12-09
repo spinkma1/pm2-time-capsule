@@ -18,10 +18,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+
 import org.springframework.scheduling.annotation.Scheduled;
 
 @Slf4j
@@ -46,11 +44,11 @@ public class CapsuleService {
         return capsuleMapper.toDto(capsule);
     }
 
-    public CapsuleDto getCapsule(String email) {
+    public List<CapsuleDto> getCapsules(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
         return capsuleRepository.getCapsulesByOwner(user)
-                .map(capsuleMapper::toDto)
-                .orElseThrow(() -> new NotFoundException("Capsule not found"));
+                .map(capsuleMapper::toDtos)
+                .orElseThrow(() -> new NotFoundException("No capsule was found for the specified user"));
     }
 
 
@@ -166,11 +164,7 @@ public class CapsuleService {
             UnlockMethodState state = entry.getValue();
 
             // If the method is in the methodSet, enable it
-            if (methodSet.contains(method)) {
-                state.setEnabled(true);
-            } else {
-                state.setEnabled(false);
-            }
+            state.setEnabled(methodSet.contains(method));
         }
 
         capsuleRepository.save(capsule.get());

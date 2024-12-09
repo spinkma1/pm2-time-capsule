@@ -31,7 +31,7 @@ public class SecurityEndpoints {
      */
     final RequestMatcher MEMBER_URLS = new OrRequestMatcher(
             antMatcher(HttpMethod.POST, "/capsules/register"),
-            antMatcher(HttpMethod.POST, "/vehicles/unregister")
+            antMatcher(HttpMethod.POST, "/capsules/unregister")
     );
 
     /**
@@ -39,9 +39,7 @@ public class SecurityEndpoints {
      */
     final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
             antMatcher(HttpMethod.GET,"/api-docs/**"),
-            antMatcher(HttpMethod.GET,"/capsules/user"),
-            antMatcher(HttpMethod.GET,"/capsules/{registration}"),
-            antMatcher(HttpMethod.GET,"/capsules/{licenseCode}/accidents"),
+            antMatcher(HttpMethod.GET,"/capsules/**"),
             antMatcher("/users/register")
 
     );

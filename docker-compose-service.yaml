@@ -1,13 +1,11 @@
-# docker-compose.yml
 version: "3.9"
 name: time-capsule
 
 services:
   postgres:
     extends:
-      file: docker-compose-postgresql.yaml
       service: postgres
-
+      file: docker-compose-postgresql.yaml
   time-capsule-service:
     container_name: time-capsule-service
     build:
@@ -15,15 +13,27 @@ services:
       dockerfile: Dockerfile
     ports:
       - '8080:8080'
-    environment:
-      CORS_ALLOWED_ORIGIN: "http://localhost:3000"
-      #SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/timecapsule"
-      SPRING_PROFILES_ACTIVE: "dev"
     depends_on:
       - postgres
+    environment:
+      CORS_ALLOWED_ORIGIN: "*"
+#      SPRING_DATASOURCE_URL: "jdbc:postgresql://time-capsule-service-host:5432/time-capsule"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://ep-plain-snow-a2y3jxg7.eu-central-1.aws.neon.tech/timecapsule?user=timecapsule_owner&password=tLKWQu1FgIP0&sslmode=require"
+      SPRING_PROFILES_ACTIVE: "dev"
+
+
+
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        
     networks:
       - time-capsule-network
 
 networks:
   time-capsule-network:
     driver: bridge
+
+

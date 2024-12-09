@@ -13,17 +13,17 @@ import java.util.List;
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${cors.allowed.origins:http://localhost:3000}")  // Přidáme Vite výchozí port
+    @Value("${cors.allowed-origins:#{null}}")
     private List<String> corsAllowedOrigins;
+
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins(corsAllowedOrigins.toArray(new String[0]))
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3600);
+                .allowedMethods("*")
+                .allowCredentials(true);
     }
 
     /**
