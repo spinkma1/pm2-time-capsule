@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(corsAllowedOrigins.toArray(new String[0]))
+                .allowedOriginPatterns("*") // TODO add specific vercel website before PROD release
                 .allowedHeaders("*")
                 .allowedMethods("*")
                 .allowCredentials(true);
