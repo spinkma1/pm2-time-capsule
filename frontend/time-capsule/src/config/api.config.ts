@@ -10,8 +10,8 @@ const API_CONFIG = {
     ENDPOINTS: {
         HEALTH: '/health',
         AUTH: {
-            LOGIN: '/auth/login',
-            REGISTER: '/auth/register',
+            LOGIN: '/user/login',
+            REGISTER: '/user/register',
             REFRESH: '/auth/refresh'
         },
         USER: {
