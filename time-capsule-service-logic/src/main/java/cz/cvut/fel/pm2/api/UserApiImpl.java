@@ -4,7 +4,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.PaymentMethod;
 import com.stripe.model.Product;
-import cz.cvut.fel.pm2.model.CapsuleDto;
+import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.CapsuleRepository;
 import cz.cvut.fel.pm2.repository.UserRepository;
@@ -30,7 +30,6 @@ public class UserApiImpl implements UserApi {
     private final UserService userService;
     private final CapsuleService capsuleService;
     private final StripeService stripeService;
-
 
 
     @Override
@@ -94,12 +93,16 @@ public class UserApiImpl implements UserApi {
     @Override
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> request) {
+        if (!request.containsKey("email") || !request.containsKey("password")) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Invalid request"));
+        }
         String password = request.get("password");
         String email = request.get("email");
+
         try {
             userService.registerUser(password, email);
             return ResponseEntity.ok(Map.of("message", "Registration successful"));
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }

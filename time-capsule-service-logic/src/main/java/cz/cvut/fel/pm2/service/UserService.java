@@ -33,14 +33,15 @@ public class UserService {
     }
 
     @Transactional
-    public User findOrCreateUser(OidcUser oidcUser) {
+    public void findOrCreateUser(OidcUser oidcUser) {
         String googleId = oidcUser.getSubject();
         String email = oidcUser.getEmail();
 
         // Check if a user with this Google ID already exists
         Optional<User> existingUser = userRepository.findByEmail(email);
         if (existingUser.isPresent()) {
-            return existingUser.get();
+            existingUser.get();
+            return;
         }
 
         // Check if a user with this email already exists
@@ -49,22 +50,26 @@ public class UserService {
             User user = existingUser.get();
             // Link this account to Google SSO if it was registered previously without Google
             user.setGoogleId(googleId);
-            return userRepository.save(user);
+            userRepository.save(user);
+            return;
         }
 
         User newUser = new User(email, googleId);
         newUser.setRole(Role.REGISTERED);
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
     }
 
-    public User registerUser(String password, String email) {
+    public void registerUser(String password, String email) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("User already exists");
         }
         User user = new User();
         user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
-        return userRepository.save(user);
+        user.setRole(Role.REGISTERED);
+        user.setCapsules(List.of());
+        user.setFollowers(List.of());
+        userRepository.save(user);
     }
 
     public Optional<User> loginUser(String username, String password) {

@@ -43,7 +43,7 @@ public class CapsuleService {
 
         return capsuleMapper.toDto(capsule);
     }
-
+ 
     public List<CapsuleDto> getCapsules(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
         return capsuleRepository.getCapsulesByOwner(user)
