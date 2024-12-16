@@ -36,7 +36,10 @@ public class CapsuleService {
 
     public CapsuleDto createCapsule(@NonNull CapsuleDto capsuleDto) throws NoSuchAlgorithmException {
         validateCapsule(capsuleDto);
+
         Capsule capsule = capsuleMapper.toEntity(capsuleDto);
+
+        capsule = capsuleRepository.save(capsule);
 
         generateAndHashQrPassword(capsule.getId());
         capsule = capsuleRepository.save(capsule);
@@ -80,7 +83,7 @@ public class CapsuleService {
 
 
 
-    public void generateAndHashQrPassword(Integer capsuleId) throws NoSuchAlgorithmException {
+    public void generateAndHashQrPassword(Long capsuleId) throws NoSuchAlgorithmException {
         var capsule = capsuleRepository.getCapsuleById(capsuleId)
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 
@@ -113,7 +116,7 @@ public class CapsuleService {
     }
 
 
-    public void updateUnlockMethodState(int capsuleId, UnlockMethod unlockMethod, boolean enabledBool, boolean completionBool) {
+    public void updateUnlockMethodState(Long capsuleId, UnlockMethod unlockMethod, boolean enabledBool, boolean completionBool) {
         // Retrieve the capsule by its ID
         var capsule = capsuleRepository.getCapsuleById(capsuleId)
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
@@ -178,7 +181,7 @@ public class CapsuleService {
 
 
 
-    public boolean tryUnlockCapsule(int capsuleId) {
+    public boolean tryUnlockCapsule(Long capsuleId) {
         // Fetch the capsule by its ID or throw an exception if not found
         var capsule = capsuleRepository.getCapsuleById(capsuleId)
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));

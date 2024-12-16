@@ -14,16 +14,22 @@ CREATE TABLE T_USER (
                         UNIQUE(email)
 );
 
-CREATE TABLE T_CAPSULE (
-                           id SERIAL PRIMARY KEY,
-                           user_id INTEGER NOT NULL,
-                           capsule_size DOUBLE PRECISION,
-                           name VARCHAR(255) NOT NULL UNIQUE,
-                           description TEXT NOT NULL,
-                           state state,
-                           type type,
-                           FOREIGN KEY (user_id) REFERENCES T_USER(id)
-);
+-- T_CAPSULE (updating existing table or creating it)
+CREATE TABLE IF NOT EXISTS T_CAPSULE (
+                                         id SERIAL PRIMARY KEY,
+                                         user_id INTEGER NOT NULL,
+                                         capsule_size DOUBLE PRECISION,
+                                         name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
+    state state,
+    type type,
+    unlock_time TIMESTAMP,
+    qr_code_password VARCHAR(255),
+    unlock_lat DOUBLE PRECISION,
+    unlock_longit DOUBLE PRECISION,
+    FOREIGN KEY (user_id) REFERENCES T_USER(id)
+    );
+
 
 CREATE TABLE T_CONTENT (
                            id SERIAL PRIMARY KEY,
