@@ -30,7 +30,7 @@ public interface CapsuleApi {
 
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping(name = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @SecurityRequirement(name = "basicAuth")
     @Operation(
 

@@ -37,9 +37,17 @@ public class CapsuleService {
     public CapsuleDto createCapsule(@NonNull CapsuleDto capsuleDto) throws NoSuchAlgorithmException {
         validateCapsule(capsuleDto);
         Capsule capsule = capsuleMapper.toEntity(capsuleDto);
-
+        try {
+            User user = userRepository.findById(capsuleDto.userId())
+                    .orElseThrow(() -> new NotFoundException("User not found"));
+            capsule.setOwner(user);
+            capsule = capsuleRepository.save(capsule);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new InvalidBodyException("Capsule with the same name already exists");
+        }
         generateAndHashQrPassword(capsule.getId());
-        capsule = capsuleRepository.save(capsule);
+
 
         return capsuleMapper.toDto(capsule);
     }

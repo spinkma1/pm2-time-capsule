@@ -119,12 +119,19 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
 
 
     // TODO
-    const handleGoogleSignIn = (credentialResponse) => {
+    const handleGoogleSignIn = async (credentialResponse) => {
         const decodedToken = jwtDecode(credentialResponse.credential);
-        const userEmail = decodedToken.email;
-        const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase();
-        setUser({ email: userEmail, initials });
-        navigate('/dashboard');
+        try {
+            const data = await ApiService.loginWithGoogle(decodedToken);
+            console.log('Login response:', data);
+            if (data) {
+                setUser({email: userEmail, initials});
+                navigate('/dashboard');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            setLoginErrors({api: 'Přihlášení selhalo'});
+        }
     };
 
     // Error handling for Google sign-in

@@ -12,6 +12,7 @@
     <artifactId>time-capsule-service-logic</artifactId>
 
     <dependencies>
+
         <dependency>
             <groupId>cz.cvut.fel.pm2</groupId>
             <artifactId>time-capsule-service-rest-client</artifactId>
@@ -183,6 +184,24 @@
             <artifactId>h2</artifactId>
             <version>2.1.214</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 

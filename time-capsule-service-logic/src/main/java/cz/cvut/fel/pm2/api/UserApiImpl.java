@@ -4,6 +4,8 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.PaymentMethod;
 import com.stripe.model.Product;
+import cz.cvut.fel.pm2.config.security.JwtUtil;
+import cz.cvut.fel.pm2.model.RefreshTokenRequestDto;
 import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.CapsuleRepository;
@@ -13,8 +15,12 @@ import cz.cvut.fel.pm2.service.StripeService;
 import cz.cvut.fel.pm2.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +37,9 @@ public class UserApiImpl implements UserApi {
     private final UserService userService;
     private final CapsuleService capsuleService;
     private final StripeService stripeService;
+
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
 
     @Override
@@ -84,8 +93,20 @@ public class UserApiImpl implements UserApi {
         String email = request.get("email");
         String password = request.get("password");
         Optional<User> user = userService.loginUser(email, password);
+
+
         if (user.isPresent()) {
-            return ResponseEntity.ok(Map.of("message", "Login successful"));
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
+
+            final UserDetails userDetails = userService.loadUserByUsername(email);
+            final String accessToken = jwtUtil.generateToken(userDetails);
+            final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Login successful",
+                    "accessToken", accessToken,
+                    "refreshToken", refreshToken));
         } else {
             return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
         }
@@ -102,7 +123,18 @@ public class UserApiImpl implements UserApi {
 
         try {
             userService.registerUser(password, email);
-            return ResponseEntity.ok(Map.of("message", "Registration successful"));
+            User user = userService.getUser(email);
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
+            final UserDetails userDetails = userService.loadUserByUsername(email);
+            final String accessToken = jwtUtil.generateToken(userDetails);
+            final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Registration successful",
+                    "accessToken", accessToken,
+                    "refreshToken", refreshToken,
+                    "id", String.valueOf(user.getId())));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
@@ -122,6 +154,43 @@ public class UserApiImpl implements UserApi {
     public Product createProduct(@RequestParam String productName, @RequestParam String productDescription) throws StripeException {
         return stripeService.createProduct(productName, productDescription);
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequestDto refreshRequest) {
+
+        System.out.println("refresh token");
+        try {
+            if (!jwtUtil.isRefreshToken(refreshRequest.getRefreshToken())) {
+                System.out.println("not refresh token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            final String username = jwtUtil.extractUsername(refreshRequest.getRefreshToken());
+            if (username == null) {
+                System.out.println("no username");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            final UserDetails userDetails = userService.loadUserByUsername(username);
+
+            if (!jwtUtil.validateToken(refreshRequest.getRefreshToken(), userDetails)) {
+                System.out.println("not valid token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            final String newAccessToken = jwtUtil.generateToken(userDetails);
+            final String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
+
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("accessToken", newAccessToken);
+            responseBody.put("refreshToken", newRefreshToken);
+
+            return ResponseEntity.ok(responseBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
 
     @Override
     @DeleteMapping("/delete")
