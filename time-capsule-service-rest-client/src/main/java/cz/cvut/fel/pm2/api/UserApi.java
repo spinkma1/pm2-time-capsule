@@ -4,8 +4,10 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.PaymentMethod;
 import com.stripe.model.Product;
+import cz.cvut.fel.pm2.model.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -57,4 +59,28 @@ public interface UserApi {
     @PostMapping("/stripe/product")
     @ResponseBody
     Product createProduct(@RequestParam String productName, @RequestParam String productDescription) throws StripeException;
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "Delete user account", description = "Permanently deletes user account and all associated data")
+    ResponseEntity<Map<String, String>> deleteAccount(@AuthenticationPrincipal OidcUser oidcUser);
+
+    @PutMapping("/profile")
+    @Operation(summary = "Update user profile", description = "Updates user profile information")
+    ResponseEntity<UserDto> updateProfile(@AuthenticationPrincipal OidcUser oidcUser, @RequestBody Map<String, String> updates);
+
+    @PostMapping("/logout")
+    @Operation(summary = "Logout user", description = "Logs out the current user")
+    ResponseEntity<Map<String, String>> logout(HttpServletRequest request);
+
+    @PutMapping("/password")
+    @Operation(summary = "Change password", description = "Changes user password")
+    ResponseEntity<Map<String, String>> changePassword(
+            @AuthenticationPrincipal OidcUser oidcUser,
+            @RequestBody PasswordChangeRequest request
+    );
+
+    public record PasswordChangeRequest(
+            String currentPassword,
+            String newPassword
+    ) {}
 }

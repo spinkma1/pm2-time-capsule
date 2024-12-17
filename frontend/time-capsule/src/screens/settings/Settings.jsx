@@ -38,6 +38,20 @@ const Settings = ({ user, setUser }) => {
         { id: 'connections', label: 'Sledující', icon: <Users size={20} /> },
     ];
 
+    const handleLogout = async () => {
+        // Zavolat BE endpoint pro vyčištění session
+        await fetch('/api/user/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        // Vyčistit lokální storage/cookies
+        localStorage.clear();
+
+        // Přesměrovat na login stránku
+        navigate('/');
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
@@ -81,7 +95,7 @@ const Settings = ({ user, setUser }) => {
                                     <span>Smazat účet</span>
                                 </button>
                                 <button
-                                    onClick={() => navigate('/')}
+                                    onClick={() => handleLogout()}
                                     className="w-full flex items-center space-x-2 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
                                 >
                                     <LogOut size={20} />

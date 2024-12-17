@@ -11,6 +11,7 @@ import cz.cvut.fel.pm2.repository.UserRepository;
 import cz.cvut.fel.pm2.service.CapsuleService;
 import cz.cvut.fel.pm2.service.StripeService;
 import cz.cvut.fel.pm2.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -120,5 +121,76 @@ public class UserApiImpl implements UserApi {
     @PostMapping("/stripe/product")
     public Product createProduct(@RequestParam String productName, @RequestParam String productDescription) throws StripeException {
         return stripeService.createProduct(productName, productDescription);
+    }
+
+    @Override
+    @DeleteMapping("/delete")
+    public ResponseEntity<Map<String, String>> deleteAccount(@AuthenticationPrincipal OidcUser oidcUser) {
+        if (oidcUser == null) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("message", "User not authenticated"));
+        }
+
+        try {
+            userService.deleteUser(oidcUser.getEmail());
+            return ResponseEntity.ok(Map.of("message", "Account successfully deleted"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @Override
+    @PutMapping("/profile")
+    public ResponseEntity<UserDto> updateProfile(
+            @AuthenticationPrincipal OidcUser oidcUser,
+            @RequestBody Map<String, String> updates
+    ) {
+        if (oidcUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        try {
+            UserDto updatedUser = userService.updateProfile(oidcUser.getEmail(), updates);
+            return ResponseEntity.ok(updatedUser);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Override
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
+        try {
+            request.getSession().invalidate();
+            return ResponseEntity.ok(Map.of("message", "Successfully logged out"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Map.of("message", "Error during logout"));
+        }
+    }
+
+    @Override
+    @PutMapping("/password")
+    public ResponseEntity<Map<String, String>> changePassword(
+            @AuthenticationPrincipal OidcUser oidcUser,
+            @RequestBody PasswordChangeRequest request
+    ) {
+        if (oidcUser == null) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("message", "User not authenticated"));
+        }
+
+        try {
+            userService.changePassword(
+                    oidcUser.getEmail(),
+                    request.currentPassword(),
+                    request.newPassword()
+            );
+            return ResponseEntity.ok(Map.of("message", "Password successfully changed"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
 }

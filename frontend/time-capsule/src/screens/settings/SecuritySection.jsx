@@ -35,12 +35,38 @@ const SecuritySection = ({ user, onUpdate }) => {
         }
     };
 
+    const handlePasswordChange = async (formData) => {
+        try {
+            const response = await fetch('/api/user/password', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    currentPassword: formData.currentPassword,
+                    newPassword: formData.newPassword
+                }),
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message);
+            }
+
+            // Zobrazit úspěšnou zprávu uživateli
+        } catch (error) {
+            // Zobrazit chybovou zprávu uživateli
+            console.error('Error changing password:', error);
+        }
+    };
+
     return (
         <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Zabezpečení</h2>
 
             {/* Password Change Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handlePasswordChange} className="space-y-6">
                 {/* Current Password */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -56,4 +56,10 @@ public class User extends AbstractEntity {
         this.password = password;
         this.role = Role.REGISTERED;
     }
+
+    @Column(name = "bio")
+    private String bio;
+
+    @Column(name = "name")
+    private String name;
 }

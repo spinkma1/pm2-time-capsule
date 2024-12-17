@@ -1,6 +1,8 @@
 package cz.cvut.fel.pm2.service;
 
 import cz.cvut.fel.pm2.enums.Role;
+import cz.cvut.fel.pm2.model.CapsuleDto;
+import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.persistence.Capsule;
 import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.UserRepository;
@@ -12,7 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -78,5 +82,94 @@ public class UserService {
             return user;
         }
         return Optional.empty();
+    }
+
+    @Transactional
+    public void deleteUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Remove user from all capsules
+        user.getCapsules().forEach(capsule -> {
+            capsule.getUsers().remove(user);
+        });
+
+        // Remove user from followers/following relationships
+        user.getFollowers().forEach(follower -> {
+            follower.getFollowers().remove(user);
+        });
+
+        // Delete user
+        userRepository.delete(user);
+    }
+
+    @Transactional
+    public UserDto updateProfile(String email, Map<String, String> updates) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (updates.containsKey("name")) {
+            user.setEmail(updates.get("name"));
+        }
+
+        if (updates.containsKey("bio")) {
+            user.setBio(updates.get("bio"));
+        }
+
+        // Handle email update separately as it requires verification
+        if (updates.containsKey("newEmail")) {
+            // Here you would typically:
+            // 1. Validate that the new email isn't already in use
+            // 2. Send verification email
+            // 3. Only update after verification
+            handleEmailUpdate(user, updates.get("newEmail"));
+        }
+
+        User savedUser = userRepository.save(user);
+        return convertToDto(savedUser);
+    }
+
+    private void handleEmailUpdate(User user, String newEmail) {
+        if (userRepository.findByEmail(newEmail).isPresent()) {
+            throw new IllegalArgumentException("Email already in use");
+        }
+
+        // Here you would typically generate a verification token and send an email
+        // For now, we'll just update directly
+        user.setEmail(newEmail);
+    }
+
+    @Transactional
+    public void changePassword(String email, String currentPassword, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Ověříme současné heslo
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        // Validate new password (můžete přidat vlastní validační pravidla)
+        if (newPassword.length() < 8) {
+            throw new IllegalArgumentException("Password must be at least 8 characters long");
+        }
+
+        // Zakódujeme a uložíme nové heslo
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    private UserDto convertToDto(User user) {
+        return new UserDto(
+                user.getId().longValue(),
+                user.getEmail(),
+                user.getRole().toString(),
+                user.getFollowers().stream()
+                        .map(this::convertToDto)
+                        .collect(Collectors.toList()),
+                user.getCapsules().stream()
+                        .map(capsule -> new CapsuleDto(/* map capsule fields */))
+                        .collect(Collectors.toList())
+        );
     }
 }
