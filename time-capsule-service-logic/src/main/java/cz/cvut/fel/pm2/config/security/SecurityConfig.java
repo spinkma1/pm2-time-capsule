@@ -72,7 +72,10 @@ public class SecurityConfig {
                         .requestMatchers(SecurityEndpoints.ADMIN_URLS).hasAuthority("ROLE_ADMIN")
                         .requestMatchers(SecurityEndpoints.MEMBER_URLS).hasAuthority("ROLE_MEMBER")
                         .anyRequest().authenticated())
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)// Custom login page, default is '/login'
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                //.oauth2Login(oauth2 -> oauth2
+                  //      .defaultSuccessUrl("/user/info", true) // Redirect to user info after successful login
+                    //    .loginPage("/oauth2/authorization/google")) // Custom login page, default is '/login'
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessHandler(oidcLogoutSuccessHandler())) // For Google SSO logout
