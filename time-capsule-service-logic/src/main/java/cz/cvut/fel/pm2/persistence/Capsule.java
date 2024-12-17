@@ -15,12 +15,12 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Table(name = "T_CAPSULE")
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class Capsule extends AbstractEntity {
 
@@ -68,12 +68,7 @@ public class Capsule extends AbstractEntity {
     @Column(nullable = false)
     //time is set true by default, others false
     // todo zakomentoval jsem to, protoze s tim nejde spustit aplikace. Pred pushem vzdy zkontrolovat clean package run
-    private HashMap<UnlockMethod, UnlockMethodState> unlockMethods = new HashMap<>() {
-        //unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, false));  // Time unlock method enabled, not complete
-        //unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(false, false)); // QR method disabled, not complete
-        //unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(false, false)); // Geolocation method disabled, not complete
-        //unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(false, false)); // Password method disabled, not complete
-    };
+    private Map<UnlockMethod, UnlockMethodState> unlockMethods = new HashMap<>();
 
     @Column(name = "unlock_time")
     private LocalDateTime unlockTime;
@@ -87,5 +82,10 @@ public class Capsule extends AbstractEntity {
     @Column(name = "unlock_longit")
     private Double unlockLongit;
 
-
+    public Capsule() {
+        unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, false));
+        unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(false, false));
+        unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(false, false));
+        unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(false, false));
+    }
 }

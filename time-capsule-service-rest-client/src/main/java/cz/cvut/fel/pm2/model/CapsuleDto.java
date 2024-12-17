@@ -9,6 +9,7 @@ import java.util.List;
 public record CapsuleDto(
 
         Long id,
+        Long userId,
 
         String name,
 

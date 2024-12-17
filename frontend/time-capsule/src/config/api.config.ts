@@ -5,14 +5,16 @@ const API_CONFIG = {
         : 'http://actual-production-url.com/api',  // Produkční URL
 
      */
-    BASE_URL: '/api',
+    BASE_URL: 'http://localhost:8080',
 
     ENDPOINTS: {
         HEALTH: '/health',
         AUTH: {
             LOGIN: '/auth/login',
             REGISTER: '/auth/register',
-            REFRESH: '/auth/refresh'
+            REFRESH: '/auth/refresh',
+            LOGINSSO: '/auth/login/sso',
+            REGISTERSSO: '/auth/register/sso',
         },
         USER: {
             PROFILE: '/user/profile',

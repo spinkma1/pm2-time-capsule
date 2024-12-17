@@ -4,16 +4,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -26,6 +30,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final ClientRegistrationRepository clientRegistrationRepository;
+
+
+    private final JwtRequestFilter jwtRequestFilter;
+
 
     /**
      * Configures CORS settings.
@@ -64,17 +72,21 @@ public class SecurityConfig {
                         .requestMatchers(SecurityEndpoints.ADMIN_URLS).hasAuthority("ROLE_ADMIN")
                         .requestMatchers(SecurityEndpoints.MEMBER_URLS).hasAuthority("ROLE_MEMBER")
                         .anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("/user/info", true) // Redirect to user info after successful login
-                        .loginPage("/oauth2/authorization/google")) // Custom login page, default is '/login'
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)// Custom login page, default is '/login'
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessHandler(oidcLogoutSuccessHandler())) // For Google SSO logout
                 .httpBasic(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
-
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 
     // Configures logout success handler to revoke Google SSO session
     private OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler() {
@@ -90,13 +102,5 @@ public class SecurityConfig {
         return new OidcUserService();
     }
 
-    /**
-     * Creates a PasswordEncoder bean.
-     *
-     * @return a configured PasswordEncoder
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+
 }

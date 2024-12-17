@@ -38,7 +38,7 @@ public class SecurityEndpoints {
      * Matcher for public URLs.
      */
     final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
-            antMatcher(HttpMethod.GET,"/api-docs/**"),
+            antMatcher(HttpMethod.GET,"/user/token"),
             antMatcher(HttpMethod.GET,"/capsules/**"),
             antMatcher("/user/**")
 
