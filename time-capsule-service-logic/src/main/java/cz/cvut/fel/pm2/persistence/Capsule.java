@@ -6,6 +6,7 @@ import cz.cvut.fel.pm2.UnlockMethodState;
 import cz.cvut.fel.pm2.enums.State;
 import cz.cvut.fel.pm2.enums.Type;
 import cz.cvut.fel.pm2.enums.UnlockMethod;
+import cz.cvut.fel.pm2.model.CapsuleDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -69,7 +70,8 @@ public class Capsule extends AbstractEntity {
     @OneToMany(mappedBy = "capsule")
     private List<Content> contents;
 
-
+    @Column(name = "team_work")
+    private boolean teamWork;
 
     @ElementCollection
     @Enumerated(EnumType.STRING)
