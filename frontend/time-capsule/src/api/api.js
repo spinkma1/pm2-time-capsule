@@ -17,7 +17,7 @@ const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
     if (!response.ok) {
       if (response.status === 401) {
         const refreshToken = localStorage.getItem("refresh_token");
-        if (refreshToken && endpoint !== "/auth/refresh") {
+        if (refreshToken && endpoint !== "/user/refresh") {
           const authResponse = await refreshTokenApi(refreshToken);
           if (authResponse) {
             localStorage.setItem("access_token", authResponse.accessToken);
@@ -78,6 +78,9 @@ export const ApiService = {
       if (response) {
         localStorage.setItem("access_token", response.accessToken);
         localStorage.setItem("refresh_token", response.refreshToken);
+        console.log("Login successful:", response)
+        console.log("Access token:", response.accessToken)
+        console.log("Refresh token:", response.refreshToken)
       }
       return response;
     } catch (error) {
@@ -99,6 +102,28 @@ export const ApiService = {
       throw error;
     }
   },
+
+  createCapsule: async (capsuleData) => {
+    try {
+      const response = await fetchWithConfig("/capsules/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(capsuleData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to create capsule:", error);
+        throw new Error(error.message || "Unknown error occurred");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Capsule creation failed:", error);
+      throw error;
+    }
+  },
+
 
   loginWithGoogle: async (token) => {
     try {

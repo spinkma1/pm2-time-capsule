@@ -22,6 +22,7 @@ import InfoSection from '../../components/capsulecreation/InfoSection';
 import Warning from '../../components/capsulecreation/Warning';
 import Confirmation from '../../components/capsulecreation/Confirmation';
 import { useGoogleMaps } from '../../components/context/GoogleProvider';
+import {ApiService as api} from "../../api/api.js";
 
 const CreateCapsule = () => {
     const navigate = useNavigate();
@@ -38,24 +39,7 @@ const CreateCapsule = () => {
         hasQRCode: false,
         qrcode: null,
         geolocation: null, // To store the selected coordinates
-        contributors: [{
-            id: 1,
-            email: "franta.vomacka@seznam.cz",
-            status: "Neaktivní",
-            initial: "F"
-        },
-        {
-            id: 2,
-            email: "jana.novakova@seznam.cz",
-            status: "Aktivní",
-            initial: "J"
-        },
-        {
-            id: 3,
-            email: "petr.maly@seznam.cz",
-            status: "Neaktivní",
-            initial: "P"
-        }],
+        contributors: [],
     });
 
 
@@ -93,10 +77,49 @@ const CreateCapsule = () => {
 
     const handleSubmit = () => {
         if (validateStep(step)) {
-            console.log('Form submitted', formData);
-            navigate('/dashboard');
+            console.log('Form submitted yeah', formData);
+
+            const submit = async () => {
+                if (!formData.title || !formData.description || !formData.openDate || !formData.contributorsLimit) {
+                    console.error("Required fields are missing.");
+                    return;
+                }
+
+                const capsuleData = {
+                    name: formData.title,
+                    description: formData.description,
+                    capsuleSize: formData.contributorsLimit,
+                    unlockTime: formData.openDate ? new Date(formData.openDate).toISOString() : null,
+                    qrCodePassword: formData.hasQRCode ? formData.qrcode : null,
+                    unlockLat: formData.hasGeolocation ? formData.geolocation?.lat : null,
+                    unlockLongit: formData.hasGeolocation ? formData.geolocation?.lng : null,
+                    users: formData.contributors.map(contributor => ({
+                        email: contributor.email
+                    })),
+                    unlockMethods: {
+                        TIME: { enabled: true, completed: false },
+                        QR_CODE: { enabled: formData.hasQRCode, completed: false },
+                        GEOLOCATION: { enabled: formData.hasGeolocation, completed: false },
+                        PASSWORD: { enabled: false, completed: false }
+                    },
+                    state: formData.isEditing ? "EDIT" : "NEW", // pokud se jedná o úpravu, použije "EDIT", jinak "NEW"
+                    type: formData.isPrivate ? "PRIVATE" : "PUBLIC"
+                };
+
+                try {
+                    const response = await api.createCapsule(capsuleData);
+                    console.log("Capsule created successfully:", response);
+                    navigate('/dashboard');
+                } catch (error) {
+                    console.error("Error while creating capsule:", error);
+                }
+            };
+
+            submit();
         }
     };
+
+
 
     const handleDateChange = (e) => {
         const newDate = e.target.value;

@@ -40,9 +40,22 @@ public class CapsuleService {
         Capsule capsule = capsuleMapper.toEntity(capsuleDto);
 
         capsule = capsuleRepository.save(capsule);
+//
+//        generateAndHashQrPassword(capsule.getId());
+//        capsule = capsuleRepository.save(capsule);
 
+//todo
+        try {
+            User user = userRepository.findById(capsuleDto.userId())
+                    .orElseThrow(() -> new NotFoundException("User not found"));
+            capsule.setOwner(user);
+            capsule = capsuleRepository.save(capsule);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new InvalidBodyException("Capsule with the same name already exists");
+        }
         generateAndHashQrPassword(capsule.getId());
-        capsule = capsuleRepository.save(capsule);
+
 
         return capsuleMapper.toDto(capsule);
     }

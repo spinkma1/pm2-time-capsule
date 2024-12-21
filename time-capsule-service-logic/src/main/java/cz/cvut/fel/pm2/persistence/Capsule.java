@@ -25,15 +25,6 @@ import java.util.Map;
 @AllArgsConstructor
 public class Capsule extends AbstractEntity {
 
-
-    public Capsule() {
-        // Set default values for the map
-        unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, false));
-        unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(false, false));
-        unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(false, false));
-        unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(false, false));
-    }
-
     @ManyToOne
     @JoinColumn(nullable = false,name = "user_id")
     @JsonManagedReference
@@ -92,5 +83,10 @@ public class Capsule extends AbstractEntity {
     @Column(name = "unlock_longit")
     private Double unlockLongit;
 
-
+    public Capsule() {
+        unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, false));
+        unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(false, false));
+        unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(false, false));
+        unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(false, false));
+    }
 }

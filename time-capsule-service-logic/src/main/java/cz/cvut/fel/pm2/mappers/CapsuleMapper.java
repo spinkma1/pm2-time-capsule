@@ -8,7 +8,7 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+
 public interface CapsuleMapper {
 
     /**
@@ -17,8 +17,8 @@ public interface CapsuleMapper {
      * @param capsuleInput  the capsule DTO containing updated values.
      * @param capsuleEntity the capsule entity to update.
      */
-    @Mapping(target = "id", ignore = true)
-    void updateEntity(CapsuleDto capsuleInput, @MappingTarget Capsule capsuleEntity);
+
+    void updateEntity(CapsuleDto capsuleInput,  Capsule capsuleEntity);
 
     /**
      * Converts a CapsuleEntity to a CapsuleDto.
