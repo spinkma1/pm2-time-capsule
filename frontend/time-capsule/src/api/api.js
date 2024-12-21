@@ -115,25 +115,27 @@ export const ApiService = {
 
   createCapsule: async (capsuleData) => {
     try {
-      console.log("Capsule data:", capsuleData)
-      const response = await fetchWithConfig("/capsules/create", {
+      console.log("Capsule data:", capsuleData);
+
+      const response = await fetchWithConfig(API_CONFIG.ENDPOINTS.CREATE.CREATE, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(capsuleData),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Failed to create capsule:", error);
-        throw new Error(error.message || "Unknown error occurred");
+      if (!response) {
+        throw new Error("Unknown error occurred");
       }
-      console.log("Capsule created successfully:", response)
-      return await response.json();
+      console.log("Response:", response)
+      console.log("Capsule created successfully:", response);
+      return response
     } catch (error) {
       console.error("Capsule creation failed:", error);
       throw error;
     }
   },
+
+
 
 
   loginWithGoogle: async (token) => {

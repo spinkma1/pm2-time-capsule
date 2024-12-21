@@ -1,13 +1,15 @@
 package cz.cvut.fel.pm2.model;
 
 
+import org.apache.catalina.User;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  * Data transfer object representing capsule.
  */
 public record CapsuleDto(
-        Long id,
         Long userId,
 
         String name,
@@ -17,7 +19,7 @@ public record CapsuleDto(
 
         Long capsuleSize,
 
-        String unlockTime,
+        LocalDateTime unlockTime,
         String qrCodePassword,
 
         Double unlockLat,

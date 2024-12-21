@@ -95,6 +95,7 @@ public interface CapsuleApi {
     @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<List<CapsuleDto>> getCapsules(@RequestParam String email);
 
+
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{capsuleId}")
     @ResponseBody

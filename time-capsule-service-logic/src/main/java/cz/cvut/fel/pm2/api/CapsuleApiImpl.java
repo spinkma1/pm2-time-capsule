@@ -40,14 +40,12 @@ public class CapsuleApiImpl implements CapsuleApi {
 
     @Override
     public ResponseEntity<Map<String, String>> openViaQr(@RequestParam String capsuleId, @RequestParam String qrCodePasswordRaw) throws NoSuchAlgorithmException {
-        // Check if the necessary parameters are provided
         if (capsuleId == null || qrCodePasswordRaw == null || qrCodePasswordRaw.isEmpty()) {
             throw new InvalidBodyException("No or wrong body was sent");
         }
 
         int intCapsuleId = Integer.parseInt(capsuleId);
 
-        // Get the capsule from the repository
         var capsule = capsuleRepository.getCapsuleById(intCapsuleId)
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 

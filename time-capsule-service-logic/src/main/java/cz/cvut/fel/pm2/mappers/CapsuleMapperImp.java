@@ -10,7 +10,10 @@ import cz.cvut.fel.pm2.model.UnlockMethodsDto;
 import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.persistence.Capsule;
 import cz.cvut.fel.pm2.persistence.User;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.processing.Generated;
@@ -57,9 +60,9 @@ public class CapsuleMapperImp implements CapsuleMapper {
         String description = capsuleEntity.getDescription();
         Boolean teamWork = capsuleEntity.getType() == Type.PRIVATE;
         Long userFileLimit = capsuleEntity.getCapsuleSize();
-        List<UserDto> users = userListToUserDtoList(capsuleEntity.getUsers());
+        List<UserDto> users = null; //cyklilo se to tady, tak jsem dal null
 
-        String unlockTime = capsuleEntity.getUnlockTime() != null ? capsuleEntity.getUnlockTime().toString() : null;
+        LocalDateTime unlockTime = capsuleEntity.getUnlockTime() != null ? capsuleEntity.getUnlockTime() : null;
         String qrCodePassword = capsuleEntity.getQrCodePassword();
         Double unlockLat = capsuleEntity.getUnlockLat();
         Double unlockLongit = capsuleEntity.getUnlockLongit();
@@ -70,7 +73,6 @@ public class CapsuleMapperImp implements CapsuleMapper {
         String state = capsuleEntity.getState() != null ? capsuleEntity.getState().name() : null;
 
         return new CapsuleDto(
-                id,
                 userId,
                 name,
                 description,
@@ -110,9 +112,18 @@ public class CapsuleMapperImp implements CapsuleMapper {
         Capsule capsule = new Capsule();
 
 
-        capsule.setUsers( userDtoListToUserList( capsuleDto.users() ) );
+        //capsule.setUsers( userDtoListToUserList( capsuleDto.users() ) );
         capsule.setName( capsuleDto.name() );
-        capsule.setDescription( capsuleDto.description() );
+        capsule.setDescription( capsuleDto.description());
+        capsule.setCapsuleSize( capsuleDto.capsuleSize() );
+        capsule.setUnlockTime( capsuleDto.unlockTime() );
+        capsule.setQrCodePassword( capsuleDto.qrCodePassword() );
+        capsule.setUnlockLat( capsuleDto.unlockLat() );
+        capsule.setUnlockLongit( capsuleDto.unlockLongit() );
+        capsule.setState( State.valueOf(capsuleDto.state()) );
+        capsule.setUnlockMethods(mapUnlockMethods(capsuleDto.unlockMethods()));
+        capsule.setState( State.EDIT );
+        capsule.setType( (capsuleDto.teamWork() == null || !capsuleDto.teamWork()) ? Type.PUBLIC : Type.PRIVATE );
 
         return capsule;
     }
@@ -158,7 +169,7 @@ public class CapsuleMapperImp implements CapsuleMapper {
             user.setRole( Enum.valueOf( Role.class, userDto.role() ) );
         }
         user.setCapsules( capsuleDtoListToCapsuleList( userDto.capsules() ) );
-        user.setFollowers( userDtoListToUserList( userDto.followers() ) );
+       // user.setFollowers( userDtoListToUserList( userDto.followers() ) );
 
         return user;
     }
@@ -194,7 +205,7 @@ public class CapsuleMapperImp implements CapsuleMapper {
         if ( user.getRole() != null ) {
             role = user.getRole().name();
         }
-        followers = userListToUserDtoList( user.getFollowers() );
+        //followers = userListToUserDtoList( user.getFollowers() );
         capsules = toDtos( user.getCapsules() );
 
         UserDto userDto = new UserDto( id, email, role, followers, capsules );
@@ -219,5 +230,25 @@ public class CapsuleMapperImp implements CapsuleMapper {
                 passwordState.isComplete()
         );
     }
+
+    private Map<UnlockMethod, UnlockMethodState> mapUnlockMethods(UnlockMethodsDto dto) {
+        Map<UnlockMethod, UnlockMethodState> unlockMethods = new HashMap<>();
+
+        // Time
+        unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, dto.timeComplete()));
+
+        // QR Code
+        unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(dto.qrCodeEnabled(), dto.qrCodeComplete()));
+
+        // Geolocation
+        unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(dto.geolocationEnabled(), dto.geolocationComplete()));
+
+        // Password
+        unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(true, dto.passwordComplete()));
+
+        return unlockMethods;
+    }
+
+
 
 }
