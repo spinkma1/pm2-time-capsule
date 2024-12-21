@@ -7,19 +7,26 @@ import java.util.List;
  * Data transfer object representing capsule.
  */
 public record CapsuleDto(
-
         Long id,
         Long userId,
 
         String name,
-
         String description,
 
         Boolean teamWork,
 
-        Long userFileLimit,
+        Long capsuleSize,
 
-        List<UserDto> users
-) {
+        String unlockTime,
+        String qrCodePassword,
 
-}
+        Double unlockLat,
+        Double unlockLongit,
+
+        List<UserDto> users,
+
+        UnlockMethodsDto unlockMethods,
+
+        String state
+) {}
+

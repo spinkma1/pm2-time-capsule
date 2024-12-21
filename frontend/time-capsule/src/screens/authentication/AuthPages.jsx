@@ -106,6 +106,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                     console.log('Registration response:', data);
                     if (data) {
                         setUser({ email: userEmail, initials });
+                        localStorage.setItem('token', data.id);
                         navigate('/dashboard');
                     }
                 } catch (error) {

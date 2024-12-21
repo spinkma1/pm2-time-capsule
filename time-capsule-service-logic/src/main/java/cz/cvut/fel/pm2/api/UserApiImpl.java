@@ -105,7 +105,8 @@ public class UserApiImpl implements UserApi {
             return ResponseEntity.ok(Map.of(
                     "message", "Login successful",
                     "accessToken", accessToken,
-                    "refreshToken", refreshToken));
+                    "refreshToken", refreshToken,
+                    "id", String.valueOf(user.get().getId())));
         } else {
             return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
         }

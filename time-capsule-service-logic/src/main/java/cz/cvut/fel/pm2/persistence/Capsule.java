@@ -22,6 +22,7 @@ import java.util.Map;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Capsule extends AbstractEntity {
 
     @ManyToOne
@@ -41,7 +42,7 @@ public class Capsule extends AbstractEntity {
     private List<Notification> notifications;
 
     @Column(name = "capsule_size")
-    private Double capsuleSize;
+    private Long capsuleSize;
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
@@ -82,10 +83,5 @@ public class Capsule extends AbstractEntity {
     @Column(name = "unlock_longit")
     private Double unlockLongit;
 
-    public Capsule() {
-        unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, false));
-        unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(false, false));
-        unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(false, false));
-        unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(false, false));
-    }
+
 }

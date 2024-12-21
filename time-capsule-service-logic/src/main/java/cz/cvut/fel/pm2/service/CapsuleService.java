@@ -63,8 +63,8 @@ public class CapsuleService {
     public void validateCapsule(CapsuleDto capsuleDto) {
         if (capsuleDto.name() == null ||
                 capsuleDto.description() == null ||
-                capsuleDto.teamWork() == null ||
-                capsuleDto.userFileLimit() == null) {
+                capsuleDto.userId() == null ||
+                capsuleDto.capsuleSize() == null) {
             throw new InvalidBodyException("No or wrong body was sent");
         }
     }

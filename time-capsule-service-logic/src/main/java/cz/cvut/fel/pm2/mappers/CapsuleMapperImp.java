@@ -1,12 +1,18 @@
 package cz.cvut.fel.pm2.mappers;
 
+import cz.cvut.fel.pm2.UnlockMethodState;
 import cz.cvut.fel.pm2.enums.Role;
+import cz.cvut.fel.pm2.enums.State;
+import cz.cvut.fel.pm2.enums.Type;
+import cz.cvut.fel.pm2.enums.UnlockMethod;
 import cz.cvut.fel.pm2.model.CapsuleDto;
+import cz.cvut.fel.pm2.model.UnlockMethodsDto;
 import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.persistence.Capsule;
 import cz.cvut.fel.pm2.persistence.User;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
@@ -41,31 +47,45 @@ public class CapsuleMapperImp implements CapsuleMapper {
 
     @Override
     public CapsuleDto toDto(Capsule capsuleEntity) {
-        if ( capsuleEntity == null ) {
+        if (capsuleEntity == null) {
             return null;
         }
 
-        Long id = null;
-        Long userId = null;
-        String name = null;
-        String description = null;
-        List<UserDto> users = null;
+        Long id = capsuleEntity.getId() != null ? capsuleEntity.getId().longValue() : null;
+        Long userId = capsuleEntity.getOwner() != null ? capsuleEntity.getOwner().getId().longValue() : null;
+        String name = capsuleEntity.getName();
+        String description = capsuleEntity.getDescription();
+        Boolean teamWork = capsuleEntity.getType() == Type.PRIVATE;
+        Long userFileLimit = capsuleEntity.getCapsuleSize();
+        List<UserDto> users = userListToUserDtoList(capsuleEntity.getUsers());
 
-        if ( capsuleEntity.getId() != null ) {
-            id = capsuleEntity.getId().longValue();
-        }
-        userId = (long) capsuleEntity.getOwner().getId();
-        name = capsuleEntity.getName();
-        description = capsuleEntity.getDescription();
-        users = userListToUserDtoList( capsuleEntity.getUsers() );
+        String unlockTime = capsuleEntity.getUnlockTime() != null ? capsuleEntity.getUnlockTime().toString() : null;
+        String qrCodePassword = capsuleEntity.getQrCodePassword();
+        Double unlockLat = capsuleEntity.getUnlockLat();
+        Double unlockLongit = capsuleEntity.getUnlockLongit();
 
-        Boolean teamWork = null;
-        Long userFileLimit = null;
+        UnlockMethodsDto unlockMethodsDto = mapUnlockMethods(capsuleEntity.getUnlockMethods());
 
-        CapsuleDto capsuleDto = new CapsuleDto( id, userId, name, description, teamWork, userFileLimit, users );
 
-        return capsuleDto;
+        String state = capsuleEntity.getState() != null ? capsuleEntity.getState().name() : null;
+
+        return new CapsuleDto(
+                id,
+                userId,
+                name,
+                description,
+                teamWork,
+                userFileLimit,
+                unlockTime,
+                qrCodePassword,
+                unlockLat,
+                unlockLongit,
+                users,
+                unlockMethodsDto,
+                state
+        );
     }
+
 
     @Override
     public List<CapsuleDto> toDtos(List<Capsule> capsuleEntities) {
@@ -181,4 +201,23 @@ public class CapsuleMapperImp implements CapsuleMapper {
 
         return userDto;
     }
+
+    private UnlockMethodsDto mapUnlockMethods(Map<UnlockMethod, UnlockMethodState> unlockMethods) {
+        UnlockMethodState timeState = unlockMethods.getOrDefault(UnlockMethod.TIME, new UnlockMethodState());
+        UnlockMethodState qrCodeState = unlockMethods.getOrDefault(UnlockMethod.QR_CODE, new UnlockMethodState());
+        UnlockMethodState geolocationState = unlockMethods.getOrDefault(UnlockMethod.GEOLOCATION, new UnlockMethodState());
+        UnlockMethodState passwordState = unlockMethods.getOrDefault(UnlockMethod.PASSWORD, new UnlockMethodState());
+
+        return new UnlockMethodsDto(
+                timeState.isEnabled(),
+                timeState.isComplete(),
+                qrCodeState.isEnabled(),
+                qrCodeState.isComplete(),
+                geolocationState.isEnabled(),
+                geolocationState.isComplete(),
+                passwordState.isEnabled(),
+                passwordState.isComplete()
+        );
+    }
+
 }

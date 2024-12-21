@@ -6,10 +6,10 @@ const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
 
   const headers = {
     ...API_CONFIG.HEADERS,
-    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    ...(accessToken? { Authorization: `Bearer ${accessToken}` } :{}),
     ...(options.headers || {}),
   };
-
+  console.log("Headers:", headers)
   const defaultOptions = { ...options, headers };
 
   try {
@@ -78,9 +78,11 @@ export const ApiService = {
       if (response) {
         localStorage.setItem("access_token", response.accessToken);
         localStorage.setItem("refresh_token", response.refreshToken);
+        localStorage.setItem("userId", response.id);
         console.log("Login successful:", response)
         console.log("Access token:", response.accessToken)
         console.log("Refresh token:", response.refreshToken)
+        console.log ("User ID:", response.id)
       }
       return response;
     } catch (error) {
@@ -93,9 +95,17 @@ export const ApiService = {
     try {
       const response = await fetchWithConfig("/user/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({email: email, password: password}),
       });
+      if(response){
+        localStorage.setItem("access_token", response.accessToken);
+        localStorage.setItem("refresh_token", response.refreshToken);
+        localStorage.setItem("userId", response.id);
+        console.log("Registration successful:", response)
+        console.log("Access token:", response.accessToken)
+        console.log("Refresh token:", response.refreshToken)
+        console.log ("User ID:", response.id)
+      }
       return response;
     } catch (error) {
       console.error("Registration failed:", error);
@@ -105,6 +115,7 @@ export const ApiService = {
 
   createCapsule: async (capsuleData) => {
     try {
+      console.log("Capsule data:", capsuleData)
       const response = await fetchWithConfig("/capsules/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -116,7 +127,7 @@ export const ApiService = {
         console.error("Failed to create capsule:", error);
         throw new Error(error.message || "Unknown error occurred");
       }
-
+      console.log("Capsule created successfully:", response)
       return await response.json();
     } catch (error) {
       console.error("Capsule creation failed:", error);

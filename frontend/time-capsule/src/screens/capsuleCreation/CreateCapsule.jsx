@@ -84,8 +84,12 @@ const CreateCapsule = () => {
                     console.error("Required fields are missing.");
                     return;
                 }
+                console.log(localStorage.getItem('userId'))
+                const userIdString = localStorage.getItem('userId');
+                const userIdLong = userIdString ? Number(userIdString) : null;
 
                 const capsuleData = {
+                    userId: userIdLong,
                     name: formData.title,
                     description: formData.description,
                     capsuleSize: formData.contributorsLimit,
@@ -97,13 +101,17 @@ const CreateCapsule = () => {
                         email: contributor.email
                     })),
                     unlockMethods: {
-                        TIME: { enabled: true, completed: false },
-                        QR_CODE: { enabled: formData.hasQRCode, completed: false },
-                        GEOLOCATION: { enabled: formData.hasGeolocation, completed: false },
-                        PASSWORD: { enabled: false, completed: false }
+                        timeEnabled: true,
+                        timeComplete: false,
+                        qrCodeEnabled: formData.hasQRCode,
+                        qrCodeComplete: false,
+                        geolocationEnabled: formData.hasGeolocation,
+                        geolocationComplete: false,
+                        passwordEnabled: false,
+                        passwordComplete: false,
                     },
-                    state: formData.isEditing ? "EDIT" : "NEW", // pokud se jedná o úpravu, použije "EDIT", jinak "NEW"
-                    type: formData.isPrivate ? "PRIVATE" : "PUBLIC"
+                    state: "EDIT",
+                    teamwork: formData.isPrivate ? true : false
                 };
 
                 try {
