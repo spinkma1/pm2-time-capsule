@@ -55,6 +55,7 @@ const Settings = ({ user, setUser }) => {
         navigate('/dashboard');
     };
 
+    /*
     const handleProfileUpdate = async (updatedData) => {
         try {
             const updatedUser = await ApiService.updateProfile(updatedData);
@@ -68,6 +69,8 @@ const Settings = ({ user, setUser }) => {
             // Můžete přidat notifikaci o chybě
         }
     };
+
+     */
 
     const menuItems = [
         { id: 'profile', label: 'Profil', icon: <User size={20} /> },
@@ -162,7 +165,7 @@ const Settings = ({ user, setUser }) => {
                                 {activeTab === 'profile' && (
                                     <ProfileSection
                                         user={userData}
-                                        onUpdate={handleProfileUpdate}
+                                        //onUpdate={handleProfileUpdate}
                                     />
                                 )}
                                 {activeTab === 'security' && (

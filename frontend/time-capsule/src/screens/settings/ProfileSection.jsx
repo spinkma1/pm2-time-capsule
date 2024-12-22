@@ -132,6 +132,7 @@ const ProfileSection = ({ user, onUpdate }) => {
 
         if (showEmailChange) {
             await handleEmailChange();
+            await handleProfileUpdate();
         } else {
             await handleProfileUpdate();
         }

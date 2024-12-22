@@ -9,6 +9,7 @@ import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.juli.logging.Log;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -138,12 +139,16 @@ public class UserService implements UserDetailsService {
         }
 
         // Handle email update separately as it requires verification
-        if (updates.containsKey("newEmail")) {
+        if (updates.containsKey("email")) {
+            if (!passwordEncoder.matches(updates.get("password"), user.getPassword())) {
+                throw new IllegalArgumentException("Password is incorrect");
+            }
+
             // Here you would typically:
             // 1. Validate that the new email isn't already in use
             // 2. Send verification email
             // 3. Only update after verification
-            handleEmailUpdate(user, updates.get("newEmail"));
+            handleEmailUpdate(user, updates.get("email"));
         }
 
         User savedUser = userRepository.save(user);

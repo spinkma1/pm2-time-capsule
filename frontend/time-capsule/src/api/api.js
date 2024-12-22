@@ -163,6 +163,8 @@ export const ApiService = {
 
   changeEmail: async (formData) => {
     try {
+      console.log("formData", formData);
+      console.log("formData", formData.password);
       await fetchWithConfig('/user/profile', {
         method: 'PUT',
         headers: {
@@ -170,7 +172,7 @@ export const ApiService = {
         },
         body: JSON.stringify({
           email: formData.newEmail,
-          password: formData.emailPassword,
+          password: formData.password,
         }),
         credentials: 'include'
       });
