@@ -211,17 +211,29 @@ public class UserApiImpl implements UserApi {
 
     @Override
     @PutMapping("/profile")
-    public ResponseEntity<UserDto> updateProfile(
-            @AuthenticationPrincipal OidcUser oidcUser,
+    public ResponseEntity<Map<String, String>> updateProfile(
+            @RequestHeader("Authorization") String authHeader,
             @RequestBody Map<String, String> updates
     ) {
-        if (oidcUser == null) {
-            return ResponseEntity.status(401).build();
-        }
-
         try {
-            UserDto updatedUser = userService.updateProfile(oidcUser.getEmail(), updates);
-            return ResponseEntity.ok(updatedUser);
+            // Odstranění "Bearer " z tokenu
+            String token = authHeader.substring(7);
+
+            // Získání username (emailu) z tokenu pomocí existujícího JwtUtil
+            String email = jwtUtil.extractUsername(token);
+
+            UserDetails userDetails = userService.loadUserByUsername(email);
+            if (!jwtUtil.validateToken(token, userDetails)) {
+                return ResponseEntity.status(401)
+                        .body(Map.of("message", "Invalid token"));
+            }
+
+            // Změna profilu
+            userService.updateProfile(
+                    email,
+                    updates
+            );
+            return ResponseEntity.ok(Map.of("message", "Profile successfully changed"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -242,24 +254,63 @@ public class UserApiImpl implements UserApi {
     @Override
     @PutMapping("/password")
     public ResponseEntity<Map<String, String>> changePassword(
-            @AuthenticationPrincipal OidcUser oidcUser,
+            @RequestHeader("Authorization") String authHeader,
             @RequestBody PasswordChangeRequest request
     ) {
-        if (oidcUser == null) {
-            return ResponseEntity.status(401)
-                    .body(Map.of("message", "User not authenticated"));
-        }
-
         try {
+            // Odstranění "Bearer " z tokenu
+            String token = authHeader.substring(7);
+
+            // Získání username (emailu) z tokenu pomocí existujícího JwtUtil
+            String email = jwtUtil.extractUsername(token);
+
+            // Validace tokenu proti user details
+            UserDetails userDetails = userService.loadUserByUsername(email);
+            if (!jwtUtil.validateToken(token, userDetails)) {
+                return ResponseEntity.status(401)
+                        .body(Map.of("message", "Invalid token"));
+            }
+
+            // Změna hesla
             userService.changePassword(
-                    oidcUser.getEmail(),
+                    email,
                     request.currentPassword(),
                     request.newPassword()
             );
+
             return ResponseEntity.ok(Map.of("message", "Password successfully changed"));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(Map.of("message", e.getMessage()));
         }
     }
+
+    @Override
+    @GetMapping("/profile")
+    public ResponseEntity<Map<String, Object>> getUserProfile(@RequestHeader("Authorization") String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            String token = authHeader.substring(7);
+            String email = jwtUtil.extractUsername(token);
+            User user = userService.getUserProfile(email);
+
+            if (user == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(Map.of(
+                    "name", user.getName(),
+                    "email", user.getEmail(),
+                    "bio", user.getBio()
+            ));
+        } catch (Exception e) {
+            e.printStackTrace(); // Pro debug
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
+
+
+

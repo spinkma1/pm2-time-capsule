@@ -138,5 +138,84 @@ export const ApiService = {
       console.error("Google login failed:", error);
       throw error;
     }
+  },
+
+  newPassword: async (formData) => {
+    try {
+      await fetchWithConfig('/user/password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword: formData.currentPassword,
+          newPassword: formData.newPassword,
+        }),
+        credentials: 'include'
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Password change failed:", error);
+      throw error;
+    }
+  },
+
+  changeEmail: async (formData) => {
+    try {
+      await fetchWithConfig('/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.newEmail,
+          password: formData.emailPassword,
+        }),
+        credentials: 'include'
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Email change failed:", error);
+      throw error;
+    }
+  },
+
+  changeProfile: async (formData) => {
+    try {
+      await fetchWithConfig('/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          bio: formData.bio,
+        }),
+        credentials: 'include'
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Profile change failed:", error);
+      throw error;
+    }
+  },
+
+  getUserProfile: async () => {
+    try {
+      // Přidáme správný base URL pro backend
+      return await fetchWithConfig('/user/profile', {  // Upravte port podle vašeho BE
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      throw error;
+    }
   }
 };

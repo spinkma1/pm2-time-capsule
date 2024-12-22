@@ -14,10 +14,14 @@ import {
 } from 'lucide-react';
 import SecuritySection from "./SecuritySection.jsx";
 import ConnectionsSection from "./ConnectionSection.jsx";
+import {ApiService} from "../../api/api.js";
 
 const Settings = ({ user, setUser }) => {
     const location = useLocation();
     const navigate = useNavigate();
+    const [userData, setUserData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState(
         location.state?.activeTab || 'profile'
     );
@@ -28,8 +32,41 @@ const Settings = ({ user, setUser }) => {
         }
     }, [location.state]);
 
+    // Načtení dat uživatele
+    useEffect(() => {
+        const fetchUserData = async () => {
+            setIsLoading(true);
+            try {
+                const data = await ApiService.getUserProfile();
+                setUserData(data);
+                setError(null);
+            } catch (error) {
+                console.error('Failed to fetch user data:', error);
+                setError('Nepodařilo se načíst data uživatele');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
     const handleNavigateBack = () => {
         navigate('/dashboard');
+    };
+
+    const handleProfileUpdate = async (updatedData) => {
+        try {
+            const updatedUser = await ApiService.updateProfile(updatedData);
+            setUserData(prev => ({
+                ...prev,
+                ...updatedUser
+            }));
+            // Můžete přidat notifikaci o úspěšné aktualizaci
+        } catch (error) {
+            console.error('Failed to update profile:', error);
+            // Můžete přidat notifikaci o chybě
+        }
     };
 
     const menuItems = [
@@ -37,6 +74,21 @@ const Settings = ({ user, setUser }) => {
         { id: 'security', label: 'Zabezpečení', icon: <Lock size={20} /> },
         { id: 'connections', label: 'Sledující', icon: <Users size={20} /> },
     ];
+
+    if (isLoading) {
+        return <div className="flex justify-center items-center min-h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900"></div>
+        </div>;
+    }
+
+    /*
+    if (error) {
+        return <div className="flex justify-center items-center min-h-screen text-red-600">
+            {error}
+        </div>;
+    }
+
+     */
 
     const handleLogout = async () => {
         // Zavolat BE endpoint pro vyčištění session
@@ -109,11 +161,8 @@ const Settings = ({ user, setUser }) => {
                             <div className="max-w-2xl mx-auto">
                                 {activeTab === 'profile' && (
                                     <ProfileSection
-                                        user={user}
-                                        onUpdate={(updatedData) => {
-                                            console.log('Updating profile:', updatedData);
-                                            // TODO: Implement profile update logic
-                                        }}
+                                        user={userData}
+                                        onUpdate={handleProfileUpdate}
                                     />
                                 )}
                                 {activeTab === 'security' && (

@@ -66,7 +66,14 @@ public interface UserApi {
 
     @PutMapping("/profile")
     @Operation(summary = "Update user profile", description = "Updates user profile information")
-    ResponseEntity<UserDto> updateProfile(@AuthenticationPrincipal OidcUser oidcUser, @RequestBody Map<String, String> updates);
+    ResponseEntity<Map<String, String>> updateProfile(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody Map<String, String> updates
+    );
+
+    @GetMapping("/profile")
+    @Operation(summary = "Get user profile data", description = "Gets user profile information")
+    ResponseEntity<Map<String, Object>> getUserProfile(@RequestHeader("Authorization") String authHeader);
 
     @PostMapping("/logout")
     @Operation(summary = "Logout user", description = "Logs out the current user")
@@ -75,7 +82,7 @@ public interface UserApi {
     @PutMapping("/password")
     @Operation(summary = "Change password", description = "Changes user password")
     ResponseEntity<Map<String, String>> changePassword(
-            @AuthenticationPrincipal OidcUser oidcUser,
+            @RequestHeader("Authorization") String token,  // Přidáváme token z hlavičky
             @RequestBody PasswordChangeRequest request
     );
 

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Lock, Shield, Eye, EyeOff } from 'lucide-react';
+import React, {useState} from 'react';
+import {Eye, EyeOff, Lock} from 'lucide-react';
+import {ApiService} from "../../api/api.js";
+import { Alert, Snackbar } from '@mui/material';
 
 const SecuritySection = ({ user, onUpdate }) => {
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -9,7 +11,17 @@ const SecuritySection = ({ user, onUpdate }) => {
         newPassword: '',
         confirmNewPassword: ''
     });
+
     const [errors, setErrors] = useState({});
+    const [notification, setNotification] = useState({
+        open: false,
+        message: '',
+        severity: 'success' // 'error', 'warning', 'info', 'success'
+    });
+
+    const handleCloseNotification = () => {
+        setNotification({ ...notification, open: false });
+    };
 
     const validatePasswords = () => {
         const newErrors = {};
@@ -28,45 +40,56 @@ const SecuritySection = ({ user, onUpdate }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (validatePasswords()) {
-            onUpdate(formData);
-        }
-    };
+            try {
+                await ApiService.newPassword(formData);
 
-    const handlePasswordChange = async (formData) => {
-        try {
-            const response = await fetch('/api/user/password', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    currentPassword: formData.currentPassword,
-                    newPassword: formData.newPassword
-                }),
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message);
+                // Úspěšná změna
+                setFormData({
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmNewPassword: ''
+                });
+                setNotification({
+                    open: true,
+                    message: 'Heslo bylo úspěšně změněno',
+                    severity: 'success'
+                });
+            } catch (error) {
+                if (error) {
+                    // Zobrazení chybové hlášky
+                    setNotification({
+                        open: true,
+                        message: 'Došlo k chybě při změně hesla. Zkontrolujte správně vyplněné stávající heslo.',
+                        severity: 'error'
+                    });
+                }
             }
-
-            // Zobrazit úspěšnou zprávu uživateli
-        } catch (error) {
-            // Zobrazit chybovou zprávu uživateli
-            console.error('Error changing password:', error);
         }
     };
 
     return (
         <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Zabezpečení</h2>
-
+            {/* Snackbar pro notifikace */}
+            <Snackbar
+                open={notification.open}
+                autoHideDuration={6000}
+                onClose={handleCloseNotification}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleCloseNotification}
+                    severity={notification.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {notification.message}
+                </Alert>
+            </Snackbar>
             {/* Password Change Form */}
-            <form onSubmit={handlePasswordChange} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Current Password */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">

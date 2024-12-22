@@ -1,7 +1,8 @@
 package cz.cvut.fel.pm2.service;
 
 import cz.cvut.fel.pm2.enums.Role;
-import cz.cvut.fel.pm2.model.CapsuleDto;
+import cz.cvut.fel.pm2.exceptions.NotFoundException;
+import cz.cvut.fel.pm2.mappers.CapsuleMapperImp;
 import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.persistence.Capsule;
 import cz.cvut.fel.pm2.persistence.User;
@@ -29,6 +30,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CapsuleMapperImp capsuleMapperImp;
 
     public List<Capsule> getCapsules(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"))
@@ -123,12 +125,12 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public UserDto updateProfile(String email, Map<String, String> updates) {
+    public void updateProfile(String email, Map<String, String> updates) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (updates.containsKey("name")) {
-            user.setEmail(updates.get("name"));
+            user.setName(updates.get("name"));
         }
 
         if (updates.containsKey("bio")) {
@@ -145,7 +147,7 @@ public class UserService implements UserDetailsService {
         }
 
         User savedUser = userRepository.save(user);
-        return convertToDto(savedUser);
+        convertToDto(savedUser);
     }
 
     private void handleEmailUpdate(User user, String newEmail) {
@@ -156,6 +158,11 @@ public class UserService implements UserDetailsService {
         // Here you would typically generate a verification token and send an email
         // For now, we'll just update directly
         user.setEmail(newEmail);
+    }
+
+    public User getUserProfile(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Transactional
@@ -182,12 +189,14 @@ public class UserService implements UserDetailsService {
         return new UserDto(
                 user.getId().longValue(),
                 user.getEmail(),
+                user.getName(),
+                user.getBio(),
                 user.getRole().toString(),
                 user.getFollowers().stream()
                         .map(this::convertToDto)
                         .collect(Collectors.toList()),
                 user.getCapsules().stream()
-                        .map(capsule -> new CapsuleDto(/* map capsule fields */))
+                        .map(capsuleMapperImp::toDto)
                         .collect(Collectors.toList())
         );
     }

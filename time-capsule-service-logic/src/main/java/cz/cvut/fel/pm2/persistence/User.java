@@ -57,7 +57,7 @@ public class User extends AbstractEntity {
         this.role = Role.REGISTERED;
     }
 
-    @Column(name = "bio")
+    @Column(name = "bio", length = 1000)
     private String bio;
 
     @Column(name = "name")

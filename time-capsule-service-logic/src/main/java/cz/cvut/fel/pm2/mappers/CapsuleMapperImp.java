@@ -8,8 +8,11 @@ import cz.cvut.fel.pm2.persistence.User;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
+
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+@Primary
 @Component
 public class CapsuleMapperImp implements CapsuleMapper {
 
@@ -164,6 +167,8 @@ public class CapsuleMapperImp implements CapsuleMapper {
         Long id = null;
         String email = null;
         String role = null;
+        String name = null;
+        String bio = null;
         List<UserDto> followers = null;
         List<CapsuleDto> capsules = null;
 
@@ -177,8 +182,14 @@ public class CapsuleMapperImp implements CapsuleMapper {
         followers = userListToUserDtoList( user.getFollowers() );
         capsules = toDtos( user.getCapsules() );
 
-        UserDto userDto = new UserDto( id, email, role, followers, capsules );
+        if ( user.getName() != null ) {
+            name = user.getName();
+        }
+        if ( user.getBio() != null ) {
+            bio = user.getBio();
+        }
 
-        return userDto;
+
+        return new UserDto( id, email, role, name, bio, followers, capsules );
     }
 }
