@@ -5,6 +5,7 @@ import cz.cvut.fel.pm2.exceptions.InvalidBodyException;
 import cz.cvut.fel.pm2.exceptions.NotFoundException;
 import cz.cvut.fel.pm2.mappers.CapsuleMapper;
 import cz.cvut.fel.pm2.model.CapsuleDto;
+import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.persistence.Capsule;
 import cz.cvut.fel.pm2.enums.UnlockMethod;
 import cz.cvut.fel.pm2.persistence.User;
@@ -13,6 +14,7 @@ import cz.cvut.fel.pm2.repository.UserRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -29,6 +31,7 @@ public class CapsuleService {
 
     private final CapsuleRepository capsuleRepository;
 
+    //todo wtf
     private final CapsuleMapper capsuleMapper;
     private final UserRepository userRepository;
     private final SecureRandom secureRandom = new SecureRandom();
@@ -38,6 +41,12 @@ public class CapsuleService {
         validateCapsule(capsuleDto);
 
         Capsule capsule = capsuleMapper.toEntity(capsuleDto);
+
+        //todo, add as param?
+//        , UserDto ownerDto
+//        capsule.setOwner(userRepository.findByEmail(ownerDto.email())
+//                .orElseThrow(() -> new NotFoundException("User not found")));
+
 
         capsule = capsuleRepository.save(capsule);
 //

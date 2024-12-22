@@ -120,17 +120,21 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
 
     // TODO
     const handleGoogleSignIn = async (credentialResponse) => {
-        const decodedToken = jwtDecode(credentialResponse.credential);
+        console.log("Raw Credential:", credentialResponse.credential);  // Verify it's a string JWT
+        const token = credentialResponse.credential; // It should be a string!
+
         try {
-            const data = await ApiService.loginWithGoogle(decodedToken);
+            const data = await ApiService.loginWithGoogle(token); // Send token directly
             console.log('Login response:', data);
             if (data) {
-                setUser({email: userEmail, initials});
+                const userEmail = data.email;
+                const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase();
+                setUser({ email: userEmail, initials });
                 navigate('/dashboard');
             }
         } catch (error) {
             console.error('Login error:', error);
-            setLoginErrors({api: 'Přihlášení selhalo'});
+            setLoginErrors({ api: 'Přihlášení selhalo' });
         }
     };
 

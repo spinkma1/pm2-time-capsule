@@ -13,8 +13,10 @@ import cz.cvut.fel.pm2.repository.UserRepository;
 import cz.cvut.fel.pm2.service.CapsuleService;
 import cz.cvut.fel.pm2.service.StripeService;
 import cz.cvut.fel.pm2.service.UserService;
+import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,18 +44,30 @@ public class UserApiImpl implements UserApi {
 
 
     @Override
-    @PostMapping("/login/sso")
-    public Map<String, String> login(@AuthenticationPrincipal OidcUser oidcUser) {
+    @PostMapping(value = "/login/sso",produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody()
+    public ResponseEntity<Map<String, String>> login(@AuthenticationPrincipal(errorOnInvalidType=true) Object principal ) {
         Map<String, String> response = new HashMap<>();
-        if (oidcUser != null) {
+
+        if (principal instanceof OidcUser oidcUser) {
             response.put("id", oidcUser.getSubject());
             response.put("name", oidcUser.getFullName());
             response.put("email", oidcUser.getEmail());
-            response.put("message", "Login successful");
+            response.put("message", "Login successful via SSO");
+        } else if (principal instanceof UserDetails userDetails) {
+            response.put("email", userDetails.getUsername());
+            response.put("message", "Login successful with standard credentials");
         } else {
             response.put("message", "User not authenticated");
         }
-        return response;
+
+        // Ensure you are returning a valid JSON body, not empty
+//        return ResponseEntity.ok()
+//                .header("Content-Type", "application/json")
+//                .body(response); // This makes sure the body is actually returned
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+//        return response;
     }
 
     @Override
@@ -120,13 +134,16 @@ public class UserApiImpl implements UserApi {
         String password = request.get("password");
         String email = request.get("email");
 
+        User user = userRepository.findByEmail(email).orElse(null);
+        user.setPassword(password);
         try {
-            userService.registerUser(password, email);
-            User user = userService.getUser(email);
+//            userService.registerUser(password, email);
+//            User user = userService.getUser(email);
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
             final UserDetails userDetails = userService.loadUserByUsername(email);
+
             final String accessToken = jwtUtil.generateToken(userDetails);
             final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
             return ResponseEntity.ok(Map.of(

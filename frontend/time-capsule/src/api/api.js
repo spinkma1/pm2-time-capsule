@@ -72,8 +72,8 @@ export const ApiService = {
     try {
       const response = await fetchWithConfig("/user/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email, password}),
       });
       if (response) {
         localStorage.setItem("access_token", response.accessToken);
@@ -93,8 +93,8 @@ export const ApiService = {
     try {
       const response = await fetchWithConfig("/user/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email, password}),
       });
       return response;
     } catch (error) {
@@ -107,7 +107,7 @@ export const ApiService = {
     try {
       const response = await fetchWithConfig("/capsules/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify(capsuleData),
       });
 
@@ -123,17 +123,34 @@ export const ApiService = {
       throw error;
     }
   },
+  loginWithGoogle: async  (token) => {
+    // Input validation
+    console.log("Attempting login with token:", token);
 
+    if (typeof token !== 'string') {
+      console.error("Error: The token is not a valid string:", token);
+      throw new Error("Invalid token format");
+    }
 
-  loginWithGoogle: async (token) => {
     try {
       const response = await fetchWithConfig("/user/login/sso", {
-        method: "GET",
+        method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
         }
       });
-      return response;
+
+      // Your fetchWithConfig already returns the parsed JSON
+      console.log("Login response:", response);
+
+      if (response.email) {
+        // Successful login - response contains user data
+        return response;
+      } else {
+        throw new Error(response.message || "Authentication failed");
+      }
+
     } catch (error) {
       console.error("Google login failed:", error);
       throw error;
