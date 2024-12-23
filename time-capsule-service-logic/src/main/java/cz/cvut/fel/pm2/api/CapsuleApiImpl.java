@@ -40,7 +40,6 @@ public class CapsuleApiImpl implements CapsuleApi {
 
     @Override
     public ResponseEntity<Map<String, String>> openViaQr(@RequestParam String capsuleId, @RequestParam String qrCodePasswordRaw) throws NoSuchAlgorithmException {
-        // Check if the necessary parameters are provided
         if (capsuleId == null || qrCodePasswordRaw == null || qrCodePasswordRaw.isEmpty()) {
             throw new InvalidBodyException("No or wrong body was sent");
         }
