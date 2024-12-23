@@ -15,6 +15,7 @@ import cz.cvut.fel.pm2.service.StripeService;
 import cz.cvut.fel.pm2.service.UserService;
 import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +34,12 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
+
 public class UserApiImpl implements UserApi {
+
+@Autowired
     private UserRepository userRepository;
+    @Autowired
     private CapsuleRepository capsuleRepository;
 
     private final UserService userService;
@@ -41,6 +48,8 @@ public class UserApiImpl implements UserApi {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
+
 
 
     @Override
@@ -135,18 +144,20 @@ public class UserApiImpl implements UserApi {
         String email = request.get("email");
 
         User user = userRepository.findByEmail(email).orElse(null);
-        user.setPassword(password);
+//        password = passwordEncoder.encode(password);
+//        user.setPassword(password);
         try {
-//            userService.registerUser(password, email);
+            userService.registerUser(password, email);
 //            User user = userService.getUser(email);
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
             final UserDetails userDetails = userService.loadUserByUsername(email);
+            user = userRepository.findByEmail(email).orElse(null);
 
             final String accessToken = jwtUtil.generateToken(userDetails);
             final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
-            return ResponseEntity.ok(Map.of(
+                return ResponseEntity.ok(Map.of(
                     "message", "Registration successful",
                     "accessToken", accessToken,
                     "refreshToken", refreshToken,

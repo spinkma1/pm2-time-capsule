@@ -90,7 +90,7 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessHandler(oidcLogoutSuccessHandler())) // For Google SSO logout
-                .addFilterBefore( preAuthRegisterFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(preAuthRegisterFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session

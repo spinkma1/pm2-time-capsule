@@ -38,8 +38,13 @@ public class PreAuthRegisterFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
+        //used ONLY FOR SSO REGISTRATION
 
-        final String authorizationHeader = request.getHeader("Authorization");
+            final String authorizationHeader = request.getHeader("Authorization");
+            if(authorizationHeader == null){
+                filterChain.doFilter(request, response);
+                return;
+            }
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String jwt = authorizationHeader.substring(7);
@@ -55,17 +60,23 @@ public class PreAuthRegisterFilter extends OncePerRequestFilter {
                     filterChain.doFilter(request, response);
                     return;
                 }
-                //generate impossibly long password if the user has none
-                String password = generateLongPassword();
-                try {
-                    userService.registerUser(password, username);
-                } catch (Exception e) {
-                    // Log and fail gracefully if registration fails
-                    logger.error("User registration failed during pre-authentication", e);
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token or user cannot be registered");
-                    return;
-                }
 
+                //TODO
+                //user doesn't exist
+                //if password isn't sent in the form (SSO), generate a long password
+                if (request.getParameter("password") == null) {
+
+                    String password = generateLongPassword();
+                    try {
+                        userService.registerUser(password, username);
+                    } catch (Exception e) {
+                        // Log and fail gracefully if registration fails
+                        logger.error("User registration failed during pre-authentication", e);
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token or user cannot be registered");
+                        return;
+                    }
+
+                }
             } catch (Exception e) {
                 // Log and fail gracefully if JWT extraction fails
                 logger.error("JWT extraction failed during pre-authentication", e);

@@ -47,12 +47,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             username = jwtUtil.extractUsername(jwt); // Get the username from the JWT
+            usedAlgorithm = jwtUtil.getAlgorithm(jwt);
         }
 
-        usedAlgorithm = jwtUtil.getAlgorithm(jwt);
-
         // Handle OAuth2 Authentication Token (Google SSO)
-        if(usedAlgorithm.equals("RS256")){
+        if(usedAlgorithm!= null && usedAlgorithm.equals("RS256")){
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             // Log the current Authentication details
@@ -80,12 +79,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
 
+
         // Additional logging for decision path based on username and JWT
         if (username != null) {
             logger.info("Extracted username: " + username);
         }
 
-        if (usedAlgorithm == "HS256") {
+        if (usedAlgorithm!= null && usedAlgorithm.equals("HS256")) {
             logger.info("Validating JWT for username: " + username);
             UserDetails userDetails = this.userService.loadUserByUsername(username);
 
@@ -100,7 +100,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 logger.info("JWT Token validation failed for: " + username);
                 return;
             }
-        } else {
+        } else if (usedAlgorithm!= null){
             // Handle OAuth2 (SSO) logic
             logger.info("Processing OAuth2 authentication for: " + username);
             UserDetails userDetails = this.userService.loadUserByUsername(username);

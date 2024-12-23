@@ -9,7 +9,7 @@ const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     ...(options.headers || {}),
   };
-
+  console.log("Headers being sent:", headers);
   const defaultOptions = { ...options, headers };
 
   try {
