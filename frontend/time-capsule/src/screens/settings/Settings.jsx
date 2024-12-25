@@ -15,6 +15,7 @@ import {
 import SecuritySection from "./SecuritySection.jsx";
 import ConnectionsSection from "./ConnectionSection.jsx";
 import {ApiService} from "../../api/api.js";
+import DeleteAccountDialog from "./DeleteAccountDialog.jsx";
 
 const Settings = ({ user, setUser }) => {
     const location = useLocation();
@@ -25,6 +26,30 @@ const Settings = ({ user, setUser }) => {
     const [activeTab, setActiveTab] = useState(
         location.state?.activeTab || 'profile'
     );
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [notification, setNotification] = useState({
+        open: false,
+        message: '',
+        severity: 'success' // 'error', 'warning', 'info', 'success'
+    });
+
+    const handleDeleteAccount = async () => {
+        setIsDeleting(true);
+        try {
+            await ApiService.deleteAccount();
+            await handleLogout();
+        } catch (error) {
+            setNotification({
+                open: true,
+                message: 'Nepodařilo se smazat účet',
+                severity: 'error'
+            });
+        } finally {
+            setIsDeleting(false);
+            setShowDeleteDialog(false);
+        }
+    };
 
     useEffect(() => {
         if (location.state?.activeTab) {
@@ -55,23 +80,6 @@ const Settings = ({ user, setUser }) => {
         navigate('/dashboard');
     };
 
-    /*
-    const handleProfileUpdate = async (updatedData) => {
-        try {
-            const updatedUser = await ApiService.updateProfile(updatedData);
-            setUserData(prev => ({
-                ...prev,
-                ...updatedUser
-            }));
-            // Můžete přidat notifikaci o úspěšné aktualizaci
-        } catch (error) {
-            console.error('Failed to update profile:', error);
-            // Můžete přidat notifikaci o chybě
-        }
-    };
-
-     */
-
     const menuItems = [
         { id: 'profile', label: 'Profil', icon: <User size={20} /> },
         { id: 'security', label: 'Zabezpečení', icon: <Lock size={20} /> },
@@ -83,15 +91,6 @@ const Settings = ({ user, setUser }) => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900"></div>
         </div>;
     }
-
-    /*
-    if (error) {
-        return <div className="flex justify-center items-center min-h-screen text-red-600">
-            {error}
-        </div>;
-    }
-
-     */
 
     const handleLogout = async () => {
         // Zavolat BE endpoint pro vyčištění session
@@ -143,12 +142,18 @@ const Settings = ({ user, setUser }) => {
                                 ))}
                                 <div className="border-t border-gray-200 my-4"></div>
                                 <button
-                                    onClick={() => setActiveTab('delete-account')}
+                                    onClick={() => setShowDeleteDialog(true)}
                                     className="w-full flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
                                 >
                                     <Trash2 size={20} />
                                     <span>Smazat účet</span>
                                 </button>
+                                <DeleteAccountDialog
+                                    isOpen={showDeleteDialog}
+                                    onClose={() => setShowDeleteDialog(false)}
+                                    onConfirm={handleDeleteAccount}
+                                    isLoading={isDeleting}
+                                />
                                 <button
                                     onClick={() => handleLogout()}
                                     className="w-full flex items-center space-x-2 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"

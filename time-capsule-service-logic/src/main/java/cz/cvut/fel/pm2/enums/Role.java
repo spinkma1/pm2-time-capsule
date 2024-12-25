@@ -4,5 +4,6 @@ public enum Role {
     REGISTERED,
     ADMIN,
     PREMIUM,
-    BANNED
+    BANNED,
+    DELETED
 }

@@ -1,6 +1,7 @@
 package cz.cvut.fel.pm2.service;
 
 import cz.cvut.fel.pm2.enums.Role;
+import cz.cvut.fel.pm2.exception.UserDeletedException;
 import cz.cvut.fel.pm2.exceptions.NotFoundException;
 import cz.cvut.fel.pm2.mappers.CapsuleMapperImp;
 import cz.cvut.fel.pm2.model.UserDto;
@@ -87,13 +88,18 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public Optional<User> loginUser(String username, String password) {
+    public Optional<User> loginUser(String username, String password) throws IllegalAccessException {
         Optional<User> user = userRepository.findByEmail(username);
-        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
-            return user;
+        if (user.isPresent()) {
+            if (user.get().getRole() == Role.DELETED) {
+                throw new UserDeletedException("Tento účet byl smazán. Pro obnovení kontaktujte podporu.");            }
+            if (passwordEncoder.matches(password, user.get().getPassword())) {
+                return user;
+            }
         }
         return Optional.empty();
     }
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
@@ -111,18 +117,19 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Remove user from all capsules
-        user.getCapsules().forEach(capsule -> {
-            capsule.getUsers().remove(user);
-        });
+        // Místo fyzického smazání jen změníme roli
+        user.setRole(Role.DELETED);
+        userRepository.save(user);
 
-        // Remove user from followers/following relationships
-        user.getFollowers().forEach(follower -> {
-            follower.getFollowers().remove(user);
-        });
-
-        // Delete user
-        userRepository.delete(user);
+        // Poslat email o smazání účtu
+        // TODO
+        /*
+        mailService.sendEmail(
+                user.getEmail(),
+                "Účet byl smazán",
+                "Váš účet byl úspěšně smazán. Pokud budete chtít účet obnovit, kontaktujte podporu."
+        );
+         */
     }
 
     @Transactional

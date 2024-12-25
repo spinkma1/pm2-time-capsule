@@ -43,7 +43,7 @@ public interface UserApi {
     @Operation(summary = "Login an existing user", description = "Login an existing user using password and username.")
     @PostMapping("/login")
     @ResponseBody
-    ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request);
+    ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) throws IllegalAccessException;
 
     @Operation(summary = "Create a new Stripe customer", description = "Creates a new customer in Stripe.")
     @PostMapping("/stripe/customer")
@@ -62,7 +62,7 @@ public interface UserApi {
 
     @DeleteMapping("/delete")
     @Operation(summary = "Delete user account", description = "Permanently deletes user account and all associated data")
-    ResponseEntity<Map<String, String>> deleteAccount(@AuthenticationPrincipal OidcUser oidcUser);
+    ResponseEntity<Map<String, String>> deleteAccount(@RequestHeader("Authorization") String authHeader);
 
     @PutMapping("/profile")
     @Operation(summary = "Update user profile", description = "Updates user profile information")

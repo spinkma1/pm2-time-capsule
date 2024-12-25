@@ -14,6 +14,12 @@ const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
 
   try {
     const response = await fetch(url, defaultOptions);
+    if (response.status === 202) { // Accepted status pro smazaný účet
+      const text = await response.text();
+      if (text.includes("Tento účet byl smazán")) {
+        throw new Error("ACCOUNT_DELETED");
+      }
+    }
     if (!response.ok) {
       if (response.status === 401) {
         const refreshToken = localStorage.getItem("refresh_token");
@@ -39,9 +45,16 @@ const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     if (response.status === 204) return true;
+    if (response.status === 403 && response.statusText === "Tento účet byl smazán. Pro obnovení kontaktujte podporu.") {
+        console.error("Account deleted. Token:", accessToken);
+        return new Error("Account deleted");
+    }
     return noBody ? undefined : await response.json();
   } catch (error) {
     console.error("API call failed:", error);
+    if (error.message === "ACCOUNT_DELETED") {
+      throw new Error("ACCOUNT_DELETED");
+    }
     throw error;
   }
 };
@@ -84,6 +97,9 @@ export const ApiService = {
       }
       return response;
     } catch (error) {
+      if (error.message === "ACCOUNT_DELETED") {
+        throw new Error("ACCOUNT_DELETED");
+      }
       console.error("Login failed:", error);
       throw error;
     }
@@ -217,6 +233,19 @@ export const ApiService = {
       });
     } catch (error) {
       console.error('Error fetching user profile:', error);
+      throw error;
+    }
+  },
+
+  deleteAccount: async () => {
+    try {
+      const response = await fetchWithConfig('/user/delete', {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      return response;
+    } catch (error) {
+      console.error("Account deletion failed:", error);
       throw error;
     }
   }

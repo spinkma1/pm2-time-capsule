@@ -4,6 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { ApiService } from "../../api/api.js";
+import {Alert, Snackbar} from "@mui/material";
 
 const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
     const navigate = useNavigate();
@@ -22,6 +23,11 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
 
     // Error states
     const [loginErrors, setLoginErrors] = useState({});
+    const [notification, setNotification] = useState({
+        open: false,
+        message: '',
+        severity: 'success' // 'error', 'warning', 'info', 'success'
+    });
     const [registerErrors, setRegisterErrors] = useState({});
 
     const [registerForm, setRegisterForm] = useState({
@@ -29,6 +35,10 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
         password: '',
         confirmPassword: '',
     });
+
+    const handleCloseNotification = () => {
+        setNotification({ ...notification, open: false });
+    };
 
     const validateLoginForm = (formData) => {
         const newErrors = {};
@@ -78,8 +88,6 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
 
      */
 
-    /* TODO*/
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         const userEmail = isLogin ? loginForm.email : registerForm.email;
@@ -95,8 +103,21 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                         navigate('/dashboard');
                     }
                 } catch (error) {
+                    if (error.message === "ACCOUNT_DELETED") {
+                        setNotification({
+                            open: true,
+                            message: 'Tento účet byl smazán. Pro obnovení kontaktujte podporu.',
+                            severity: 'error'
+                        });
+                    } else {
+                        setNotification({
+                            open: true,
+                            message: 'Nesprávné přihlašovací údaje.',
+                            severity: 'error'
+                        });
+                    }
                     console.error('Login error:', error);
-                    setLoginErrors({ api: 'Přihlášení selhalo' });
+                    //setLoginErrors({ api: 'Přihlášení selhalo' });
                 }
             }
         } else {
@@ -142,8 +163,22 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
 
     return (
 
-
         <div className="min-h-screen bg-gray-50 flex flex-col relative">
+            {/* Snackbar pro notifikace */}
+            <Snackbar
+                open={notification.open}
+                autoHideDuration={6000}
+                onClose={handleCloseNotification}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleCloseNotification}
+                    severity={notification.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {notification.message}
+                </Alert>
+            </Snackbar>
             <div className="bg-white shadow-sm py-4 px-6 flex flex-col md:flex-row md:justify-between relative">
                 <button
                     onClick={() => navigate('/')}

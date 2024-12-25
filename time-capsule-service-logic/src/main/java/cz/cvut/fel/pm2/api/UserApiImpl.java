@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -89,7 +90,7 @@ public class UserApiImpl implements UserApi {
 
     @Override
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) throws IllegalAccessException {
         String email = request.get("email");
         String password = request.get("password");
         Optional<User> user = userService.loginUser(email, password);
@@ -194,14 +195,23 @@ public class UserApiImpl implements UserApi {
 
     @Override
     @DeleteMapping("/delete")
-    public ResponseEntity<Map<String, String>> deleteAccount(@AuthenticationPrincipal OidcUser oidcUser) {
-        if (oidcUser == null) {
-            return ResponseEntity.status(401)
-                    .body(Map.of("message", "User not authenticated"));
-        }
-
+    public ResponseEntity<Map<String, String>> deleteAccount(@RequestHeader("Authorization") String authHeader) {
         try {
-            userService.deleteUser(oidcUser.getEmail());
+            // Odstranění "Bearer " z tokenu
+            String token = authHeader.substring(7);
+
+            // Získání emailu z tokenu pomocí jwtUtil
+            String email = jwtUtil.extractUsername(token);
+
+            // Ověření platnosti tokenu
+            UserDetails userDetails = userService.loadUserByUsername(email);
+            if (!jwtUtil.validateToken(token, userDetails)) {
+                return ResponseEntity.status(401)
+                        .body(Map.of("message", "Invalid token"));
+            }
+
+            // Smazání účtu
+            userService.deleteUser(email);
             return ResponseEntity.ok(Map.of("message", "Account successfully deleted"));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
@@ -300,13 +310,17 @@ public class UserApiImpl implements UserApi {
             if (user == null) {
                 return ResponseEntity.notFound().build();
             }
+
+            if (user.getBio() == null || user.getName() == null || user.getEmail() == null) {
+
+            }
             return ResponseEntity.ok(Map.of(
-                    "name", user.getName(),
-                    "email", user.getEmail(),
-                    "bio", user.getBio()
+                    "name", user.getBio() != null ? Objects.requireNonNull(user.getName()) : "",
+                    "email", user.getEmail() != null ? user.getEmail() : "",
+                    "bio", user.getBio() != null ? user.getBio() : ""
             ));
         } catch (Exception e) {
-            e.printStackTrace(); // Pro debug
+            e.printStackTrace(); // Pro debugu
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
