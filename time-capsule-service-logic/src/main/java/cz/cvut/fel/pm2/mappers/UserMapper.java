@@ -8,7 +8,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {CapsuleMapper.class})
 public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
@@ -25,4 +25,6 @@ public interface UserMapper {
     @Mapping(source = "followers", target = "followers")
     @Mapping(source = "capsules", target = "capsules")
     User toEntity(UserDto userDto);
+
+
 }
