@@ -75,7 +75,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(newUser);
     }
 
-    public void registerUser(String password, String email) {
+    public User registerUser(String password, String email) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("User already exists");
         }
@@ -86,6 +86,7 @@ public class UserService implements UserDetailsService {
         user.setCapsules(List.of());
         user.setFollowers(List.of());
         userRepository.save(user);
+        return user;
     }
 
     public Optional<User> loginUser(String username, String password) throws IllegalAccessException {

@@ -5,6 +5,7 @@ import cz.cvut.fel.pm2.exceptions.InvalidBodyException;
 import cz.cvut.fel.pm2.exceptions.NotFoundException;
 import cz.cvut.fel.pm2.mappers.CapsuleMapper;
 import cz.cvut.fel.pm2.model.CapsuleDto;
+import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.persistence.Capsule;
 import cz.cvut.fel.pm2.enums.UnlockMethod;
 import cz.cvut.fel.pm2.persistence.User;
@@ -13,6 +14,8 @@ import cz.cvut.fel.pm2.repository.UserRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,23 +38,54 @@ public class CapsuleService {
     private final MailService mailService;
 
     public CapsuleDto createCapsule(@NonNull CapsuleDto capsuleDto) throws NoSuchAlgorithmException {
+        // Validace vstupního DTO
         validateCapsule(capsuleDto);
+
         Capsule capsule = capsuleMapper.toEntity(capsuleDto);
+        capsule = capsuleRepository.save(capsule);
+
         try {
-            User user = userRepository.findById(capsuleDto.userId())
+            User owner = userRepository.findById(capsuleDto.userId())
                     .orElseThrow(() -> new NotFoundException("User not found"));
-            capsule.setOwner(user);
+            capsule.setOwner(owner);
+
+            List<User> users = new ArrayList<>();
+            for (UserDto userDto : capsuleDto.users()) {
+                User user = userRepository.findByEmail(userDto.email())
+                        .orElseThrow(() -> {
+                            mailService.sendEmail(
+                                    owner.getEmail(),
+                                    "Subscription Successful",
+                                    "You have successfully subscribed to the capsule by : " + owner.getEmail() + "Please register to access the capsule. https://time-capsule-phi.vercel.app/"
+                            );
+                            return null;
+                        });
+
+                if (user != null) {
+                    users.add(user);
+                    if (!user.getCapsules().contains(capsule)) {
+                        user.getCapsules().add(capsule);
+                    }
+                }
+            }
+
+            capsule.setUsers(users);
+
             capsule = capsuleRepository.save(capsule);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        } catch (DataIntegrityViolationException e) {
             throw new InvalidBodyException("Capsule with the same name already exists");
+        } catch (Exception e) {
+            // Zachycení ostatních chyb
+            throw new RuntimeException("An error occurred while creating the capsule", e);
         }
         generateAndHashQrPassword(capsule.getId());
 
 
         return capsuleMapper.toDto(capsule);
     }
- 
+
+
     public List<CapsuleDto> getCapsules(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
         return capsuleRepository.getCapsulesByOwner(user)
@@ -63,8 +97,8 @@ public class CapsuleService {
     public void validateCapsule(CapsuleDto capsuleDto) {
         if (capsuleDto.name() == null ||
                 capsuleDto.description() == null ||
-                capsuleDto.teamWork() == null ||
-                capsuleDto.userFileLimit() == null) {
+                capsuleDto.userId() == null ||
+                capsuleDto.capsuleSize() == null) {
             throw new InvalidBodyException("No or wrong body was sent");
         }
     }
@@ -88,7 +122,7 @@ public class CapsuleService {
 
 
 
-    public void generateAndHashQrPassword(Integer capsuleId) throws NoSuchAlgorithmException {
+    public void generateAndHashQrPassword(Long capsuleId) throws NoSuchAlgorithmException {
         var capsule = capsuleRepository.getCapsuleById(capsuleId)
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 
@@ -121,26 +155,23 @@ public class CapsuleService {
     }
 
 
-    public void updateUnlockMethodState(int capsuleId, UnlockMethod unlockMethod, boolean enabledBool, boolean completionBool) {
+    public void updateUnlockMethodState(Long capsuleId, UnlockMethod unlockMethod, boolean enabledBool, boolean completionBool) {
         // Retrieve the capsule by its ID
         var capsule = capsuleRepository.getCapsuleById(capsuleId)
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 
-        // Retrieve the unlockMethods map for this capsule
         var unlockMethods = capsule.getUnlockMethods();
 
-        // Check if the unlock method exists in the map
         if (unlockMethods.containsKey(unlockMethod)) {
-            // Get the current state of the unlock method
+
             UnlockMethodState currentState = unlockMethods.get(unlockMethod);
 
-            // Update the state: set the new enabled and complete values
             currentState.setEnabled(enabledBool);
             currentState.setComplete(completionBool);
 
-            // Save the updated capsule back to the repository
+
             capsuleRepository.save(capsule);
-            tryUnlockCapsule(capsuleId);
+            tryUnlockCapsule((long) capsuleId);
             capsuleRepository.save(capsule);
 
         } else {
@@ -186,7 +217,7 @@ public class CapsuleService {
 
 
 
-    public boolean tryUnlockCapsule(int capsuleId) {
+    public boolean tryUnlockCapsule(Long capsuleId) {
         // Fetch the capsule by its ID or throw an exception if not found
         var capsule = capsuleRepository.getCapsuleById(capsuleId)
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
@@ -194,24 +225,24 @@ public class CapsuleService {
         var unlockMethods = capsule.getUnlockMethods();
         boolean allMethodsSatisfied = true;
 
-        // Loop through the unlock methods and check if each enabled method is complete
+
         for (Map.Entry<UnlockMethod, UnlockMethodState> entry : unlockMethods.entrySet()) {
             UnlockMethod method = entry.getKey();
             UnlockMethodState state = entry.getValue();
 
-            // If the method is enabled, we check if it's complete
+
             if (state.isEnabled() && !state.isComplete()) {
                 allMethodsSatisfied = false;
-                break; // Exit the loop early as we found an unsatisfied method
+                break;
             }
         }
 
-        // If all methods are satisfied, set the capsule to OPEN
+
         if (allMethodsSatisfied) {
             capsule.setState(State.OPEN);
-            capsuleRepository.save(capsule); // Don't forget to persist the change
+            capsuleRepository.save(capsule);
 
-            // Send email notification
+
             sendOpenNotifications(capsule);
 
             return true;
@@ -233,7 +264,6 @@ public class CapsuleService {
         capsule.getUsers().add(user);
         capsuleRepository.save(capsule);
 
-        // Notify the user, that he was subscribed to a capsule, through email
         mailService.sendEmail(
                 user.getEmail(),
                 "Subscription Successful",

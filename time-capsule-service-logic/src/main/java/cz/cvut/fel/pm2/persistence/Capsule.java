@@ -6,6 +6,7 @@ import cz.cvut.fel.pm2.UnlockMethodState;
 import cz.cvut.fel.pm2.enums.State;
 import cz.cvut.fel.pm2.enums.Type;
 import cz.cvut.fel.pm2.enums.UnlockMethod;
+import cz.cvut.fel.pm2.model.CapsuleDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,7 @@ import java.util.Map;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Capsule extends AbstractEntity {
 
     @ManyToOne
@@ -41,7 +43,7 @@ public class Capsule extends AbstractEntity {
     private List<Notification> notifications;
 
     @Column(name = "capsule_size")
-    private Double capsuleSize;
+    private Long capsuleSize;
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
@@ -60,7 +62,8 @@ public class Capsule extends AbstractEntity {
     @OneToMany(mappedBy = "capsule")
     private List<Content> contents;
 
-
+    @Column(name = "team_work")
+    private boolean teamWork;
 
     @ElementCollection
     @Enumerated(EnumType.STRING)
@@ -69,7 +72,6 @@ public class Capsule extends AbstractEntity {
     //time is set true by default, others false
     // todo zakomentoval jsem to, protoze s tim nejde spustit aplikace. Pred pushem vzdy zkontrolovat clean package run
     private Map<UnlockMethod, UnlockMethodState> unlockMethods = new HashMap<>();
-
     @Column(name = "unlock_time")
     private LocalDateTime unlockTime;
 
@@ -82,10 +84,5 @@ public class Capsule extends AbstractEntity {
     @Column(name = "unlock_longit")
     private Double unlockLongit;
 
-    public Capsule() {
-        unlockMethods.put(UnlockMethod.TIME, new UnlockMethodState(true, false));
-        unlockMethods.put(UnlockMethod.QR_CODE, new UnlockMethodState(false, false));
-        unlockMethods.put(UnlockMethod.GEOLOCATION, new UnlockMethodState(false, false));
-        unlockMethods.put(UnlockMethod.PASSWORD, new UnlockMethodState(false, false));
-    }
+
 }

@@ -1,5 +1,7 @@
 package cz.cvut.fel.pm2.config.security;
 
+import cz.cvut.fel.pm2.persistence.User;
+import cz.cvut.fel.pm2.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,11 +15,16 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -31,8 +38,9 @@ import java.util.List;
 public class SecurityConfig {
     private final ClientRegistrationRepository clientRegistrationRepository;
 
-
+//    private final CustomOAuthSuccessHandler customOAuthSuccessHandler;
     private final JwtRequestFilter jwtRequestFilter;
+    private final PreAuthRegisterFilter preAuthRegisterFilter;
 
 
     /**
@@ -64,7 +72,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // e
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .requestMatchers(SecurityEndpoints.PUBLIC_URLS).permitAll()
@@ -72,13 +80,18 @@ public class SecurityConfig {
                         .requestMatchers(SecurityEndpoints.ADMIN_URLS).hasAuthority("ROLE_ADMIN")
                         .requestMatchers(SecurityEndpoints.MEMBER_URLS).hasAuthority("ROLE_MEMBER")
                         .anyRequest().authenticated())
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                //.oauth2Login(oauth2 -> oauth2
-                  //      .defaultSuccessUrl("/user/info", true) // Redirect to user info after successful login
-                    //    .loginPage("/oauth2/authorization/google")) // Custom login page, default is '/login'
+                .oauth2Login(oauth2 -> oauth2
+//                        .successHandler(customOAuthSuccessHandler)
+                    .loginPage("/oauth2/authorization/google")
+                    .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+                            .oidcUserService(oidcUserService()) // inject your custom user service here
+                    )
+                )
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessHandler(oidcLogoutSuccessHandler())) // For Google SSO logout
+                .addFilterBefore(preAuthRegisterFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -89,6 +102,14 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+
+    @Bean
+    public HttpFirewall httpFirewall() {
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
+        firewall.setAllowSemicolon(true);  // Allow semicolons in the URL
+        return firewall;
     }
 
     // Configures logout success handler to revoke Google SSO session
@@ -102,8 +123,16 @@ public class SecurityConfig {
 
     @Bean
     public OidcUserService oidcUserService() {
-        return new OidcUserService();
+//        return new OidcUserService();
+        return new OidcUserService() {
+            @Override
+            public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
+                OidcUser oidcUser = super.loadUser(userRequest);
+                // Custom processing if needed, e.g., log, user persistence, etc.
+                return oidcUser;
+            }};
     }
+
 
 
 }

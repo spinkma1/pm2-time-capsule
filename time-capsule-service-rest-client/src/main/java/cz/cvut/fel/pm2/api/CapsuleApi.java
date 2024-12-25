@@ -1,5 +1,4 @@
 package cz.cvut.fel.pm2.api;
-
 import cz.cvut.fel.pm2.api.examples.ExampleStrings;
 import cz.cvut.fel.pm2.exceptions.InvalidBodyException;
 import cz.cvut.fel.pm2.exceptions.NotFoundException;
@@ -16,24 +15,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
-
 /**
  * API interface for discount-related operations.
  */
 @Tag(name = "Capsule API", description = "API for time capsules.")
 @RequestMapping("/capsules")
 public interface CapsuleApi {
-
-
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @SecurityRequirement(name = "basicAuth")
     @Operation(
-
             summary =
                     "Updates capsule parameters.")
     @ApiResponses(
@@ -94,6 +88,7 @@ public interface CapsuleApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<List<CapsuleDto>> getCapsules(@RequestParam String email);
+
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{capsuleId}")

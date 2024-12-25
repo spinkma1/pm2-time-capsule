@@ -20,9 +20,9 @@ import java.util.Map;
 public interface UserApi {
 
     @Operation(summary = "Login with Google SSO", description = "Initiates login process with Google Single Sign-On.")
-    @GetMapping("/login/sso")
+    @PostMapping("/login/sso")
     @ResponseBody
-    Map<String, String> login(OidcUser oidcUser);
+    ResponseEntity<Map<String, String>> login(Object principal);
 
     @Operation(summary = "Get User Information", description = "Returns user information including capsules and followers.")
     @GetMapping("/info")

@@ -32,7 +32,7 @@ public interface CapsuleRepository extends JpaRepository<Capsule, Long> {
      * @param id id of the capsule
      * @return capsule with the given id
      */
-    Optional<Capsule> getCapsuleById(Integer id);
+    Optional<Capsule> getCapsuleById(Long id);
 
     /**
      * Find capsule by qr code password

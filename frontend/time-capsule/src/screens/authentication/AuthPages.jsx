@@ -99,7 +99,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                     const data = await ApiService.login(loginForm.email, loginForm.password);
                     console.log('Login response:', data);
                     if (data) {
-                        setUser({ email: userEmail, initials });
+                        setUser({ email: data.email, initials });
                         navigate('/dashboard');
                     }
                 } catch (error) {
@@ -127,6 +127,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                     console.log('Registration response:', data);
                     if (data) {
                         setUser({ email: userEmail, initials });
+                        localStorage.setItem('token', data.id);
                         navigate('/dashboard');
                     }
                 } catch (error) {
@@ -141,17 +142,21 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
 
     // TODO
     const handleGoogleSignIn = async (credentialResponse) => {
-        const decodedToken = jwtDecode(credentialResponse.credential);
+        console.log("Raw Credential:", credentialResponse.credential);  // Verify it's a string JWT
+        const token = credentialResponse.credential; // It should be a string!
+
         try {
-            const data = await ApiService.loginWithGoogle(decodedToken);
+            const data = await ApiService.loginWithGoogle(token); // Send token directly
             console.log('Login response:', data);
             if (data) {
-                setUser({email: userEmail, initials});
+                const userEmail = data.email;
+                const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase();
+                setUser({ email: userEmail, initials });
                 navigate('/dashboard');
             }
         } catch (error) {
             console.error('Login error:', error);
-            setLoginErrors({api: 'Přihlášení selhalo'});
+            setLoginErrors({ api: 'Přihlášení selhalo' });
         }
     };
 
@@ -230,6 +235,8 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                                     }}
                                     className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 ${isLogin ? (loginErrors.email ? 'border-red-500' : 'border-gray-300') : (registerErrors.email ? 'border-red-500' : 'border-gray-300')}`}
                                     placeholder="vase@email.cz"
+                                    autoFocus={true}
+                                    tabIndex={1}
                                 />
                             </div>
                             {(isLogin ? loginErrors.email : registerErrors.email) && <p className="text-red-500 text-sm mt-1">{isLogin ? loginErrors.email : registerErrors.email}</p>}
@@ -251,6 +258,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                                     }}
                                     className={`w-full pl-10 pr-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 ${isLogin ? (loginErrors.password ? 'border-red-500' : 'border-gray-300') : (registerErrors.password ? 'border-red-500' : 'border-gray-300')}`}
                                     placeholder="••••••••"
+                                    tabIndex={2}
                                 />
                                 <button
                                     type="button"
@@ -274,12 +282,13 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
                                         onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
                                         className={`w-full pl-10 pr-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 ${registerErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'}`}
                                         placeholder="••••••••"
+                                        tabIndex={3}
                                     />
                                 </div>
                                 {registerErrors.confirmPassword && <p className="text-red-500 text-sm mt-1">{registerErrors.confirmPassword}</p>}
                             </div>
                         )}
-
+                        {(isLogin ? loginErrors.api : registerErrors.api) && <p className="text-red-500 text-sm mt-1">{isLogin ? loginErrors.api : registerErrors.api}</p>}
                         {isLogin && (
                             <div className="flex justify-end">
                                 <button

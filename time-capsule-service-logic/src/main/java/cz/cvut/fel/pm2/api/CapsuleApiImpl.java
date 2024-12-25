@@ -40,15 +40,14 @@ public class CapsuleApiImpl implements CapsuleApi {
 
     @Override
     public ResponseEntity<Map<String, String>> openViaQr(@RequestParam String capsuleId, @RequestParam String qrCodePasswordRaw) throws NoSuchAlgorithmException {
-        // Check if the necessary parameters are provided
         if (capsuleId == null || qrCodePasswordRaw == null || qrCodePasswordRaw.isEmpty()) {
             throw new InvalidBodyException("No or wrong body was sent");
         }
 
-        int intCapsuleId = Integer.parseInt(capsuleId);
+         Long longCapsuleId = Long.parseLong(capsuleId);
 
         // Get the capsule from the repository
-        var capsule = capsuleRepository.getCapsuleById(intCapsuleId)
+        var capsule = capsuleRepository.getCapsuleById(longCapsuleId)
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 
         // Get the stored hashed password
@@ -57,11 +56,11 @@ public class CapsuleApiImpl implements CapsuleApi {
         // Hash the provided QR code password and compare with the stored hash
         String hashedPasswordRaw = hashPassword(qrCodePasswordRaw);
         if (hashedPasswordRaw.equals(storedHashedPassword)) {
-            capsuleService.tryUnlockCapsule(Integer.parseInt(capsuleId));
+            capsuleService.tryUnlockCapsule(Long.parseLong(capsuleId));
 
             // Send a successful response
             Map<String, String> response = new HashMap<>();
-            capsuleService.updateUnlockMethodState(Integer.parseInt(capsuleId), UnlockMethod.QR_CODE, true,true);
+            capsuleService.updateUnlockMethodState(Long.parseLong(capsuleId), UnlockMethod.QR_CODE, true,true);
             response.put("message", "QR code password is correct, unlock method confirmed");
             return ResponseEntity.ok(response);
 

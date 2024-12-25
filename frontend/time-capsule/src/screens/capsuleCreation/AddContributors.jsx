@@ -39,7 +39,7 @@ const AddContributor = ({ capsule }) => {
         return Object.keys(errors).length === 0;
     };
 
-    // Přidání přispěvatele
+
     const handleEmailSubmit = (e) => {
         e.preventDefault();
         const newEmail = emailForm.email.trim();
@@ -63,14 +63,11 @@ const AddContributor = ({ capsule }) => {
         }
     };
 
-    // TODO: Odeslání dat na server
     const handleSubmit = () => {
         const updatedCapsule = {
             ...capsule,
             contributors: formData.contributors,
         };
-        console.log(updatedCapsule);
-        navigate('/capsuleDetail');
     }
 
     return (
@@ -134,7 +131,7 @@ const AddContributor = ({ capsule }) => {
 
                             <InfoBox
                                 title="Správa přispěvatelů"
-                                description={`Přispěvatelé mohou přidávat obsah do kapsle až do jejího uzavření. Každý přispěvatel může přidat maximálně ${capsule.maxItems} souborů.`}
+                                description={`Přispěvatelé mohou přidávat obsah do kapsle až do jejího uzavření. Každý přispěvatel může přidat maximálně ${capsule.maxItems} souborů. Lidé, kterým je přidělen přístup k vaší kapsi, musí být registrováni na této platformě.`}
                             />
                         
 

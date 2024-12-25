@@ -1,20 +1,20 @@
 import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { useLocation, useNavigate } from 'react-router-dom'; 
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const QRGenerator = () => {
-    const randomString = "https://www.google.com/";
+
+const QRGenerator = (randomString) =>{
     const location = useLocation();
     const navigate = useNavigate();
 
     const isFullScreen = location.pathname === '/qrcode';
 
     const handleBack = () => {
-        navigate(-1);  
+        navigate(-1);
     };
 
     return (
-        <div 
+        <div
             className={`${
                 isFullScreen ? 'w-full h-screen flex justify-center items-center' : 'w-[200px] h-[200px] mx-auto'
             }`}
@@ -29,10 +29,10 @@ const QRGenerator = () => {
             )}
 
             {randomString ? (
-                <QRCodeSVG 
-                    value={randomString} 
-                    height="100%" 
-                    width="100%" 
+                <QRCodeSVG
+                    value={randomString}
+                    height="100%"
+                    width="100%"
                 />
             ) : (
                 <div className="loader"></div>

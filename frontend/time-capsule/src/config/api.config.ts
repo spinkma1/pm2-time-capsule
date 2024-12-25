@@ -19,6 +19,9 @@ const API_CONFIG = {
         USER: {
             PROFILE: '/user/profile',
             UPDATE: '/user/update'
+        },
+        CREATE: {
+            CREATE: '/capsules/create',
         }
     },
 

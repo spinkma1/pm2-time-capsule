@@ -2,16 +2,12 @@ import React, { useState } from 'react';
 import {
     ArrowLeft,
     Calendar,
-    Upload,
-    Users,
     Lock,
     Check,
     MapPin,
-    Plus,
-    Copy,
     QrCode
 } from 'lucide-react';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 import Contributor from '../../components/capsulecreation/Contributor';
 import CopyLinkButton from '../../components/capsulecreation/CopyLinkButton';
 import InfoBox from '../../components/capsulecreation/InfoBox';
@@ -33,11 +29,11 @@ const CreateCapsule = () => {
         title: '',
         description: '',
         openDate: '',
-        isPrivate: true,
+        isPrivate: false,
         contributorsLimit: 5,
         hasGeolocation: false,
         hasQRCode: false,
-        qrcode: null,
+        qrcode: Math.random().toString(36).substring(2, 18),
         geolocation: null, // To store the selected coordinates
         contributors: [],
     });
@@ -80,12 +76,17 @@ const CreateCapsule = () => {
             console.log('Form submitted yeah', formData);
 
             const submit = async () => {
-                if (!formData.title || !formData.description || !formData.openDate || !formData.contributorsLimit) {
+                if (!formData.title || !formData.description || !formData.openDate) {
                     console.error("Required fields are missing.");
+
                     return;
                 }
+                console.log(localStorage.getItem('userId'))
+                const userIdString = localStorage.getItem('userId');
+                const userIdLong = userIdString ? Number(userIdString) : null;
 
                 const capsuleData = {
+                    userId: userIdLong,
                     name: formData.title,
                     description: formData.description,
                     capsuleSize: formData.contributorsLimit,
@@ -97,15 +98,19 @@ const CreateCapsule = () => {
                         email: contributor.email
                     })),
                     unlockMethods: {
-                        TIME: { enabled: true, completed: false },
-                        QR_CODE: { enabled: formData.hasQRCode, completed: false },
-                        GEOLOCATION: { enabled: formData.hasGeolocation, completed: false },
-                        PASSWORD: { enabled: false, completed: false }
+                        timeEnabled: true,
+                        timeComplete: false,
+                        qrCodeEnabled: formData.hasQRCode,
+                        qrCodeComplete: false,
+                        geolocationEnabled: formData.hasGeolocation,
+                        geolocationComplete: false,
+                        passwordEnabled: false,
+                        passwordComplete: false,
                     },
-                    state: formData.isEditing ? "EDIT" : "NEW", // pokud se jedná o úpravu, použije "EDIT", jinak "NEW"
-                    type: formData.isPrivate ? "PRIVATE" : "PUBLIC"
+                    state: "EDIT",
+                    teamwork: formData.isPrivate ? true : false
                 };
-
+                console.log("Capsule data:", capsuleData)
                 try {
                     const response = await api.createCapsule(capsuleData);
                     console.log("Capsule created successfully:", response);
@@ -342,7 +347,7 @@ const CreateCapsule = () => {
                                 {/* QR Generator */}
                                 {formData.hasQRCode && (
                                     <div className="flex justify-center mt-6">
-                                        <QRGenerator />
+                                        <QRGenerator randomString={formData.qrcode} />
                                     </div>
                                 )}
                                 {/* Geolocation */}
