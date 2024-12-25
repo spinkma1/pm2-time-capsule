@@ -84,5 +84,8 @@ public class Capsule extends AbstractEntity {
     @Column(name = "unlock_longit")
     private Double unlockLongit;
 
+    public void addContent(Content content) {
+        contents.add(content);
+    }
 
 }

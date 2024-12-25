@@ -21,9 +21,13 @@ public class SecurityEndpoints {
      * Matcher for admin URLs.
      */
     final RequestMatcher ADMIN_URLS = new OrRequestMatcher(
-            antMatcher(HttpMethod.DELETE,"/examples/{code}"), // todo udpate regarding api
+            antMatcher(HttpMethod.DELETE,"/examples/{code}"), // todo update regarding api
             antMatcher(HttpMethod.POST,"/examples/register-admin"),
-            antMatcher(HttpMethod.POST,"/examples/create")
+            antMatcher(HttpMethod.POST,"/examples/create"),
+            antMatcher(HttpMethod.POST, "/content/upload/{id}"),
+            antMatcher(HttpMethod.GET, "/content/{id}"),
+            antMatcher(HttpMethod.PUT, "/content/update/{id}"),
+            antMatcher(HttpMethod.DELETE, "/content/delete/{id}")
     );
 
     /**
@@ -31,7 +35,11 @@ public class SecurityEndpoints {
      */
     final RequestMatcher MEMBER_URLS = new OrRequestMatcher(
             antMatcher(HttpMethod.POST, "/capsules/register"),
-            antMatcher(HttpMethod.POST, "/capsules/unregister")
+            antMatcher(HttpMethod.POST, "/capsules/unregister"),
+            antMatcher(HttpMethod.POST, "/content/upload/{id}"),
+            antMatcher(HttpMethod.GET, "/content/{id}"),
+            antMatcher(HttpMethod.PUT, "/content/update/{id}"),
+            antMatcher(HttpMethod.DELETE, "/content/delete/{id}")
     );
 
     /**
