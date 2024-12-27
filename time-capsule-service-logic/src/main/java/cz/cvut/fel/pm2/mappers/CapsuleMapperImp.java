@@ -196,21 +196,16 @@ public class CapsuleMapperImp implements CapsuleMapper {
 
         Long id = null;
         String email = null;
-        String role = null;
         String name = null;
         String bio = null;
+        String role = null;
         List<UserDto> followers = null;
         List<CapsuleDto> capsules = null;
 
         if ( user.getId() != null ) {
-            id = user.getId().longValue();
+            id = user.getId();
         }
         email = user.getEmail();
-        if ( user.getRole() != null ) {
-            role = user.getRole().name();
-        }
-        //followers = userListToUserDtoList( user.getFollowers() );
-        capsules = toDtos( user.getCapsules() );
 
         if ( user.getName() != null ) {
             name = user.getName();
@@ -219,8 +214,13 @@ public class CapsuleMapperImp implements CapsuleMapper {
             bio = user.getBio();
         }
 
+        if ( user.getRole() != null ) {
+            role = String.valueOf(user.getRole());
+        }
+        //followers = userListToUserDtoList( user.getFollowers() );
+        capsules = toDtos( user.getCapsules() );
 
-        return new UserDto( id, email, role, name, bio, followers, capsules );
+        return new UserDto( id, email, name, bio, role, followers, capsules );
     }
 
     private UnlockMethodsDto mapUnlockMethods(Map<UnlockMethod, UnlockMethodState> unlockMethods) {

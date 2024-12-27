@@ -29,10 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -352,6 +349,16 @@ public class UserApiImpl implements UserApi {
         } catch (Exception e) {
             e.printStackTrace(); // Pro debugu
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<List<UserDto>> searchUsers(@RequestParam String query) {
+        try {
+            List<UserDto> users = userService.searchUsers(query);
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }

@@ -213,4 +213,12 @@ public class UserService implements UserDetailsService {
                         .collect(Collectors.toList())
         );
     }
+
+    public List<UserDto> searchUsers(String query) {
+        String lowercaseQuery = query.toLowerCase();
+        return userRepository.findByEmailContainingOrNameContaining(lowercaseQuery, lowercaseQuery)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
 }

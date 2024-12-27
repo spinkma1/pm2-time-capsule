@@ -62,4 +62,7 @@ public class User extends AbstractEntity {
 
     @Column(name = "name")
     private String name;
+
+    @ManyToMany(mappedBy = "followers")
+    private List<User> following;
 }

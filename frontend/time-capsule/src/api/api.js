@@ -49,6 +49,9 @@ const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
         console.error("Account deleted. Token:", accessToken);
         return new Error("Account deleted");
     }
+    if (response.status === 204 || response.headers.get("content-length") === "0") {
+      return null; // nebo prázdný objekt {}
+    }
     return noBody ? undefined : await response.json();
   } catch (error) {
     console.error("API call failed:", error);
@@ -239,13 +242,91 @@ export const ApiService = {
 
   deleteAccount: async () => {
     try {
-      const response = await fetchWithConfig('/user/delete', {
+      return await fetchWithConfig('/user/delete', {
         method: 'DELETE',
         credentials: 'include'
       });
-      return response;
     } catch (error) {
       console.error("Account deletion failed:", error);
+      throw error;
+    }
+  },
+
+  followUser: async (userId) => {
+    try {
+      await fetchWithConfig(`/follow/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error("Failed to follow user:", error);
+      throw error;
+    }
+  },
+
+  unfollowUser: async (userId, followerId) => {
+    try {
+      await fetchWithConfig(`/follow/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          followerId: followerId,
+        }),
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error("Failed to unfollow user:", error);
+      throw error;
+    }
+  },
+
+  getFollowers: async () => {
+    try {
+      return await fetchWithConfig('/follow/followers', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+    } catch (error) {
+        console.error("Failed to get followers:", error);
+        throw error;
+    }
+  },
+
+  getFollowing: async () => {
+    try {
+        return await fetchWithConfig('/follow/following', {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        });
+    } catch (error) {
+        console.error("Failed to get following:", error);
+        throw error;
+    }
+  },
+
+  searchUsers: async (query) => {
+    try {
+      return await fetchWithConfig(`/user/search?query=${encodeURIComponent(query)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+
+      });
+    } catch (error) {
+      console.error('Failed to search users:', error);
       throw error;
     }
   }
