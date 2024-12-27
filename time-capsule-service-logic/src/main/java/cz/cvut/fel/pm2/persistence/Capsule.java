@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class Capsule extends AbstractEntity {
             joinColumns = @JoinColumn(name = "capsule_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> users;
+    private List<User> users =  new ArrayList<>();
 
     @OneToMany(mappedBy = "capsule")
     private List<Notification> notifications;

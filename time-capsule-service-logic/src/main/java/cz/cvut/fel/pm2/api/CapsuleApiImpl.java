@@ -70,13 +70,19 @@ public class CapsuleApiImpl implements CapsuleApi {
         }
     }
 
-    @PostMapping("/capsules/{capsuleId}/subscribe")
-    public ResponseEntity<String> subscribeToCapsule(
-            //TODO
-            @PathVariable String capsuleId,
-            @RequestParam String userEmail) {
-        capsuleService.subscribeToCapsule(capsuleId, userEmail);
-        return ResponseEntity.ok(userEmail + "successfully subscribed to the capsule: " + capsuleId);
+    @Override
+    public ResponseEntity<CapsuleDto> subscribeToCapsule(@RequestParam String capsuleId, @RequestParam String userEmail) {
+        return ResponseEntity.ok(capsuleService.subscribeToCapsule(capsuleId, userEmail));
+    }
+
+    @Override
+    public ResponseEntity<CapsuleDto> getCapsuleDetails(@RequestParam String capsuleId) {
+        return ResponseEntity.ok(capsuleService.getCapsuleDetails(capsuleId));
+    }
+
+    @Override
+    public ResponseEntity<CapsuleDto> unlockCapsuleEarly(@RequestParam String capsuleId) {
+        return ResponseEntity.ok(capsuleService.unlockCapsuleEarly(capsuleId));
     }
 
 

@@ -11,6 +11,7 @@ import cz.cvut.fel.pm2.enums.UnlockMethod;
 import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.CapsuleRepository;
 import cz.cvut.fel.pm2.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -250,7 +251,11 @@ public class CapsuleService {
         return false;
     }
 
-    public void subscribeToCapsule(String capsuleId, String userEmail) {
+    public CapsuleDto subscribeToCapsule(String capsuleId, String userEmail) {
+        if (capsuleId == null || capsuleId.isEmpty() || userEmail == null || userEmail.isEmpty()) {
+            throw new InvalidBodyException("Capsule ID or user email cannot be empty");
+        }
+
         Capsule capsule = capsuleRepository.getCapsuleByName(capsuleId)
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 
@@ -267,8 +272,10 @@ public class CapsuleService {
         mailService.sendEmail(
                 user.getEmail(),
                 "Subscription Successful",
-                "You have successfully subscribed to the capsule: " + capsule.getName()
+                "You have been successfully subscribed to the capsule: " + capsule.getName()
         );
+
+        return capsuleMapper.toDto(capsule);
     }
 
 
@@ -341,5 +348,34 @@ public class CapsuleService {
         });
     }
 
+    public CapsuleDto getCapsuleDetails(String capsuleId) {
+        if (capsuleId == null || capsuleId.isEmpty()) {
+            throw new InvalidBodyException("Capsule ID is required");
+        }
+
+        Capsule capsule = capsuleRepository.getCapsuleByName(capsuleId)
+                .orElseThrow(() -> new NotFoundException("Capsule not found"));
+
+        return capsuleMapper.toDto(capsule);
+    }
+
+    @Transactional
+    public CapsuleDto unlockCapsuleEarly(String capsuleId) {
+        Capsule capsule = capsuleRepository.getCapsuleByName(capsuleId)
+                .orElseThrow(() -> new NotFoundException("Capsule not found"));
+
+        capsule.setUnlockTime(LocalDateTime.now());
+        capsuleRepository.save(capsule);
+
+        capsule.getUsers().forEach(user -> {
+            mailService.sendEmail(
+                    user.getEmail(),
+                    "Capsule Unlocked Early",
+                    "The time capsule '" + capsule.getName() + "' has been unlocked early!"
+            );
+        });
+
+        return capsuleMapper.toDto(capsule);
+    }
 
 }

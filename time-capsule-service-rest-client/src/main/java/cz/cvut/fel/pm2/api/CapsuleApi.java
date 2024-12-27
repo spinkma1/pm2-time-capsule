@@ -99,4 +99,19 @@ public interface CapsuleApi {
     @PutMapping(value = "/openviaqr")
     @ResponseBody
     ResponseEntity<Map<String, String>> openViaQr(@RequestParam String capsuleId, @RequestParam String qrCode) throws NoSuchAlgorithmException;
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping(value = "/{capsuleId}")
+    @ResponseBody
+    ResponseEntity<CapsuleDto> getCapsuleDetails(@PathVariable String capsuleId);
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping(value = "/{capsuleId}/subscribe/{userId}")
+    @ResponseBody
+    ResponseEntity<CapsuleDto> subscribeToCapsule(@PathVariable String capsuleId, @PathVariable String userId);
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{capsuleId}/unlock-early")
+    @ResponseBody
+    ResponseEntity<CapsuleDto> unlockCapsuleEarly(@PathVariable String capsuleId);
 }
