@@ -57,7 +57,7 @@ public class Content extends AbstractEntity{
         this.dateOfUpload = dateOfUpload;
     }
 
-    public Object getData() {
+    public byte[] getData() {
         return data;
     }
 
