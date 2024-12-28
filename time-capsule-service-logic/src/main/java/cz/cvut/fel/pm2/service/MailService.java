@@ -1,8 +1,8 @@
 package cz.cvut.fel.pm2.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MailService {
 
-    @Autowired
-    private JavaMailSender emailSender;
+    private final JavaMailSender emailSender;
 
 
     /**
@@ -36,6 +36,8 @@ public class MailService {
             emailSender.send(message);
         } catch (MailException e) {
             log.warn("the email could not be sent. Error message: {}", e.getMessage());
+        } catch (Exception e) {
+            log.error("An unexpected error occurred while sending the email. Error message: {}", e.getMessage());
         }
     }
 

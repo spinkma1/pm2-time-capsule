@@ -15,7 +15,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -37,6 +37,9 @@ public class CapsuleService {
     private final SecureRandom secureRandom = new SecureRandom();
     private final MailService mailService;
 
+    private static final String NOT_FOUND_USER_MESSAGE = "User not found";
+    private static final String NOT_FOUND_CAPSULE_MESSAGE = "Capsule not found";
+
     public CapsuleDto createCapsule(@NonNull CapsuleDto capsuleDto) throws NoSuchAlgorithmException {
         // Validace vstupního DTO
         validateCapsule(capsuleDto);
@@ -46,7 +49,7 @@ public class CapsuleService {
 
         try {
             User owner = userRepository.findById(capsuleDto.userId())
-                    .orElseThrow(() -> new NotFoundException("User not found"));
+                    .orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_MESSAGE));
             capsule.setOwner(owner);
 
             List<User> users = new ArrayList<>();
@@ -87,11 +90,27 @@ public class CapsuleService {
 
 
     public List<CapsuleDto> getCapsules(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_MESSAGE));
         return capsuleRepository.getCapsulesByOwner(user)
                 .map(capsuleMapper::toDtos)
                 .orElseThrow(() -> new NotFoundException("No capsule was found for the specified user"));
     }
+
+    @PreAuthorize("@adminUtils.checkForAdminRights()")
+    public Boolean deleteCapsule(Long capsuleId) {
+        Capsule capsule = capsuleRepository.getCapsuleById(capsuleId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_CAPSULE_MESSAGE));
+        User owner = capsule.getOwner();
+        owner.getCapsules().remove(capsule);
+        mailService.sendEmail(
+                owner.getEmail(),
+                "Capsule Deleted",
+                "The capsule " + capsule.getName() + " has been deleted, because it didnt comply with the rules of our service. If you want to know more, please contact us."
+        );
+        capsuleRepository.delete(capsule);
+        return true;
+    }
+
 
 
     public void validateCapsule(CapsuleDto capsuleDto) {
@@ -111,20 +130,24 @@ public class CapsuleService {
         Optional<Capsule> capsule = capsuleRepository.getCapsuleByName(capsuleId);
 
         if (ready) {
-            capsule.orElseThrow(() -> new NotFoundException("Capsule not found")).setState(State.WAIT);
+            capsule.orElseThrow(() -> new NotFoundException(NOT_FOUND_CAPSULE_MESSAGE)).setState(State.WAIT);
         }
         else {
-            capsule.orElseThrow(() -> new NotFoundException("Capsule not found")).setState(State.EDIT);
+            capsule.orElseThrow(() -> new NotFoundException(NOT_FOUND_CAPSULE_MESSAGE)).setState(State.EDIT);
         }
 
-        return capsuleMapper.toDto(capsuleRepository.save(capsule.get()));
+        return capsuleMapper
+                .toDto(
+                        capsuleRepository.save(
+                                capsule.orElseThrow(
+                                        () -> new NotFoundException(NOT_FOUND_CAPSULE_MESSAGE))));
     }
 
 
 
     public void generateAndHashQrPassword(Long capsuleId) throws NoSuchAlgorithmException {
         var capsule = capsuleRepository.getCapsuleById(capsuleId)
-                .orElseThrow(() -> new NotFoundException("Capsule not found"));
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_CAPSULE_MESSAGE));
 
         String rawPassword;
         String hashedPassword;
@@ -158,7 +181,7 @@ public class CapsuleService {
     public void updateUnlockMethodState(Long capsuleId, UnlockMethod unlockMethod, boolean enabledBool, boolean completionBool) {
         // Retrieve the capsule by its ID
         var capsule = capsuleRepository.getCapsuleById(capsuleId)
-                .orElseThrow(() -> new NotFoundException("Capsule not found"));
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_CAPSULE_MESSAGE));
 
         var unlockMethods = capsule.getUnlockMethods();
 
@@ -181,8 +204,8 @@ public class CapsuleService {
 
     public void setCapsuleOpenLocation(String capsuleId, Double longitude, Double latitude) {
         var capsule = capsuleRepository.getCapsuleByName(capsuleId);
-        capsule.orElseThrow(() -> new NotFoundException("Capsule not found")).setUnlockLongit(longitude);
-        capsule.orElseThrow(() -> new NotFoundException("Capsule not found")).setUnlockLat(latitude);
+        capsule.orElseThrow(() -> new NotFoundException(NOT_FOUND_CAPSULE_MESSAGE)).setUnlockLongit(longitude);
+        capsule.orElseThrow(() -> new NotFoundException(NOT_FOUND_CAPSULE_MESSAGE)).setUnlockLat(latitude);
         capsuleRepository.save(capsule.get());
     }
 
