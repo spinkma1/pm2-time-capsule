@@ -8,16 +8,13 @@ import cz.cvut.fel.pm2.service.FollowService;
 import cz.cvut.fel.pm2.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -33,7 +30,7 @@ public class FollowApiImpl implements FollowApi {
         try {
             String token = authHeader.substring(7);
             String email = jwtUtil.extractUsername(token);
-            User user = userService.getUser(email);
+            User user = userService.getUserProfile(email);
             Long followerId = user.getId();
 
             if (followedId == null) {
@@ -54,7 +51,7 @@ public class FollowApiImpl implements FollowApi {
         try {
             String token = authHeader.substring(7);
             String email = jwtUtil.extractUsername(token);
-            User user = userService.getUser(email);
+            User user = userService.getUserProfile(email);
             Long followerId = user.getId();
 
             if (followedId == null) {
