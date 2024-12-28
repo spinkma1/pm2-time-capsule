@@ -1,4 +1,3 @@
-/*
 package cz.cvut.fel.pm2;
 
 import com.stripe.exception.StripeException;
@@ -27,7 +26,7 @@ import java.util.Map;
 
 @TestPropertySource(locations = "classpath:application-test.properties")
 @ActiveProfiles("test")
-public class StripeTest {
+class StripeTest {
 
     @Autowired
     private StripeService stripeService;
@@ -52,7 +51,7 @@ public class StripeTest {
         //balance in test mode takes too long to update to available from pending
     @Test
     @Disabled
-    public void ResetTestBalance() throws Exception {
+    void ResetTestBalance() throws Exception {
         // Get the current balance
         Balance balance = stripeService.getBalance();
         long availableBalanceCents = balance.getAvailable().stream().mapToLong(b -> b.getAmount()).sum();
@@ -161,7 +160,7 @@ public class StripeTest {
 
 
     @Test
-    public void testCreateCustomer() throws StripeException {
+    void testCreateCustomer() throws StripeException {
         String email = "test@example.com";
         String name = "Franta Omacka";
         Customer customer = stripeService.createCustomer(name,email);
@@ -209,7 +208,7 @@ public class StripeTest {
 
 
     @Test
-    public void testCreateSubscription() throws StripeException {
+    void testCreateSubscription() throws StripeException {
         String email = "test@example.com";
         String name = "Franta Omacka";
 
@@ -260,7 +259,7 @@ public class StripeTest {
 
     @Test
     @Disabled
-    public void testCreatePayout() throws StripeException {
+    void testCreatePayout() throws StripeException {
         long payoutAmount = 3000; // Amount in cents
         String currency = "czk";
 
@@ -272,7 +271,7 @@ public class StripeTest {
     }
 
     @Test
-    public void testCancelSubscription() throws StripeException {
+    void testCancelSubscription() throws StripeException {
         String email = "test@example.com";
         String name = "Franta Omacka";
 
@@ -298,7 +297,7 @@ public class StripeTest {
     }
     @Test
     @Disabled
-    public void testSubscriptionRefund() throws Exception {
+    void testSubscriptionRefund() throws Exception {
         // Step 1: Create a customer
         String email = "test@example.com";
         String name = "Franta Omacka";
@@ -381,6 +380,3 @@ public class StripeTest {
     }
 
 }
-
-
- */
