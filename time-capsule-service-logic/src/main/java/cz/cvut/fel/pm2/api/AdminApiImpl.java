@@ -1,6 +1,5 @@
 package cz.cvut.fel.pm2.api;
 
-import cz.cvut.fel.pm2.AdminApi;
 import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.service.CapsuleService;
 import cz.cvut.fel.pm2.service.UserService;

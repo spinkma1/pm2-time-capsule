@@ -73,9 +73,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .requestMatchers(SecurityEndpoints.PUBLIC_URLS).permitAll()
-                        .requestMatchers(SecurityEndpoints.AUTHENTICATED_URLS).hasAnyAuthority("ROLE_ADMIN", "ROLE_MEMBER")
+                        .requestMatchers(SecurityEndpoints.AUTHENTICATED_URLS).hasAnyAuthority("ROLE_ADMIN", "ROLE_MEMBER", "ROLE_REGISTERED")
                         .requestMatchers(SecurityEndpoints.ADMIN_URLS).hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(SecurityEndpoints.MEMBER_URLS).hasAuthority("ROLE_MEMBER")
+                        .requestMatchers(SecurityEndpoints.MEMBER_URLS).hasAnyAuthority("ROLE_MEMBER", "ROLE_REGISTERED", "ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
 //                        .successHandler(customOAuthSuccessHandler)

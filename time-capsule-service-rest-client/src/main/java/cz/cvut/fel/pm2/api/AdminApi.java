@@ -1,4 +1,4 @@
-package cz.cvut.fel.pm2;
+package cz.cvut.fel.pm2.api;
 
 import cz.cvut.fel.pm2.model.UserDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
