@@ -359,7 +359,6 @@ public class CapsuleService {
         return capsuleMapper.toDto(capsule);
     }
 
-    @Transactional
     public CapsuleDto unlockCapsuleEarly(String capsuleId) {
         Capsule capsule = capsuleRepository.getCapsuleByName(capsuleId)
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));

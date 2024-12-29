@@ -101,7 +101,7 @@ public interface CapsuleApi {
     ResponseEntity<Map<String, String>> openViaQr(@RequestParam String capsuleId, @RequestParam String qrCode) throws NoSuchAlgorithmException;
 
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping(value = "/{capsuleId}")
+    @GetMapping(value = "/{capsuleId}")
     @ResponseBody
     ResponseEntity<CapsuleDto> getCapsuleDetails(@PathVariable String capsuleId);
 
