@@ -52,7 +52,7 @@ public class UserApiImpl implements UserApi {
 
 
     @Override
-    @PostMapping(value = "/login/sso",produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/login/sso",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody()
     public ResponseEntity<Map<String, String>> login(@AuthenticationPrincipal(errorOnInvalidType=true) Object principal ) {
         Map<String, String> response = new HashMap<>();

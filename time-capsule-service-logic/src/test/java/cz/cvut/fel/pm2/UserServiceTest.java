@@ -2,9 +2,7 @@ package cz.cvut.fel.pm2;
 
 import cz.cvut.fel.pm2.enums.Role;
 import cz.cvut.fel.pm2.exception.UserDeletedException;
-import cz.cvut.fel.pm2.exceptions.NotFoundException;
 import cz.cvut.fel.pm2.mappers.CapsuleMapperImp;
-import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.persistence.Capsule;
 import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.UserRepository;
@@ -15,10 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -102,7 +98,7 @@ class UserServiceTest {
 
         User user = new User();
         user.setPassword("encodedPassword");
-        user.setRole(Role.REGISTERED);
+        user.setRole(Role.ROLE_REGISTERED);
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(password, "encodedPassword")).thenReturn(true);
@@ -120,7 +116,7 @@ class UserServiceTest {
 
         User user = new User();
         user.setPassword("encodedPassword");
-        user.setRole(Role.REGISTERED);
+        user.setRole(Role.ROLE_REGISTERED);
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(password, "encodedPassword")).thenReturn(false);
@@ -136,7 +132,7 @@ class UserServiceTest {
         String password = "securepassword";
 
         User user = new User();
-        user.setRole(Role.DELETED);
+        user.setRole(Role.ROLE_DELETED);
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
@@ -152,7 +148,7 @@ class UserServiceTest {
 
         userService.deleteUser(email);
 
-        assertEquals(Role.DELETED, user.getRole());
+        assertEquals(Role.ROLE_DELETED, user.getRole());
         verify(userRepository).save(user);
     }
 
