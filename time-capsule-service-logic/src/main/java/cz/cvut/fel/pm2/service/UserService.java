@@ -4,13 +4,15 @@ import cz.cvut.fel.pm2.enums.Role;
 import cz.cvut.fel.pm2.exception.UserDeletedException;
 import cz.cvut.fel.pm2.exceptions.NotFoundException;
 import cz.cvut.fel.pm2.mappers.CapsuleMapperImp;
+import cz.cvut.fel.pm2.mappers.UserMapperImpl;
 import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.persistence.Capsule;
 import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.juli.logging.Log;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,7 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,18 +35,28 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CapsuleMapperImp capsuleMapperImp;
+    private final MailService mailService;
+    private final UserMapperImpl userMapperImpl;
+
+    private static final String NOT_FOUND_USER_MESSAGE = "User not found";
 
     public List<Capsule> getCapsules(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"))
+        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_USER_MESSAGE))
                 .getCapsules();
     }
 
-    public User getUser(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+    @PreAuthorize("@adminUtils.checkForAdminRights()")
+    public UserDto getAdminUser(String email) {
+        return userMapperImpl
+                .toDto(userRepository
+                        .findByEmail(email)
+                        .orElseThrow(
+                                () -> new NotFoundException(NOT_FOUND_USER_MESSAGE)));
     }
 
     public List<String> getFollowers(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"))
+        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_USER_MESSAGE))
                 .getFollowers().stream().map(User::getEmail).toList();
     }
 
@@ -56,7 +68,6 @@ public class UserService implements UserDetailsService {
         // Check if a user with this Google ID already exists
         Optional<User> existingUser = userRepository.findByEmail(email);
         if (existingUser.isPresent()) {
-            existingUser.get();
             return;
         }
 
@@ -71,7 +82,7 @@ public class UserService implements UserDetailsService {
         }
 
         User newUser = new User(email, googleId);
-        newUser.setRole(Role.REGISTERED);
+        newUser.setRole(Role.ROLE_REGISTERED);
         userRepository.save(newUser);
     }
 
@@ -82,7 +93,7 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
-        user.setRole(Role.REGISTERED);
+        user.setRole(Role.ROLE_REGISTERED);
         user.setCapsules(List.of());
         user.setFollowers(List.of());
         userRepository.save(user);
@@ -92,8 +103,8 @@ public class UserService implements UserDetailsService {
     public Optional<User> loginUser(String username, String password) throws IllegalAccessException {
         Optional<User> user = userRepository.findByEmail(username);
         if (user.isPresent()) {
-            if (user.get().getRole() == Role.DELETED) {
-                throw new UserDeletedException("Tento účet byl smazán. Pro obnovení kontaktujte podporu.");            }
+            if (user.get().getRole() == Role.ROLE_DELETED || user.get().getRole() == Role.ROLE_BANNED) {
+                throw new UserDeletedException("Tento účet byl smazán nebo zabanován. Pro obnovení kontaktujte podporu.");            }
             if (passwordEncoder.matches(password, user.get().getPassword())) {
                 return user;
             }
@@ -104,39 +115,41 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException(NOT_FOUND_USER_MESSAGE));
 
+        // Create a collection of GrantedAuthority
+        List<GrantedAuthority> authorities = List.of(() -> user.getRole().toString());
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(), user.getPassword(), new ArrayList<>());
+                user.getEmail(),
+                user.getPassword(),
+                authorities
+        );
     }
+
 
 
 
     @Transactional
     public void deleteUser(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_USER_MESSAGE));
 
         // Místo fyzického smazání jen změníme roli
-        user.setRole(Role.DELETED);
+        user.setRole(Role.ROLE_DELETED);
         userRepository.save(user);
 
-        // Poslat email o smazání účtu
-        // TODO
-        /*
         mailService.sendEmail(
                 user.getEmail(),
                 "Účet byl smazán",
                 "Váš účet byl úspěšně smazán. Pokud budete chtít účet obnovit, kontaktujte podporu."
         );
-         */
     }
 
     @Transactional
     public void updateProfile(String email, Map<String, String> updates) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_USER_MESSAGE));
 
         if (updates.containsKey("name")) {
             user.setName(updates.get("name"));
@@ -163,6 +176,28 @@ public class UserService implements UserDetailsService {
         convertToDto(savedUser);
     }
 
+    @PreAuthorize("@adminUtils.checkForAdminRights()")
+    public List<String> findEmails(String query) {
+        return userRepository.findByEmailContaining(query)
+                .map(users -> users.stream()
+                        .map(User::getEmail)
+                        .toList())
+                .orElseGet(Collections::emptyList);
+    }
+
+    @PreAuthorize("@adminUtils.checkForAdminRights()")
+    public Boolean updateUser(UserDto userDto) {
+        User user = userRepository.findByEmail(userDto.email())
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_MESSAGE));
+
+        user.setName(userDto.name());
+        user.setBio(userDto.bio());
+        user.setRole(Role.valueOf(userDto.role()));
+
+        userRepository.save(user);
+        return true;
+    }
+
     private void handleEmailUpdate(User user, String newEmail) {
         if (userRepository.findByEmail(newEmail).isPresent()) {
             throw new IllegalArgumentException("Email already in use");
@@ -175,13 +210,13 @@ public class UserService implements UserDetailsService {
 
     public User getUserProfile(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_MESSAGE));
     }
 
     @Transactional
     public void changePassword(String email, String currentPassword, String newPassword) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_USER_MESSAGE));
 
         // Ověříme současné heslo
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
@@ -212,5 +247,13 @@ public class UserService implements UserDetailsService {
                         .map(capsuleMapperImp::toDto)
                         .collect(Collectors.toList())
         );
+    }
+
+    public List<UserDto> searchUsers(String query) {
+        String lowercaseQuery = query.toLowerCase();
+        return userRepository.findByEmailContainingOrNameContaining(lowercaseQuery, lowercaseQuery)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 }

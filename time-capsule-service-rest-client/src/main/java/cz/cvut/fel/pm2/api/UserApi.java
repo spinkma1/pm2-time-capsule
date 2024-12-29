@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "User API", description = "API for user authentication and profile information.")
@@ -86,8 +87,12 @@ public interface UserApi {
             @RequestBody PasswordChangeRequest request
     );
 
-    public record PasswordChangeRequest(
+    record PasswordChangeRequest(
             String currentPassword,
             String newPassword
     ) {}
+
+    @GetMapping("/search")
+    @Operation(summary = "Search users", description = "Search users by email or name")
+    ResponseEntity<List<UserDto>> searchUsers(@RequestParam String query);
 }

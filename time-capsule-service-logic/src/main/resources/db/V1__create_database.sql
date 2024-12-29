@@ -1,5 +1,5 @@
 -- Enum Types
-CREATE TYPE role AS ENUM ('REGISTERED', 'ADMIN', 'PREMIUM', 'BANNED', 'DELETED');
+CREATE TYPE role AS ENUM ('ROLE_REGISTERED', 'ROLE_ADMIN', 'ROLE_PREMIUM', 'ROLE_BANNED', 'ROLE_DELETED');
 CREATE TYPE state AS ENUM ('EDIT', 'WAIT', 'OPEN');
 CREATE TYPE type AS ENUM ('PRIVATE', 'PUBLIC');
 CREATE TYPE notification_type AS ENUM ('NEW_ACCESS', 'REMINDER', 'OPENED');
@@ -10,7 +10,7 @@ CREATE TABLE T_USER (
                         google_id VARCHAR(255) UNIQUE,
                         email VARCHAR(255) NOT NULL UNIQUE,
                         password VARCHAR(255),
-                        role role DEFAULT 'REGISTERED',
+                        role role DEFAULT 'ROLE_REGISTERED',
                         UNIQUE(email)
 );
 

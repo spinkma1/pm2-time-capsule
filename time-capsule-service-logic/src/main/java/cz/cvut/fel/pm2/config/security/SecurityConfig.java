@@ -1,20 +1,16 @@
 package cz.cvut.fel.pm2.config.security;
 
-import cz.cvut.fel.pm2.persistence.User;
-import cz.cvut.fel.pm2.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
@@ -35,6 +31,7 @@ import java.util.List;
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     private final ClientRegistrationRepository clientRegistrationRepository;
 
@@ -76,9 +73,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .requestMatchers(SecurityEndpoints.PUBLIC_URLS).permitAll()
-                        .requestMatchers(SecurityEndpoints.AUTHENTICATED_URLS).hasAnyAuthority("ROLE_ADMIN", "ROLE_MEMBER")
+                        .requestMatchers(SecurityEndpoints.AUTHENTICATED_URLS).hasAnyAuthority("ROLE_ADMIN", "ROLE_MEMBER", "ROLE_REGISTERED")
                         .requestMatchers(SecurityEndpoints.ADMIN_URLS).hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(SecurityEndpoints.MEMBER_URLS).hasAuthority("ROLE_MEMBER")
+                        .requestMatchers(SecurityEndpoints.MEMBER_URLS).hasAnyAuthority("ROLE_MEMBER", "ROLE_REGISTERED", "ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
 //                        .successHandler(customOAuthSuccessHandler)
@@ -123,13 +120,10 @@ public class SecurityConfig {
 
     @Bean
     public OidcUserService oidcUserService() {
-//        return new OidcUserService();
         return new OidcUserService() {
             @Override
             public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
-                OidcUser oidcUser = super.loadUser(userRequest);
-                // Custom processing if needed, e.g., log, user persistence, etc.
-                return oidcUser;
+                return super.loadUser(userRequest);
             }};
     }
 

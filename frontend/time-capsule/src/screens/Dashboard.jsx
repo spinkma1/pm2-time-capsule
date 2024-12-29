@@ -15,221 +15,32 @@ import {
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Dashboard = ({ user, setSelectedCapsule }) => {
+const Dashboard = ({ user }) => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
-    const [anchorEl] = useState(null); // State for managing menu anchor
-
-    console.log(user);
+    const [anchorEl] = useState(null);
     if (!user) {
-        user = {
-            email: 'test@gmail.com',
-            initials: 'TT',
+        if(localStorage.getItem("userId") != null && localStorage.getItem("email") != null) {
+            user = {
+                email: localStorage.getItem("email"),
+                initials: localStorage.getItem("email").charAt(0).toUpperCase(),
+            }
         }
     }
+    console.log(user)
 
     // Mock data for demonstration
     const stats = {
-        totalCapsules: 8,
-        pendingOpen: 4,
-        sharedWithMe: 2,
-        subscribed: 3,
-        subscribing: 2
+        totalCapsules: 0,
+        pendingOpen: 0,
+        sharedWithMe: 0,
+        subscribed: 0,
+        subscribing: 0
     };
 
     const capsules = [
-        {
-            id: 1,
-            title: "Maturitní vzpomínky 2024",
-            openDate: null,
-            createdDate: "2024-01-01",
-            status: "editing",
-            contributorsAmount: 3,
-            thumbnail: null,
-            maxItems: 5,
-            type: "own",
-            contributors: [
-                { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
-                { id: 2, email: "m.svoboda@gmail.com", avatar: "MS" },
-                { id: 3, email: "petr.dvorak420@fel.cvut.cz", avatar: "PD" }
-            ],
-            items: [
-                {
-                    id: 1,
-                    type: "image",
-                    title: "tridnifoto.jpg",
-                    addedBy: "Jan Novák",
-                    addedDate: "2024-01-15",
-                    thumbnail: "/api/placeholder/400/300"
-                },
-                {
-                    id: 2,
-                    type: "video",
-                    title: "posledni_zvoneni.mp4",
-                    addedBy: "Marie Svobodová",
-                    addedDate: "2024-01-16",
-                    thumbnail: "/api/placeholder/400/300"
-                },
-                {
-                    id: 3,
-                    type: "text",
-                    title: "vzkaz_pro_budouci_ja.txt",
-                    addedBy: "Petr Dvořák",
-                    addedDate: "2024-01-17"
-                },
-                {
-                    id: 4,
-                    type: "audio",
-                    title: "nase_oblibena_pisnicka.mp3",
-                    addedBy: "Jan Novák",
-                    addedDate: "2024-01-18"
-                }
-            ]
-        },
-        {
-            id: 2,
-            title: "Naše svatba",
-            openDate: "2024-12-24",
-            createdDate: "2024-01-01",
-            status: "closed",
-            contributorsAmount: 3,
-            thumbnail: "/api/placeholder/320/180",
-            maxItems: 3,
-            type: "own",
-            contributors: [
-                { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
-                { id: 2, email: "m.svoboda@gmail.com", avatar: "MS" },
-                { id: 3, email: "petr.dvorak420@fel.cvut.cz", avatar: "PD" }
-            ],
-            items: [
-                {
-                    id: 1,
-                    type: "image",
-                    title: "tridnifoto.jpg",
-                    addedBy: "Jan Novák",
-                    addedDate: "2024-01-15",
-                    thumbnail: "/api/placeholder/400/300"
-                },
-                {
-                    id: 2,
-                    type: "video",
-                    title: "posledni_zvoneni.mp4",
-                    addedBy: "Marie Svobodová",
-                    addedDate: "2024-01-16",
-                    thumbnail: "/api/placeholder/400/300"
-                },
-                {
-                    id: 3,
-                    type: "text",
-                    title: "vzkaz_pro_budouci_ja.txt",
-                    addedBy: "Petr Dvořák",
-                    addedDate: "2024-01-17"
-                },
-                {
-                    id: 4,
-                    type: "audio",
-                    title: "nase_oblibena_pisnicka.mp3",
-                    addedBy: "Jan Novák",
-                    addedDate: "2024-01-18"
-                }
-            ]
-        },
-        {
-            id: 3,
-            title: "Rodinná historie",
-            openDate: "2024-11-15",
-            createdDate: "2024-01-01",
-            status: "opened",
-            contributorsAmount: 3,
-            thumbnail: "/api/placeholder/320/180",
-            maxItems: 3,
-            type: "shared",
-            contributors: [
-                { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
-                { id: 2, email: "m.svoboda@gmail.com", avatar: "MS" },
-                { id: 3, email: "petr.dvorak420@fel.cvut.cz", avatar: "PD" }
-            ],
-            items: [
-                {
-                    id: 1,
-                    type: "image",
-                    title: "tridnifoto.jpg",
-                    addedBy: "Jan Novák",
-                    addedDate: "2024-01-15",
-                    thumbnail: "/api/placeholder/400/300"
-                },
-                {
-                    id: 2,
-                    type: "video",
-                    title: "posledni_zvoneni.mp4",
-                    addedBy: "Marie Svobodová",
-                    addedDate: "2024-01-16",
-                    thumbnail: "/api/placeholder/400/300"
-                },
-                {
-                    id: 3,
-                    type: "text",
-                    title: "vzkaz_pro_budouci_ja.txt",
-                    addedBy: "Petr Dvořák",
-                    addedDate: "2024-01-17"
-                },
-                {
-                    id: 4,
-                    type: "audio",
-                    title: "nase_oblibena_pisnicka.mp3",
-                    addedBy: "Jan Novák",
-                    addedDate: "2024-01-18"
-                }
-            ]
-        },{
-            id: 4,
-            title: "Výročí od maturity",
-            openDate: "2024-11-15",
-            createdDate: "2024-01-01",
-            status: "closed",
-            contributorsAmount: 3,
-            thumbnail: null,
-            maxItems: 3,
-            type: "own",
-            contributors: [
-                { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
-                { id: 2, email: "m.svoboda@gmail.com", avatar: "MS" },
-                { id: 3, email: "petr.dvorak420@fel.cvut.cz", avatar: "PD" }
-            ],
-            items: [
-                {
-                    id: 1,
-                    type: "image",
-                    title: "tridnifoto.jpg",
-                    addedBy: "Jan Novák",
-                    addedDate: "2024-01-15",
-                    thumbnail: "/api/placeholder/400/300"
-                },
-                {
-                    id: 2,
-                    type: "video",
-                    title: "posledni_zvoneni.mp4",
-                    addedBy: "Marie Svobodová",
-                    addedDate: "2024-01-16",
-                    thumbnail: "/api/placeholder/400/300"
-                },
-                {
-                    id: 3,
-                    type: "text",
-                    title: "vzkaz_pro_budouci_ja.txt",
-                    addedBy: "Petr Dvořák",
-                    addedDate: "2024-01-17"
-                },
-                {
-                    id: 4,
-                    type: "audio",
-                    title: "nase_oblibena_pisnicka.mp3",
-                    addedBy: "Jan Novák",
-                    addedDate: "2024-01-18"
-                }
-            ]
-        },
+
     ];
 
     // Function to filter capsules based on filterStatus and searchQuery
@@ -396,7 +207,9 @@ const Dashboard = ({ user, setSelectedCapsule }) => {
                     ) : (
                         <div className="text-center py-12">
                             <div className="text-gray-400 mb-4">Zatím nemáte žádné kapsle :(</div>
-                            <button className="bg-blue-900 text-white px-6 py-3 rounded-lg flex items-center space-x-2 mx-auto">
+                            <button className="bg-blue-900 text-white px-6 py-3 rounded-lg flex items-center space-x-2 mx-auto" onClick={() => {
+                                navigate('/createCapsule');
+                            }}>
                                 <Plus size={20} />
                                 <span>Vytvořit první kapsli</span>
                             </button>

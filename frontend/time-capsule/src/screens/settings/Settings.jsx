@@ -94,7 +94,7 @@ const Settings = ({ user, setUser }) => {
 
     const handleLogout = async () => {
         // Zavolat BE endpoint pro vyčištění session
-        await fetch('/api/user/logout', {
+        await fetch('/user/logout', {
             method: 'POST',
             credentials: 'include'
         });

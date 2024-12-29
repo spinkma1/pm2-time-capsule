@@ -28,6 +28,8 @@ const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
           if (authResponse) {
             localStorage.setItem("access_token", authResponse.accessToken);
             localStorage.setItem("refresh_token", authResponse.refreshToken);
+            localStorage.setItem("userId", authResponse.id);
+            localStorage.setItem("email", email);
             return fetchWithConfig(endpoint, options, noBody);
           } else {
             handleLogout();
@@ -48,6 +50,9 @@ const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
     if (response.status === 403 && response.statusText === "Tento účet byl smazán. Pro obnovení kontaktujte podporu.") {
         console.error("Account deleted. Token:", accessToken);
         return new Error("Account deleted");
+    }
+    if (response.status === 204 || response.headers.get("content-length") === "0") {
+      return null; // nebo prázdný objekt {}
     }
     return noBody ? undefined : await response.json();
   } catch (error) {
@@ -91,6 +96,8 @@ export const ApiService = {
       if (response) {
         localStorage.setItem("access_token", response.accessToken);
         localStorage.setItem("refresh_token", response.refreshToken);
+        localStorage.setItem("userId", response.id);
+        localStorage.setItem("email", email);
         console.log("Login successful:", response)
         console.log("Access token:", response.accessToken)
         console.log("Refresh token:", response.refreshToken)
@@ -112,10 +119,18 @@ export const ApiService = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+      if (response) {
+        localStorage.setItem("access_token", response.accessToken);
+        localStorage.setItem("refresh_token", response.refreshToken);
+        localStorage.setItem("userId", response.id);
+        localStorage.setItem("email", email);
+        console.log("Login successful:", response)
+        console.log("Access token:", response.accessToken)
+        console.log("Refresh token:", response.refreshToken)
+      }
       return response;
     } catch (error) {
-      console.error("Registration failed:", error);
-      throw error;
+      throw new Error("REGISTRATION_FAILED");
     }
   },
 
@@ -127,16 +142,12 @@ export const ApiService = {
         body: JSON.stringify(capsuleData),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Failed to create capsule:", error);
-        throw new Error(error.message || "Unknown error occurred");
+      if (!response) {
+        throw new Error("CAPSULE_CREATION_FAILED");
       }
-
-      return await response.json();
     } catch (error) {
       console.error("Capsule creation failed:", error);
-      throw error;
+      throw new Error("CAPSULE_CREATION_FAILED");
     }
   },
 
@@ -149,6 +160,15 @@ export const ApiService = {
           "Authorization": `Bearer ${token}`
         }
       });
+        if (response) {
+            localStorage.setItem("access_token", response.accessToken);
+            localStorage.setItem("refresh_token", response.refreshToken);
+            localStorage.setItem("userId", response.id);
+            localStorage.setItem("email", response.email);
+            console.log("Login successful:", response)
+            console.log("Access token:", response.accessToken)
+            console.log("Refresh token:", response.refreshToken)
+        }
       return response;
     } catch (error) {
       console.error("Google login failed:", error);
@@ -239,13 +259,91 @@ export const ApiService = {
 
   deleteAccount: async () => {
     try {
-      const response = await fetchWithConfig('/user/delete', {
+      return await fetchWithConfig('/user/delete', {
         method: 'DELETE',
         credentials: 'include'
       });
-      return response;
     } catch (error) {
       console.error("Account deletion failed:", error);
+      throw error;
+    }
+  },
+
+  followUser: async (userId) => {
+    try {
+      await fetchWithConfig(`/follow/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error("Failed to follow user:", error);
+      throw error;
+    }
+  },
+
+  unfollowUser: async (userId, followerId) => {
+    try {
+      await fetchWithConfig(`/follow/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          followerId: followerId,
+        }),
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error("Failed to unfollow user:", error);
+      throw error;
+    }
+  },
+
+  getFollowers: async () => {
+    try {
+      return await fetchWithConfig('/follow/followers', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+    } catch (error) {
+        console.error("Failed to get followers:", error);
+        throw error;
+    }
+  },
+
+  getFollowing: async () => {
+    try {
+        return await fetchWithConfig('/follow/following', {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        });
+    } catch (error) {
+        console.error("Failed to get following:", error);
+        throw error;
+    }
+  },
+
+  searchUsers: async (query) => {
+    try {
+      return await fetchWithConfig(`/user/search?query=${encodeURIComponent(query)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+
+      });
+    } catch (error) {
+      console.error('Failed to search users:', error);
       throw error;
     }
   }

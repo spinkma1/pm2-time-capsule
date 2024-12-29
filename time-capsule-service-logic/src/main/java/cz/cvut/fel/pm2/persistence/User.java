@@ -24,7 +24,7 @@ public class User extends AbstractEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private Role role = Role.REGISTERED;
+    private Role role = Role.ROLE_REGISTERED;
 
     @ManyToMany(mappedBy = "users")
     private List<Notification> notifications;
@@ -44,7 +44,7 @@ public class User extends AbstractEntity {
     public User(String email, String googleId) {
         this.email = email;
         this.googleId = googleId;
-        this.role = Role.REGISTERED;
+        this.role = Role.ROLE_REGISTERED;
     }
 
     // Default constructor
@@ -54,7 +54,7 @@ public class User extends AbstractEntity {
     public User(String email, String password, Role role) {
         this.email = email;
         this.password = password;
-        this.role = Role.REGISTERED;
+        this.role = Role.ROLE_REGISTERED;
     }
 
     @Column(name = "bio", length = 1000)
@@ -62,4 +62,7 @@ public class User extends AbstractEntity {
 
     @Column(name = "name")
     private String name;
+
+    @ManyToMany(mappedBy = "followers")
+    private List<User> following;
 }

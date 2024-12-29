@@ -1,8 +1,6 @@
-/*
 package cz.cvut.fel.pm2;
 
 import cz.cvut.fel.pm2.service.MailService;
-import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
@@ -18,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @TestPropertySource(locations = "classpath:application-test.properties")
 @ActiveProfiles("test")
 
-public class MailTest {
+class MailTest {
 
 
     @Autowired
@@ -26,13 +24,10 @@ public class MailTest {
 
 
     @Test
-    public void testSendEmail() {
+    void testSendEmail() {
         mailService.sendEmail("timecapsulepm2@gmail.com", "Test", "Test");
     }
 
 
 
 }
-
-
- */

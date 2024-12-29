@@ -29,10 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -147,17 +144,13 @@ public class UserApiImpl implements UserApi {
         String password = request.get("password");
         String email = request.get("email");
 
-        User user = userRepository.findByEmail(email).orElse(null);
-//        password = passwordEncoder.encode(password);
-//        user.setPassword(password);
         try {
             userService.registerUser(password, email);
-//            User user = userService.getUser(email);
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
             final UserDetails userDetails = userService.loadUserByUsername(email);
-            user = userRepository.findByEmail(email).orElse(null);
+            User user = userRepository.findByEmail(email).orElse(null);
 
             final String accessToken = jwtUtil.generateToken(userDetails);
             final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
@@ -165,6 +158,7 @@ public class UserApiImpl implements UserApi {
                     "message", "Registration successful",
                     "accessToken", accessToken,
                     "refreshToken", refreshToken,
+                    "email", email,
                     "id", String.valueOf(user.getId())));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
@@ -352,6 +346,16 @@ public class UserApiImpl implements UserApi {
         } catch (Exception e) {
             e.printStackTrace(); // Pro debugu
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<List<UserDto>> searchUsers(@RequestParam String query) {
+        try {
+            List<UserDto> users = userService.searchUsers(query);
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }
