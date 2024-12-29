@@ -19,6 +19,7 @@ import Warning from '../../components/capsulecreation/Warning';
 import Confirmation from '../../components/capsulecreation/Confirmation';
 import { useGoogleMaps } from '../../components/context/GoogleProvider';
 import {ApiService as api} from "../../api/api.js";
+import {Alert, Snackbar} from "@mui/material";
 
 const CreateCapsule = () => {
     const navigate = useNavigate();
@@ -34,10 +35,15 @@ const CreateCapsule = () => {
         hasGeolocation: false,
         hasQRCode: false,
         qrcode: Math.random().toString(36).substring(2, 18),
-        geolocation: null, // To store the selected coordinates
+        geolocation: null,
         contributors: [],
     });
 
+    const [notification, setNotification] = useState({
+        open: false,
+        message: '',
+        severity: 'success' // 'error', 'warning', 'info', 'success'
+    });
 
     const [errors, setErrors] = useState({});
 
@@ -112,11 +118,16 @@ const CreateCapsule = () => {
                 };
                 console.log("Capsule data:", capsuleData)
                 try {
-                    const response = await api.createCapsule(capsuleData);
-                    console.log("Capsule created successfully:", response);
+                    await api.createCapsule(capsuleData);
                     navigate('/dashboard');
                 } catch (error) {
-                    console.error("Error while creating capsule:", error);
+                    if (error.message === "CAPSULE_CREATION_FAILED") {
+                        setNotification({
+                            open: true,
+                            message: 'Nastala chyba při vytváření kapsle. Zkuste to prosím znovu.',
+                            severity: 'error'
+                        });
+                    }
                 }
             };
 
@@ -125,7 +136,9 @@ const CreateCapsule = () => {
     };
 
 
-
+    const handleCloseNotification = () => {
+        setNotification({ ...notification, open: false });
+    };
     const handleDateChange = (e) => {
         const newDate = e.target.value;
         setFormData(prev => ({
@@ -233,6 +246,20 @@ const CreateCapsule = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
+            <Snackbar
+                open={notification.open}
+                autoHideDuration={6000}
+                onClose={handleCloseNotification}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleCloseNotification}
+                    severity={notification.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {notification.message}
+                </Alert>
+            </Snackbar>
             {/* Header */}
             <header className="bg-white shadow-sm">
                 <div className="container mx-auto px-4 py-4">

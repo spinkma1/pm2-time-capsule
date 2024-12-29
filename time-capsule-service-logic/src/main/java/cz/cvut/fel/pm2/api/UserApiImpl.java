@@ -144,17 +144,13 @@ public class UserApiImpl implements UserApi {
         String password = request.get("password");
         String email = request.get("email");
 
-        User user = userRepository.findByEmail(email).orElse(null);
-//        password = passwordEncoder.encode(password);
-//        user.setPassword(password);
         try {
             userService.registerUser(password, email);
-//            User user = userService.getUser(email);
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
             final UserDetails userDetails = userService.loadUserByUsername(email);
-            user = userRepository.findByEmail(email).orElse(null);
+            User user = userRepository.findByEmail(email).orElse(null);
 
             final String accessToken = jwtUtil.generateToken(userDetails);
             final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
@@ -162,6 +158,7 @@ public class UserApiImpl implements UserApi {
                     "message", "Registration successful",
                     "accessToken", accessToken,
                     "refreshToken", refreshToken,
+                    "email", email,
                     "id", String.valueOf(user.getId())));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));

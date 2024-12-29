@@ -45,13 +45,13 @@ public class CapsuleService {
         validateCapsule(capsuleDto);
 
         Capsule capsule = capsuleMapper.toEntity(capsuleDto);
-        capsule = capsuleRepository.save(capsule);
+
 
         try {
             User owner = userRepository.findById(capsuleDto.userId())
                     .orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_MESSAGE));
             capsule.setOwner(owner);
-
+            capsule = capsuleRepository.save(capsule);
             List<User> users = new ArrayList<>();
             for (UserDto userDto : capsuleDto.users()) {
                 User user = userRepository.findByEmail(userDto.email())

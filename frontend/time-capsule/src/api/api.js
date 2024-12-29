@@ -28,6 +28,8 @@ const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
           if (authResponse) {
             localStorage.setItem("access_token", authResponse.accessToken);
             localStorage.setItem("refresh_token", authResponse.refreshToken);
+            localStorage.setItem("userId", authResponse.id);
+            localStorage.setItem("email", email);
             return fetchWithConfig(endpoint, options, noBody);
           } else {
             handleLogout();
@@ -94,6 +96,8 @@ export const ApiService = {
       if (response) {
         localStorage.setItem("access_token", response.accessToken);
         localStorage.setItem("refresh_token", response.refreshToken);
+        localStorage.setItem("userId", response.id);
+        localStorage.setItem("email", email);
         console.log("Login successful:", response)
         console.log("Access token:", response.accessToken)
         console.log("Refresh token:", response.refreshToken)
@@ -115,10 +119,18 @@ export const ApiService = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+      if (response) {
+        localStorage.setItem("access_token", response.accessToken);
+        localStorage.setItem("refresh_token", response.refreshToken);
+        localStorage.setItem("userId", response.id);
+        localStorage.setItem("email", email);
+        console.log("Login successful:", response)
+        console.log("Access token:", response.accessToken)
+        console.log("Refresh token:", response.refreshToken)
+      }
       return response;
     } catch (error) {
-      console.error("Registration failed:", error);
-      throw error;
+      throw new Error("REGISTRATION_FAILED");
     }
   },
 
@@ -130,16 +142,12 @@ export const ApiService = {
         body: JSON.stringify(capsuleData),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Failed to create capsule:", error);
-        throw new Error(error.message || "Unknown error occurred");
+      if (!response) {
+        throw new Error("CAPSULE_CREATION_FAILED");
       }
-
-      return await response.json();
     } catch (error) {
       console.error("Capsule creation failed:", error);
-      throw error;
+      throw new Error("CAPSULE_CREATION_FAILED");
     }
   },
 
@@ -152,6 +160,15 @@ export const ApiService = {
           "Authorization": `Bearer ${token}`
         }
       });
+        if (response) {
+            localStorage.setItem("access_token", response.accessToken);
+            localStorage.setItem("refresh_token", response.refreshToken);
+            localStorage.setItem("userId", response.id);
+            localStorage.setItem("email", response.email);
+            console.log("Login successful:", response)
+            console.log("Access token:", response.accessToken)
+            console.log("Refresh token:", response.refreshToken)
+        }
       return response;
     } catch (error) {
       console.error("Google login failed:", error);

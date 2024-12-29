@@ -66,27 +66,7 @@ const AuthPages = ({ setCurrentPage, currentPage, setUser }) => {
         setRegisterErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-    /* MOCKUP*/
-    /*
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const userEmail = isLogin ? loginForm.email : registerForm.email; 
-        const initials = userEmail.split('@')[0].slice(0, 2).toUpperCase();
 
-        if (isLogin) {
-            if (validateLoginForm(loginForm)) {
-                navigate('/dashboard');
-                setUser({ email: userEmail, initials });
-            }
-        } else {
-            if (validateRegisterForm(registerForm)) {
-                setUser({ email: userEmail, initials });
-                navigate
-            }
-        }
-    }
-
-     */
 
     const handleSubmit = async (e) => {
         e.preventDefault();
