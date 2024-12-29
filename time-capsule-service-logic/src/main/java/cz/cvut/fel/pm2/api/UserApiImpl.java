@@ -330,6 +330,7 @@ public class UserApiImpl implements UserApi {
             String token = authHeader.substring(7);
             String email = jwtUtil.extractUsername(token);
             User user = userService.getUserProfile(email);
+            String role = user.getRole().toString();
 
             if (user == null) {
                 return ResponseEntity.notFound().build();
@@ -341,7 +342,8 @@ public class UserApiImpl implements UserApi {
             return ResponseEntity.ok(Map.of(
                     "name", user.getBio() != null ? Objects.requireNonNull(user.getName()) : "",
                     "email", user.getEmail() != null ? user.getEmail() : "",
-                    "bio", user.getBio() != null ? user.getBio() : ""
+                    "bio", user.getBio() != null ? user.getBio() : "",
+                    "role", role
             ));
         } catch (Exception e) {
             e.printStackTrace(); // Pro debugu

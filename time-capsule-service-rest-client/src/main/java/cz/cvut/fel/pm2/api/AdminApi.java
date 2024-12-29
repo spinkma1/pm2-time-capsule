@@ -8,11 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "Admin API", description = "API for getting admin/privileged information in the application.")
 @RequestMapping("/admin")
@@ -27,7 +28,7 @@ public interface AdminApi {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/updateUser", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<Boolean> updateUser(@RequestParam UserDto userDto);
+    ResponseEntity<Boolean> updateUser(@RequestBody Map<String, String> userDto);
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/deleteCapsule/{capsuleId}", produces = MediaType.APPLICATION_JSON_VALUE)
