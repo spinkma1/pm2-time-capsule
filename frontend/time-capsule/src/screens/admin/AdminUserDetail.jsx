@@ -29,7 +29,6 @@ const AdminUserDetail = () => {
             try {
                 const response = await ApiService.getUserByEmail(email);
                 setUser(response);
-                console.log("toooo", response);
                 setName(response.name || '');
                 setRole(response.role || ''); // Store role as the identifier
                 setBio(response.bio || '');

@@ -14,7 +14,6 @@ const AdminDashboard = () => {
         if (query.length > 2) {
             try {
                 const response = await ApiService.findEmails(query);
-                console.log("API Response:", response);
 
                 // Ensure response is an array
                 if (Array.isArray(response)) {
@@ -36,7 +35,6 @@ const AdminDashboard = () => {
         try {
             // Assuming ApiService.getUserByEmail is working as expected:
             const response = await ApiService.getUserByEmail(email);
-            console.warn("API Response:", response);
             navigate(`/admin/user/${email}`); // Ensure it uses email as the identifier
         } catch (error) {
             console.error('Error fetching user details:', error);
