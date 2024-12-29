@@ -150,7 +150,15 @@ const ConnectionsSection = () => {
                         return (
                             <div key={result.id}
                                  className="p-4 hover:bg-gray-50 flex items-center justify-between border-b last:border-b-0">
-                                {/* ... existující zobrazení uživatele ... */}
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-10 h-10 bg-blue-900 rounded-full flex items-center justify-center text-white">
+                                        {result.email?.substring(0, 2).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <div className="font-medium">{result.name || result.email}</div>
+                                        <div className="text-sm text-gray-500">{result.email}</div>
+                                    </div>
+                                </div>
                                 {!isCurrentUser && (
                                     <button
                                         onClick={() => alreadyFollowing ? handleUnfollow(result.id) : handleFollow(result.id)}
