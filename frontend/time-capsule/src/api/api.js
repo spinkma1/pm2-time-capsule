@@ -165,6 +165,7 @@ export const ApiService = {
             localStorage.setItem("refresh_token", response.refreshToken);
             localStorage.setItem("userId", response.id);
             localStorage.setItem("email", response.email);
+            localStorage.setItem("role", response.role);
             console.log("Login successful:", response)
             console.log("Access token:", response.accessToken)
             console.log("Refresh token:", response.refreshToken)
@@ -344,6 +345,69 @@ export const ApiService = {
       });
     } catch (error) {
       console.error('Failed to search users:', error);
+      throw error;
+    }
+  },
+
+  // Admin functions
+  findEmails: async (query) => {
+    try {
+      const response = await fetchWithConfig(`/admin/findEmails/${encodeURIComponent(query)}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+      return response; // Response is a List<String>
+    } catch (error) {
+      console.error('Failed to find emails:', error);
+      throw error;
+    }
+  },
+
+  getUserByEmail: async (email) => {
+    try {
+      const response = await fetchWithConfig(`/admin/getUserByEmail/${encodeURIComponent(email)}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+      return response; // Response is a UserDto
+    } catch (error) {
+      console.error('Failed to get user by email:', error);
+      throw error;
+    }
+  },
+
+  updateUser: async (userDto) => {
+    try {
+      const response = await fetchWithConfig('/admin/updateUser', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+        name: userDto.name,
+        bio: userDto.bio,
+        role: userDto.role,
+        email: userDto.email,
+      }),
+        credentials: 'include',
+      });
+      return response; // Response is a Boolean
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      throw error;
+    }
+  },
+
+  deleteCapsule: async (capsuleId) => {
+    try {
+      const response = await fetchWithConfig(`/admin/deleteCapsule/${capsuleId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+      return response; // Response is a Boolean
+    } catch (error) {
+      console.error('Failed to delete capsule:', error);
       throw error;
     }
   }

@@ -186,13 +186,13 @@ public class UserService implements UserDetailsService {
     }
 
     @PreAuthorize("@adminUtils.checkForAdminRights()")
-    public Boolean updateUser(UserDto userDto) {
-        User user = userRepository.findByEmail(userDto.email())
+    public Boolean updateUser(Map<String, String> userDto) {
+        User user = userRepository.findByEmail(userDto.get("email"))
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_MESSAGE));
 
-        user.setName(userDto.name());
-        user.setBio(userDto.bio());
-        user.setRole(Role.valueOf(userDto.role()));
+        user.setName(userDto.get("name"));
+        user.setBio(userDto.get("bio"));
+        user.setRole(Role.valueOf(userDto.get("role")));
 
         userRepository.save(user);
         return true;

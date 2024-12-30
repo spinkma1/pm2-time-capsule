@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class AdminApiImpl implements AdminApi {
     }
 
     @Override
-    public ResponseEntity<Boolean> updateUser(UserDto userDto) {
+    public ResponseEntity<Boolean> updateUser(Map<String, String> userDto) {
         return ResponseEntity.ok(userService.updateUser(userDto));
     }
 

@@ -5,6 +5,7 @@ import {
     Unlock,
     Share2,
     Search,
+    Star,
     ChevronDown,
     Settings,
     User,
@@ -12,22 +13,44 @@ import {
     Ban,
     Pencil, UserSearch
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
+import {ApiService} from "../api/api.js";
 
 const Dashboard = ({ user }) => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [anchorEl] = useState(null);
+    const [userRole, setUserRole] = useState(null); // New state for user role
+
     if (!user) {
-        if(localStorage.getItem("userId") != null && localStorage.getItem("email") != null) {
+        const storedUserEmail = localStorage.getItem("email");
+        if (localStorage.getItem("userId") && storedUserEmail) {
             user = {
-                email: localStorage.getItem("email"),
-                initials: localStorage.getItem("email").charAt(0).toUpperCase(),
-            }
+                email: storedUserEmail,
+                initials: storedUserEmail.charAt(0).toUpperCase(),
+            };
         }
     }
+
+    // Fetch user role if not already provided
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            try {
+                const response = await ApiService.getUserProfile();
+                setUserRole(response.role);
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        fetchUserRole();
+        console.log('fetching user profile:', fetchUserRole);
+    }, []);
+    console.log(userRole)
+
+    ApiService.getPro
     console.log(user)
 
     // Mock data for demonstration
@@ -61,16 +84,28 @@ const Dashboard = ({ user }) => {
                         <div className="flex items-center space-x-4">
                             <div className="relative">
                                 <button
-                                    onClick={() => navigate('/settings', { state: { activeTab: 'connections' } })}
+                                    onClick={() => navigate('/settings', {state: {activeTab: 'connections'}})}
                                     className="p-1 hover:bg-gray-100 rounded-full transition-colors  mx-1"
                                     title="Spravovat sledující"
                                 >
-                                    <UserSearch size={24} className="text-blue-900" />
+                                    <UserSearch size={24} className="text-blue-900"/>
                                 </button>
-                                <button className="p-1 hover:bg-gray-100 rounded-full transition-colors  mx-1" title="Předplatné"
-                                    onClick={() => { navigate("/payment") }}>
-                                    <CircleDollarSign size={24} className="text-blue-900" />
+                                <button className="p-1 hover:bg-gray-100 rounded-full transition-colors  mx-1"
+                                        title="Předplatné"
+                                        onClick={() => {
+                                            navigate("/payment")
+                                        }}>
+                                    <CircleDollarSign size={24} className="text-blue-900"/>
                                 </button>
+                                {userRole === 'ROLE_ADMIN' && ( // Render based on userRole state
+                                    <button
+                                        className="p-1 hover:bg-gray-100 rounded-full transition-colors mx-1"
+                                        title="Administrace"
+                                        onClick={() => navigate('/adminDashboard')}
+                                    >
+                                        <Star size={24} className="text-blue-900" />
+                                    </button>
+                                )}
                             </div>
                             <div className="relative">
                                 <button

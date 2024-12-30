@@ -1,68 +1,64 @@
 import React, { useState } from 'react';
 import { Search, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {ApiService} from "../../api/api.js";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
-    // Mock data
-    const mockUsers = [
-        {
-            id: 1,
-            email: 'jan.novak@email.cz',
-            capsuleCount: 5,
-            status: 'active'
-        },
-        {
-            id: 2,
-            email: 'petra.svobodova@email.cz',
-            capsuleCount: 3,
-            status: 'blocked'
-        }
-    ];
-
-    const handleSearch = (query) => {
+    const handleSearch = async (query) => {
         setSearchQuery(query);
+
         if (query.length > 2) {
-            // Simulace vyhledávání
-            const results = mockUsers.filter(user =>
-                user.email.toLowerCase().includes(query.toLowerCase())
-            );
-            setSearchResults(results);
+            try {
+                const response = await ApiService.findEmails(query);
+
+                // Ensure response is an array
+                if (Array.isArray(response)) {
+                    setSearchResults(response.map(email => ({ email })));
+                } else {
+                    console.error("Unexpected response format:", response);
+                    setSearchResults([]); // Reset results if unexpected format
+                }
+            } catch (error) {
+                console.error("Error fetching emails:", error);
+            }
         } else {
             setSearchResults([]);
         }
     };
 
-    const handleUserSelect = (userId) => {
-        navigate(`/admin/user/${userId}`);
+
+    const handleUserSelect = async (email) => {
+        try {
+            // Assuming ApiService.getUserByEmail is working as expected:
+            const response = await ApiService.getUserByEmail(email);
+            navigate(`/admin/user/${email}`); // Ensure it uses email as the identifier
+        } catch (error) {
+            console.error('Error fetching user details:', error);
+        }
     };
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header */}
             <header className="bg-white shadow-sm">
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex justify-between items-center">
                         <button
-                            onClick={() => navigate('/adminDashboard')}
-                            className="flex items-center text-gray-600 hover:text-blue-900"
-                        >
+                            onClick={() => navigate('/dashboard')}
+                            className="flex items-center text-gray-600 hover:text-blue-900">
                             <ArrowLeft size={20} className="mr-2" />
                             Zpět na dashboard
                         </button>
-                        <div className="text-2xl font-bold text-blue-900">
-                            Administrace
-                        </div>
+                        <div className="text-2xl font-bold text-blue-900">Administrace</div>
                     </div>
                 </div>
             </header>
 
             <main className="container mx-auto px-4 py-8">
                 <div className="max-w-3xl mx-auto">
-                    {/* Search Section */}
                     <div className="bg-white rounded-lg shadow-sm p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-6">Vyhledat uživatele</h2>
                         <div className="relative">
@@ -76,14 +72,13 @@ const AdminDashboard = () => {
                             />
                         </div>
 
-                        {/* Search Results */}
                         {searchResults.length > 0 && (
                             <div className="mt-4 space-y-2">
-                                {searchResults.map((user) => (
+                                {searchResults.map((user, index) => (
                                     <div
-                                        key={user.id}
+                                        key={index}
                                         className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-                                        onClick={() => handleUserSelect(user.id)}
+                                        onClick={() => handleUserSelect(user.email)}
                                     >
                                         <div className="flex items-center">
                                             <div className="w-10 h-10 bg-blue-900 text-white rounded-full flex items-center justify-center">
@@ -91,17 +86,8 @@ const AdminDashboard = () => {
                                             </div>
                                             <div className="ml-4">
                                                 <div className="font-medium">{user.email}</div>
-                                                <div className="text-sm text-gray-500">
-                                                    {user.capsuleCount} kapslí
-                                                </div>
                                             </div>
                                         </div>
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full 
-                      ${user.status === 'active'
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-red-100 text-red-800'}`}>
-                      {user.status === 'active' ? 'Aktivní' : 'Blokován'}
-                    </span>
                                     </div>
                                 ))}
                             </div>
