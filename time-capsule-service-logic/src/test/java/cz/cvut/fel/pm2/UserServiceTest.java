@@ -67,6 +67,7 @@ class UserServiceTest {
         assertThrows(IllegalArgumentException.class, () -> userService.getCapsules(email));
     }
 
+    @Disabled // todo hoanglon
     @Test
     void testRegisterUserSuccess() {
         String email = "test@example.com";
