@@ -17,7 +17,7 @@ import ConfirmPopup from './ConfirmPopup';
 import { useParams } from 'react-router-dom';
 
 
-const CapsuleDetail = ({ capsule, setSelectedCapsule }) => {
+const CapsuleDetail = ({  }) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [showContributors, setShowContributors] = useState(false);

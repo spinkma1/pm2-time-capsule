@@ -6,6 +6,7 @@ import cz.cvut.fel.pm2.mappers.CapsuleMapperImp;
 import cz.cvut.fel.pm2.persistence.Capsule;
 import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.UserRepository;
+import cz.cvut.fel.pm2.service.MailService;
 import cz.cvut.fel.pm2.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,9 @@ class UserServiceTest {
 
     @Mock
     private CapsuleMapperImp capsuleMapperImp;
+
+    @Mock
+    private MailService mailService;
 
     @BeforeEach
     void setUp() {

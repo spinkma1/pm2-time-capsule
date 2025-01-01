@@ -41,7 +41,7 @@ public class CapsuleService {
     private static final String NOT_FOUND_USER_MESSAGE = "User not found";
     private static final String NOT_FOUND_CAPSULE_MESSAGE = "Capsule not found";
 
-    public CapsuleDto createCapsule(@NonNull CapsuleDto capsuleDto) throws NoSuchAlgorithmException {
+    public CapsuleDto createCapsule(@NonNull CapsuleDto capsuleDto, @NonNull String email) throws NoSuchAlgorithmException {
         // Validace vstupního DTO
         validateCapsule(capsuleDto);
 
@@ -49,7 +49,8 @@ public class CapsuleService {
 
 
         try {
-            User owner = userRepository.findById(capsuleDto.userId())
+
+            User owner = userRepository.findByEmail(email)
                     .orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_MESSAGE));
             capsule.setOwner(owner);
             capsule = capsuleRepository.save(capsule);
@@ -117,7 +118,6 @@ public class CapsuleService {
     public void validateCapsule(CapsuleDto capsuleDto) {
         if (capsuleDto.name() == null ||
                 capsuleDto.description() == null ||
-                capsuleDto.userId() == null ||
                 capsuleDto.capsuleSize() == null) {
             throw new InvalidBodyException("No or wrong body was sent");
         }

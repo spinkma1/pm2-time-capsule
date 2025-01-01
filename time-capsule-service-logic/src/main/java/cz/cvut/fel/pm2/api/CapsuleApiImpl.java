@@ -1,14 +1,17 @@
 package cz.cvut.fel.pm2.api;
 
+import cz.cvut.fel.pm2.config.security.JwtUtil;
 import cz.cvut.fel.pm2.enums.UnlockMethod;
 import cz.cvut.fel.pm2.exceptions.InvalidBodyException;
 import cz.cvut.fel.pm2.exceptions.NotFoundException;
 import cz.cvut.fel.pm2.model.CapsuleDto;
 import cz.cvut.fel.pm2.repository.CapsuleRepository;
 import cz.cvut.fel.pm2.service.CapsuleService;
+import cz.cvut.fel.pm2.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -22,15 +25,47 @@ import static cz.cvut.fel.pm2.service.CapsuleService.hashPassword;
 public class CapsuleApiImpl implements CapsuleApi {
     private final CapsuleService capsuleService;
     private final CapsuleRepository capsuleRepository;
+    private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     @Override
-    public ResponseEntity<CapsuleDto> createCapsule(CapsuleDto capsuleDto) throws NoSuchAlgorithmException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(capsuleService.createCapsule(capsuleDto));
+    public ResponseEntity<CapsuleDto> createCapsule(CapsuleDto capsuleDto, @RequestHeader("Authorization") String authHeader) throws NoSuchAlgorithmException {
+        try {
+            String token = authHeader.substring(7);
+
+            String email = jwtUtil.extractUsername(token);
+
+            UserDetails userDetails = userService.loadUserByUsername(email);
+            if (!jwtUtil.validateToken(token, userDetails)) {
+                return ResponseEntity.status(401).body(null);
+
+            }
+            if (userDetails.getUsername() !=null) {
+
+                return ResponseEntity.status(HttpStatus.CREATED).body(capsuleService.createCapsule(capsuleDto, userDetails.getUsername()));
+            }
+            return ResponseEntity.status(401).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
     }
-
     @Override
-    public ResponseEntity<List<CapsuleDto>> getCapsules(@RequestParam String email) {
-        return ResponseEntity.ok(capsuleService.getCapsules(email));
+    public ResponseEntity<List<CapsuleDto>> getCapsules(@RequestHeader("Authorization") String authHeader) {
+            try {
+                String token = authHeader.substring(7);
+
+                String email = jwtUtil.extractUsername(token);
+
+                UserDetails userDetails = userService.loadUserByUsername(email);
+                if (!jwtUtil.validateToken(token, userDetails)) {
+                    return ResponseEntity.ok(capsuleService.getCapsules(email));
+                }
+
+                return ResponseEntity.ok(capsuleService.getCapsules(email));
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
     }
 
     @Override

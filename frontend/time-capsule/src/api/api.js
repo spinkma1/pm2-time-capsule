@@ -3,10 +3,10 @@ import API_CONFIG from "../config/api.config";
 const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
   const url = `${API_CONFIG.BASE_URL}${endpoint}`;
   const accessToken = localStorage.getItem("access_token");
-
+  console.log(accessToken)
   const headers = {
     ...API_CONFIG.HEADERS,
-    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    ...(accessToken && accessToken !== "undefined" ? { Authorization: `Bearer ${accessToken}` } : {}),
     ...(options.headers || {}),
   };
   console.log("Headers:", headers)
@@ -163,7 +163,6 @@ export const ApiService = {
         if (response) {
             localStorage.setItem("access_token", response.accessToken);
             localStorage.setItem("refresh_token", response.refreshToken);
-            localStorage.setItem("userId", response.id);
             localStorage.setItem("email", response.email);
             localStorage.setItem("role", response.role);
             console.log("Login successful:", response)
@@ -254,6 +253,21 @@ export const ApiService = {
       });
     } catch (error) {
       console.error('Error fetching user profile:', error);
+      throw error;
+    }
+  },
+
+  getCapsules: async () => {
+    try {
+      return await fetchWithConfig('/capsules/user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error('Error fetching capsules:', error);
       throw error;
     }
   },

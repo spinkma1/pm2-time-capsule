@@ -63,19 +63,25 @@ public class UserApiImpl implements UserApi {
             response.put("email", oidcUser.getEmail());
             response.put("message", "Login successful via SSO");
         } else if (principal instanceof UserDetails userDetails) {
+
+            // Generate tokens
+            String accessToken = jwtUtil.generateToken(userDetails);
+            String refreshToken = jwtUtil.generateRefreshToken(userDetails);
+
+            // Return response with access and refresh tokens
+            response.put("message", "Login successful");
+            response.put("accessToken", accessToken);
+            response.put("refreshToken", refreshToken);
             response.put("email", userDetails.getUsername());
-            response.put("message", "Login successful with standard credentials");
+
+            return ResponseEntity.ok(response);
         } else {
             response.put("message", "User not authenticated");
         }
 
-        // Ensure you are returning a valid JSON body, not empty
-//        return ResponseEntity.ok()
-//                .header("Content-Type", "application/json")
-//                .body(response); // This makes sure the body is actually returned
 
         return new ResponseEntity<>(response, HttpStatus.OK);
-//        return response;
+
     }
 
     @Override
@@ -97,16 +103,36 @@ public class UserApiImpl implements UserApi {
 
 
     @PostMapping("/register/sso")
-    public Map<String, Object> register(@AuthenticationPrincipal OidcUser oidcUser) {
+    public ResponseEntity<Map<String, Object>> register(@AuthenticationPrincipal OidcUser oidcUser) {
         Map<String, Object> response = new HashMap<>();
+
         if (oidcUser != null) {
-            userService.findOrCreateUser(oidcUser);
-            response.put("message", "Registration successful");
+                String email = oidcUser.getEmail();
+
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(email, null)
+                );
+
+                // Load the user details
+                UserDetails userDetails = userService.loadUserByUsername(email);
+
+                // Generate tokens
+                String accessToken = jwtUtil.generateToken(userDetails);
+                String refreshToken = jwtUtil.generateRefreshToken(userDetails);
+
+                // Return response with access and refresh tokens
+                response.put("message", "Login successful");
+                response.put("accessToken", accessToken);
+                response.put("refreshToken", refreshToken);
+                response.put("email", email);
+
+                return ResponseEntity.ok(response);
         } else {
             response.put("message", "User not authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
-        return response;
     }
+
 
     @Override
     @PostMapping("/login")

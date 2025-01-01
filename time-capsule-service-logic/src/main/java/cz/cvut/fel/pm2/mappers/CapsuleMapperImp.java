@@ -75,6 +75,7 @@ public class CapsuleMapperImp implements CapsuleMapper {
         String state = capsuleEntity.getState() != null ? capsuleEntity.getState().name() : null;
 
         return new CapsuleDto(
+                id,
                 userId,
                 name,
                 description,

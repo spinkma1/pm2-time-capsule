@@ -34,7 +34,7 @@ public interface UserApi {
     @Operation(summary = "Register a new user", description = "Registers a new user using Google Single Sign-On.")
     @PostMapping("/register/sso")
     @ResponseBody
-    Map<String, Object> register(@AuthenticationPrincipal OidcUser oidcUser);
+    ResponseEntity<Map<String, Object>> register(@AuthenticationPrincipal OidcUser oidcUser);
 
     @Operation(summary = "Register a new user", description = "Registers a new user using password and username.")
     @PostMapping("/register")

@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
 import Contributor from '../../components/capsulecreation/Contributor';
-import CopyLinkButton from '../../components/capsulecreation/CopyLinkButton';
 import InfoBox from '../../components/capsulecreation/InfoBox';
 import DropdownSelect from '../../components/capsulecreation/DropdownSelect';
 import QRGenerator from './QRGenerator';
@@ -25,7 +24,6 @@ const CreateCapsule = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [isFirstLoad, setIsFirstLoad] = useState(true);
-    const scriptLoaded = useGoogleMaps();
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -87,12 +85,9 @@ const CreateCapsule = () => {
 
                     return;
                 }
-                console.log(localStorage.getItem('userId'))
-                const userIdString = localStorage.getItem('userId');
-                const userIdLong = userIdString ? Number(userIdString) : null;
 
                 const capsuleData = {
-                    userId: userIdLong,
+                    userId: null,
                     name: formData.title,
                     description: formData.description,
                     capsuleSize: formData.contributorsLimit,
@@ -114,7 +109,7 @@ const CreateCapsule = () => {
                         passwordComplete: false,
                     },
                     state: "EDIT",
-                    teamwork: formData.isPrivate ? true : false
+                    teamwork: formData.isPrivate
                 };
                 console.log("Capsule data:", capsuleData)
                 try {

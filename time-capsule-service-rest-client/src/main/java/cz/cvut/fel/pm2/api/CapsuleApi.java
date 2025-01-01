@@ -83,11 +83,11 @@ public interface CapsuleApi {
                                     """)}
                     )
             )
-            @RequestBody CapsuleDto capsule) throws NoSuchAlgorithmException;
+            @RequestBody CapsuleDto capsule, @RequestHeader("Authorization") String authHeader) throws NoSuchAlgorithmException;
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<List<CapsuleDto>> getCapsules(@RequestParam String email);
+    @PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<List<CapsuleDto>> getCapsules(@RequestHeader("Authorization") String authHeader);
 
 
     @ResponseStatus(HttpStatus.OK)

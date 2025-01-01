@@ -6,9 +6,6 @@ import {
     Share2,
     Search,
     Star,
-    ChevronDown,
-    Settings,
-    User,
     CircleDollarSign,
     Ban,
     Pencil, UserSearch
@@ -20,9 +17,10 @@ import {ApiService} from "../api/api.js";
 const Dashboard = ({ user }) => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
-    const [filterStatus, setFilterStatus] = useState('all');
+    const [filterStatus, setFilterStatus] = useState('ALL');
     const [anchorEl] = useState(null);
     const [userRole, setUserRole] = useState(null); // New state for user role
+    const [capsules, setCapsules] = useState([]);
 
     if (!user) {
         const storedUserEmail = localStorage.getItem("email");
@@ -34,7 +32,8 @@ const Dashboard = ({ user }) => {
         }
     }
 
-    // Fetch user role if not already provided
+
+
     useEffect(() => {
         const fetchUserRole = async () => {
             try {
@@ -45,13 +44,23 @@ const Dashboard = ({ user }) => {
             }
         };
 
-        fetchUserRole();
-        console.log('fetching user profile:', fetchUserRole);
-    }, []);
-    console.log(userRole)
+        const fetchCapsules = async () => {
+            try {
+                const token = localStorage.getItem("access_token");
+                if (token) {
+                    console.log(token)
+                    const capsules = await ApiService.getCapsules();
+                    console.log(capsules)
+                    setCapsules(capsules);
+                }
+            } catch (error) {
+                console.error('Error fetching capsules:', error);
+            }
+        };
 
-    ApiService.getPro
-    console.log(user)
+        fetchUserRole();
+        fetchCapsules();
+    }, []);
 
     // Mock data for demonstration
     const stats = {
@@ -62,14 +71,11 @@ const Dashboard = ({ user }) => {
         subscribing: 0
     };
 
-    const capsules = [
-
-    ];
 
     // Function to filter capsules based on filterStatus and searchQuery
     const filteredCapsules = capsules.filter((capsule) => {
-        const matchesStatus = filterStatus === 'all' || capsule.status === filterStatus;
-        const matchesSearch = capsule.title.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesStatus = filterStatus === 'ALL' || capsule.state === filterStatus;
+        const matchesSearch = capsule.name.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesStatus && matchesSearch;
     });
 
@@ -170,9 +176,10 @@ const Dashboard = ({ user }) => {
                             value={filterStatus}
                             onChange={(e) => setFilterStatus(e.target.value)}
                         >
-                            <option value="all">Všechny kapsle</option>
-                            <option value="pending">Čekající</option>
-                            <option value="opened">Otevřené</option>
+                            <option value="ALL">Všechny kapsle</option>
+                            <option value="EDIT">Čekající</option>
+                            <option value="WAIT">Uzamčené</option>
+                            <option value="OPEN">Otevřené</option>
                         </select>
                         <button className="bg-blue-900 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
                             onClick={() => {
@@ -192,17 +199,17 @@ const Dashboard = ({ user }) => {
                                 <div className="relative">
                                     <img
                                         src={capsule.thumbnail ? capsule.thumbnail : "/placeholder.png"}
-                                        alt={capsule.title}
+                                        alt={capsule.name}
                                         className="w-full h-48 object-cover"
                                     />
                                     <div className="absolute top-2 right-2 bg-blue-900 rounded-full p-2">
                                         {(() => {
-                                            switch (capsule.status) {
-                                                case 'opened':
+                                            switch (capsule.state) {
+                                                case 'OPEN':
                                                     return <Unlock size={16} color='white' />;
-                                                case 'closed':
+                                                case 'WAIT':
                                                     return <Lock size={16}  color='white'/>;
-                                                case 'editing':
+                                                case 'EDIT':
                                                     return <Pencil size={16} color='white'/>;
                                                 default:
                                                     return <Ban size={16} color='white'/>;
@@ -211,27 +218,30 @@ const Dashboard = ({ user }) => {
                                     </div>
                                 </div>
                                 <div className="p-4">
-                                    <h3 className="font-semibold text-lg mb-2">{capsule.title}</h3>
+                                    <h3 className="font-semibold text-lg mb-2">{capsule.name}</h3>
                                     <div className="flex items-center text-gray-600 text-sm mb-3">
-                                        {capsule.openDate !== null ? (
+                                        {capsule.unlockTime !== null ? (
                                             <>
                                                 <Clock size={16} className="mr-1" />
-                                                <span>Otevření: {new Date(capsule.openDate).toLocaleDateString()}</span>
+                                                <span>
+  Otevření: {new Date(Date.UTC(capsule.unlockTime[0], capsule.unlockTime[1] - 1, capsule.unlockTime[2], capsule.unlockTime[3], capsule.unlockTime[4])).toLocaleDateString()}
+</span>
+
                                             </>
                                         ) : <></>}
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center text-gray-600 text-sm">
                                             <Share2 size={16} className="mr-1" />
-                                            <span>{capsule.contributorsAmount} přispěvatelů</span>
+                                            <span>{(capsule.users && capsule.users.length > 0) ? capsule.users.length : 0} přispěvatelů</span>
+
                                         </div>
                                         <button
                                             className="text-blue-900 hover:text-blue-700 font-medium"
                                             onClick={() => {
-                                                setSelectedCapsule(capsule);
                                                 navigate(`/capsuleDetail/${capsule.id}`);
                                             }}
-                                            aria-label={`Zobrazit detail kapsle ${capsule.title}`}
+                                            aria-label={`Zobrazit detail kapsle ${capsule.name}`}
                                         >
                                             Zobrazit detail
                                         </button>
