@@ -83,6 +83,7 @@ public class UserService implements UserDetailsService {
 
         User newUser = new User(email, googleId);
         newUser.setRole(Role.ROLE_REGISTERED);
+        mailService.sendEmail(email,"Time capsule registration", "Vítej v aplikaci Time Capsule! Děkujeme ti za registraci.");
         userRepository.save(newUser);
     }
 
@@ -97,6 +98,7 @@ public class UserService implements UserDetailsService {
         user.setCapsules(List.of());
         user.setFollowers(List.of());
         userRepository.save(user);
+        mailService.sendEmail(email,"Time capsule registration", "Vítej v aplikaci Time Capsule! Děkujeme ti za registraci.");
         return user;
     }
 
