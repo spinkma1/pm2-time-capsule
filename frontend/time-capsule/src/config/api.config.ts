@@ -5,7 +5,7 @@ const API_CONFIG = {
         : 'http://actual-production-url.com/api',  // Produkční URL
 
      */
-    BASE_URL: 'http://localhost:8080',
+    BASE_URL: 'https://time-capsule-phi.vercel.app',
 
     ENDPOINTS: {
         HEALTH: '/health',
