@@ -5,7 +5,7 @@
 
     <groupId>cz.cvut.fel.pm2</groupId>
     <artifactId>time-capsule-service</artifactId>
-    <version>1.0.0-rc1</version>
+    <version>1.0.0-rc2</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -18,7 +18,7 @@
         <test-containers.version>1.19.0</test-containers.version>
         <openapi.version>1.5.12</openapi.version>
         <openapi.starter.version>2.2.0</openapi.starter.version>
-        <httpclient5.version>5.2.1</httpclient5.version>
+        <httpclient5.version>5.4.1</httpclient5.version>
         <jacoco.version>0.8.11</jacoco.version>
     </properties>
 
@@ -62,12 +62,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.13.3</version>
+            <artifactId>jackson-core</artifactId>
+            <version>2.18.2</version>
         </dependency>
+
+
 
 
         <dependency>

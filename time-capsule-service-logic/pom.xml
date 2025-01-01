@@ -6,7 +6,7 @@
     <parent>
         <groupId>cz.cvut.fel.pm2</groupId>
         <artifactId>time-capsule-service</artifactId>
-        <version>1.0.0-rc1</version>
+        <version>1.0.0-rc2</version>
     </parent>
 
     <artifactId>time-capsule-service-logic</artifactId>
@@ -16,7 +16,7 @@
         <dependency>
             <groupId>cz.cvut.fel.pm2</groupId>
             <artifactId>time-capsule-service-rest-client</artifactId>
-            <version>1.0.0-rc1</version>
+            <version>1.0.0-rc2</version>
         </dependency>
 
         <dependency>
@@ -177,29 +177,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>core</artifactId>
-            <version>3.5.3</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>javase</artifactId>
-            <version>3.5.3</version>
-        </dependency>
-
-
-        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sparkjava</groupId>
-            <artifactId>spark-core</artifactId>
-            <version>2.9.4</version>
         </dependency>
 
 
@@ -228,10 +208,6 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>0.11.5</version>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
         </dependency>
     </dependencies>
 
