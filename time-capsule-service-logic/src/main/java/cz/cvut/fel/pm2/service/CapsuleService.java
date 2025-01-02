@@ -376,7 +376,7 @@ public class CapsuleService {
             throw new InvalidBodyException("Capsule ID is required");
         }
 
-        Capsule capsule = capsuleRepository.getCapsuleByName(capsuleId)
+        Capsule capsule = capsuleRepository.getCapsuleById(Long.parseLong(capsuleId))
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 
         return capsuleMapper.toDto(capsule);
@@ -397,6 +397,34 @@ public class CapsuleService {
             );
         });
 
+        return capsuleMapper.toDto(capsule);
+    }
+
+    public CapsuleDto lockCapsule(String capsuleId) {
+        if (capsuleId == null || capsuleId.isEmpty()) {
+            throw new InvalidBodyException("Capsule ID is required");
+        }
+
+        Capsule capsule = capsuleRepository.getCapsuleById(Long.parseLong(capsuleId))
+                .orElseThrow(() -> new NotFoundException("Capsule not found"));
+
+        capsule.setState(State.WAIT);
+
+        // Save the updated capsule in the repository
+        capsuleRepository.save(capsule);
+
+        mailService.sendEmail(
+                capsule.getOwner().getEmail(),
+                "Capsule Locked",
+                "Your capsule '" + capsule.getName() + "' has been locked and is ready to be opened based on its unlock methods."
+        );
+
+        System.err.println("Capsule locked");
+        System.err.println("Capsule locked");
+        System.err.println("Capsule locked");
+
+        Optional<Capsule> caps = capsuleRepository.getCapsuleById(Long.parseLong(capsuleId));
+        System.out.println(caps.get().getState());
         return capsuleMapper.toDto(capsule);
     }
 

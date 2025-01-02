@@ -114,4 +114,10 @@ public interface CapsuleApi {
     @PutMapping("/{capsuleId}/unlock-early")
     @ResponseBody
     ResponseEntity<CapsuleDto> unlockCapsuleEarly(@PathVariable String capsuleId);
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/lock/{capsuleId}")
+    @ResponseBody
+    ResponseEntity<CapsuleDto> lockCapsule(@PathVariable String capsuleId);
+
 }

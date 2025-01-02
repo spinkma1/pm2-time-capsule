@@ -111,7 +111,7 @@ public class CapsuleApiImpl implements CapsuleApi {
     }
 
     @Override
-    public ResponseEntity<CapsuleDto> getCapsuleDetails(@RequestParam String capsuleId) {
+    public ResponseEntity<CapsuleDto> getCapsuleDetails(String capsuleId) {
         return ResponseEntity.ok(capsuleService.getCapsuleDetails(capsuleId));
     }
 
@@ -120,5 +120,9 @@ public class CapsuleApiImpl implements CapsuleApi {
         return ResponseEntity.ok(capsuleService.unlockCapsuleEarly(capsuleId));
     }
 
+    @Override
+    public ResponseEntity<CapsuleDto> lockCapsule(String capsuleId) {
+        return ResponseEntity.ok(capsuleService.lockCapsule(capsuleId));
+    }
 
 }

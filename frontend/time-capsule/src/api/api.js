@@ -151,6 +151,22 @@ export const ApiService = {
     }
   },
 
+  lockCapsule: async (capsuleId) => {
+    try {
+      const response = await fetchWithConfig(`/capsules/lock/${capsuleId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      return response;
+    } catch (error) {
+      console.error('Failed to lock capsule:', error);
+      throw error;
+    }
+  },
+
 
   loginWithGoogle: async (token) => {
     try {

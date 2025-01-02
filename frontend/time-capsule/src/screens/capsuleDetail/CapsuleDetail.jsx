@@ -15,6 +15,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import ConfirmPopup from './ConfirmPopup';
 import { useParams } from 'react-router-dom';
+import {ApiService as api} from "../../api/api.js";
 
 
 const CapsuleDetail = ({  }) => {
@@ -22,6 +23,54 @@ const CapsuleDetail = ({  }) => {
     const navigate = useNavigate();
     const [showContributors, setShowContributors] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+    const capsule = {
+        id: "1",
+        title: "Moje Digitální Časová Kapsle",
+        description: "Sbírka vzpomínek a dokumentů z mých cest.",
+        createdDate: "2024-12-01T10:00:00Z",
+        status: "editing", // Options: 'editing', 'closed', 'opened'
+        openDate: "2025-12-31T10:00:00Z",
+        maxItems: 10,
+        contributors: [
+            { id: 1, avatar: "A", email: "creator@example.com" },
+            { id: 2, avatar: "B", email: "contributor1@example.com" },
+            { id: 3, avatar: "C", email: "contributor2@example.com" },
+        ],
+        items: [
+            {
+                id: "item1",
+                type: "image",
+                title: "Fotografie z dovolené",
+                thumbnail: "https://via.placeholder.com/150",
+                addedBy: "creator@example.com",
+                addedDate: "2024-12-02T14:30:00Z",
+            },
+            {
+                id: "item2",
+                type: "text",
+                title: "Deník z výletu",
+                addedBy: "contributor1@example.com",
+                addedDate: "2024-12-03T09:00:00Z",
+            },
+            {
+                id: "item3",
+                type: "video",
+                title: "Rodinné video",
+                thumbnail: "https://via.placeholder.com/150",
+                addedBy: "creator@example.com",
+                addedDate: "2024-12-04T16:45:00Z",
+            },
+            {
+                id: "item4",
+                type: "audio",
+                title: "Oblíbená píseň",
+                addedBy: "contributor2@example.com",
+                addedDate: "2024-12-05T11:15:00Z",
+            },
+        ],
+    };
+
 
     const handleNavigateToFollower = (id) => {
         navigate(`/user/${id}`);
@@ -53,7 +102,7 @@ const CapsuleDetail = ({  }) => {
         setCapsuleStatus('opened');
     };
     const handleLockCapsule = () => {
-        console.log('Capsule locked!');
+        api.lockCapsule(id);
         setIsPopupOpen(false); // Zavřít popup po potvrzení
     };
 
@@ -93,7 +142,7 @@ const CapsuleDetail = ({  }) => {
                                 </div>
                             </div>
                         </div>
-                        {capsule.status === 'closed' ? (
+                        {capsule.status === 'closed' ? ( //////////////////// NORMAL STATE
                             <div
                                 className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0 cursor-pointer" // Přidání cursor-pointer pro indikaci kliknutí
                                 onClick={() => navigate(`/capsule/open/${capsule.id}`)}
@@ -107,15 +156,9 @@ const CapsuleDetail = ({  }) => {
                                         : `Zbývá ${getTimeRemaining(capsule.openDate)}`}
                                 </div>
 
-                                <div className="text-sm font-medium text-blue-900 mb-1">
-                                    {getTimeRemaining(capsule.openDate) === "Otevřít"
-                                        ? <></>
-                                        : `Zbývá ${getTimeRemaining(capsule.openDate)}`}
-                                </div>
-
                             </div>) : (<></>)}
 
-                        {capsule.status === 'opened' ? (
+                        {capsule.status === 'opened' ? ( //////////////////// NORMAL STATE
                             <div className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0">
                                 <div className="flex items-center justify-center mb-2">
                                     <Unlock size={20} className="text-blue-900" />
