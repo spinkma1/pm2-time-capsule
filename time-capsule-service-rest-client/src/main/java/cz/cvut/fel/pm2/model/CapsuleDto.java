@@ -11,7 +11,7 @@ import java.util.List;
  */
 public record CapsuleDto(
         Long id,
-        Long userId,
+        UserDto owner,
 
         String name,
         String description,
@@ -20,7 +20,7 @@ public record CapsuleDto(
 
         Long capsuleSize,
 
-        LocalDateTime unlockTime,
+        String unlockTime,
         String qrCodePassword,
 
         Double unlockLat,
@@ -30,6 +30,8 @@ public record CapsuleDto(
 
         UnlockMethodsDto unlockMethods,
 
-        String state
+        String state,
+
+        List<ContentDto> content
 ) {}
 

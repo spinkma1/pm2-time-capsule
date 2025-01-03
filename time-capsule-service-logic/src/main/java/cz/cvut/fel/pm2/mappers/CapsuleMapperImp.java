@@ -6,24 +6,31 @@ import cz.cvut.fel.pm2.enums.State;
 import cz.cvut.fel.pm2.enums.Type;
 import cz.cvut.fel.pm2.enums.UnlockMethod;
 import cz.cvut.fel.pm2.model.CapsuleDto;
+import cz.cvut.fel.pm2.model.ContentDto;
 import cz.cvut.fel.pm2.model.UnlockMethodsDto;
 import cz.cvut.fel.pm2.model.UserDto;
 import cz.cvut.fel.pm2.persistence.Capsule;
+import cz.cvut.fel.pm2.persistence.Content;
 import cz.cvut.fel.pm2.persistence.User;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.processing.Generated;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 @Primary
 @Component
 public class CapsuleMapperImp implements CapsuleMapper {
+
+    @Autowired
+    ContentMapper contentMapper;
 
     public void updateEntity(CapsuleDto capsuleInput, Capsule capsuleEntity) {
         if ( capsuleInput == null ) {
@@ -57,26 +64,49 @@ public class CapsuleMapperImp implements CapsuleMapper {
         }
 
         Long id = capsuleEntity.getId() != null ? capsuleEntity.getId().longValue() : null;
-        Long userId = capsuleEntity.getOwner() != null ? capsuleEntity.getOwner().getId().longValue() : null;
+        UserDto owner = userToUserDto(capsuleEntity.getOwner());
         String name = capsuleEntity.getName();
         String description = capsuleEntity.getDescription();
         Boolean teamWork = capsuleEntity.getType() == Type.PRIVATE;
         Long userFileLimit = capsuleEntity.getCapsuleSize();
-        List<UserDto> users = null; //cyklilo se to tady, tak jsem dal null
+        List<UserDto> users = new ArrayList<>();
+        List<Content> content = capsuleEntity.getContents();
+        List<ContentDto> contentDtos = new ArrayList<>();
 
-        LocalDateTime unlockTime = capsuleEntity.getUnlockTime() != null ? capsuleEntity.getUnlockTime() : null;
+        for (User user : capsuleEntity.getUsers()) {
+            users.add(new UserDto(user.getId(), user.getEmail(), user.getName(), user.getBio(), user.getRole().name(), null, null));
+        }
+
+        if (content != null) {
+            for (Content c : content) {
+                contentDtos.add(contentMapper.toDto(c));
+            }
+        }
+
+        String unlockTime = capsuleEntity.getUnlockTime().format(DateTimeFormatter.ISO_DATE_TIME);
         String qrCodePassword = capsuleEntity.getQrCodePassword();
         Double unlockLat = capsuleEntity.getUnlockLat();
         Double unlockLongit = capsuleEntity.getUnlockLongit();
 
         UnlockMethodsDto unlockMethodsDto = mapUnlockMethods(capsuleEntity.getUnlockMethods());
 
+        String state = null;
 
-        String state = capsuleEntity.getState() != null ? capsuleEntity.getState().name() : null;
+        switch (capsuleEntity.getState()) {
+            case State.EDIT:
+                state = "editing";
+                break;
+            case State.WAIT:
+                state = "closed";
+                break;
+            case State.OPEN:
+                state = "opened";
+                break;
+        }
 
         return new CapsuleDto(
                 id,
-                userId,
+                owner,
                 name,
                 description,
                 teamWork,
@@ -87,7 +117,8 @@ public class CapsuleMapperImp implements CapsuleMapper {
                 unlockLongit,
                 users,
                 unlockMethodsDto,
-                state
+                state,
+                contentDtos
         );
     }
 
@@ -119,11 +150,11 @@ public class CapsuleMapperImp implements CapsuleMapper {
         capsule.setName( capsuleDto.name() );
         capsule.setDescription( capsuleDto.description());
         capsule.setCapsuleSize( capsuleDto.capsuleSize() );
-        capsule.setUnlockTime( capsuleDto.unlockTime() );
+        capsule.setUnlockTime(LocalDateTime.parse(capsuleDto.unlockTime(), DateTimeFormatter.ISO_DATE_TIME));
         capsule.setQrCodePassword( capsuleDto.qrCodePassword() );
         capsule.setUnlockLat( capsuleDto.unlockLat() );
         capsule.setUnlockLongit( capsuleDto.unlockLongit() );
-        capsule.setState( State.valueOf(capsuleDto.state()) );
+        capsule.setState(State.valueOf(capsuleDto.state()) );
         capsule.setUnlockMethods(mapUnlockMethods(capsuleDto.unlockMethods()));
         capsule.setState( State.EDIT );
         capsule.setType( (capsuleDto.teamWork() == null || !capsuleDto.teamWork()) ? Type.PUBLIC : Type.PRIVATE );

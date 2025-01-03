@@ -13,10 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 @Service
 public class DBStart implements CommandLineRunner {
@@ -39,28 +40,40 @@ public class DBStart implements CommandLineRunner {
         }
 
         private void initializeDatabase() {
-            List<User> users = new ArrayList<>();
-            for (int i = 1; i <= 5; i++) {
-                User user = new User();
-                user.setEmail("kingleduc" + i + "@gmail.com");
-                user.setPassword(passwordEncoder.encode("12345678"));
-                user.setName("User " + i);
-                user.setBio("This is bio of User " + i);
-                users.add(userRepository.save(user));
-            }
+            User user = new User();
+            user.setEmail("aaaaaa@a.com");
+            user.setPassword(passwordEncoder.encode("aaaaaa@a.com"));
+            user.setName("User");
+            user.setBio("This is bio of User");
+            userRepository.save(user);
+
+            User user1 = new User();
+            user1.setEmail("karo@a.com");
+            user1.setPassword(passwordEncoder.encode("aaa312aaa@a.com"));
+            user1.setName("Karovec");
+            user1.setBio("This is bio of Karovec");
+            userRepository.save(user1);
+
+            User user2 = new User();
+            user2.setEmail("aaaa132aa@a.com");
+            user2.setPassword(passwordEncoder.encode("aaaaa31a@a.com"));
+            user2.setName("User2");
+            user2.setBio("This is bio of User2");
+            userRepository.save(user2);
+
 
             // Create capsules
             List<Capsule> capsules = new ArrayList<>();
-            Random random = new Random();
             for (int i = 1; i <= 3; i++) {
                 Capsule capsule = new Capsule();
                 capsule.setName("Capsule " + i);
                 capsule.setDescription("Description of Capsule " + i);
-                capsule.setOwner(users.get(random.nextInt(users.size())));
+                capsule.setOwner(user);
                 capsule.setState(State.EDIT);
                 capsule.setType(Type.PRIVATE);
                 capsule.setCapsuleSize(100L * i);
-                capsule.setUnlockTime(null);
+                capsule.setUnlockTime(LocalDateTime.of(2025, 12, 12, 0, 0, 0));
+                capsule.setUsers(List.of(user1, user2));
                 capsules.add(capsuleRepository.save(capsule));
             }
 

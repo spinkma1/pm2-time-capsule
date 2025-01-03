@@ -11,7 +11,6 @@ import cz.cvut.fel.pm2.enums.UnlockMethod;
 import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.CapsuleRepository;
 import cz.cvut.fel.pm2.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -410,7 +409,6 @@ public class CapsuleService {
 
         capsule.setState(State.WAIT);
 
-        // Save the updated capsule in the repository
         capsuleRepository.save(capsule);
 
         mailService.sendEmail(
@@ -419,12 +417,6 @@ public class CapsuleService {
                 "Your capsule '" + capsule.getName() + "' has been locked and is ready to be opened based on its unlock methods."
         );
 
-        System.err.println("Capsule locked");
-        System.err.println("Capsule locked");
-        System.err.println("Capsule locked");
-
-        Optional<Capsule> caps = capsuleRepository.getCapsuleById(Long.parseLong(capsuleId));
-        System.out.println(caps.get().getState());
         return capsuleMapper.toDto(capsule);
     }
 
