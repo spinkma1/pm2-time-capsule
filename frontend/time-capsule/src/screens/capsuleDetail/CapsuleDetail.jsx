@@ -75,11 +75,19 @@ const CapsuleDetail = ({  }) => {
     };
 
 
-    const handleEarlyOpen = () => {
-        setCapsule((prevCapsule) => ({
-            ...prevCapsule,
-            status: 'opened',
-        }));
+    const handleEarlyOpen = async ()=> {
+        try {
+            const response = await api.earlyOpenCapsule(id);
+            if (response) {
+                console.log('Capsule locked successfully:', response);
+                setIsPopupOpen(false)
+                window.location.reload();
+            } else {
+                console.error('No response returned from lockCapsule API call');
+            }
+        } catch (error) {
+            console.error('Error while locking the capsule:', error);
+        }
     };
 
     const handleLockCapsule = async () => {
