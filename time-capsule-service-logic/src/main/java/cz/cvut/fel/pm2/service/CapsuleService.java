@@ -344,6 +344,31 @@ public class CapsuleService {
         });
     }
 
+
+    public List<CapsuleDto> findCapsulesByUser(Long userId) {
+        List<CapsuleDto> capsules = capsuleRepository.findCapsulesByUser(userId).stream().map(capsuleMapper::toDto).toList();
+        return capsules;
+    }
+
+    public List<CapsuleDto> findCapsulesWhereUserContributes(Long userId) {
+        List<CapsuleDto> capsules = capsuleRepository.findCapsulesWhereUserContributes(userId).stream().map(capsuleMapper::toDto).toList();
+        return capsules;
+    }
+    public List<CapsuleDto> findAllCapsulesForUser(Long userId) {
+        // Fetch owned capsules
+        List<CapsuleDto> ownedCapsules = findCapsulesByUser(userId);
+
+        // Fetch contributed capsules
+        List<CapsuleDto> contributedCapsules = findCapsulesWhereUserContributes(userId);
+
+        // Combine both lists
+        List<CapsuleDto> allCapsules = new ArrayList<>();
+        allCapsules.addAll(ownedCapsules);
+        allCapsules.addAll(contributedCapsules);
+
+        return allCapsules;
+    }
+
     //Notify the owner and subscribed users about an capsule, that will open soon, through email
     private void sendUpcomingOpenNotification(Capsule capsule) {
         String subject = "Capsule Will Be Openable Soon!";

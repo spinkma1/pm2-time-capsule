@@ -21,7 +21,16 @@ const Dashboard = ({ user }) => {
     const [anchorEl] = useState(null);
     const [userRole, setUserRole] = useState(null); // New state for user role
     const [capsules, setCapsules] = useState([]);
-
+    const [pendingOpen,setPendingOpen] = useState([]);
+    const [contributorCapsules, setContributorCapsules] = useState([]);
+    const [combinedCapsules, setCombinedCapsules] = useState([]);
+    const [stats, setStats] = useState({
+        totalCapsules: 0,
+        pendingOpen: 0,
+        sharedWithMe: 0,
+        subscribed: 0,
+        subscribing: 0
+    });
     if (!user) {
         const storedUserEmail = localStorage.getItem("email");
         if (localStorage.getItem("userId") && storedUserEmail) {
@@ -34,6 +43,9 @@ const Dashboard = ({ user }) => {
 
 
 
+
+
+    // Fetch capsules and contributor capsules
     useEffect(() => {
         const fetchUserRole = async () => {
             try {
@@ -46,13 +58,17 @@ const Dashboard = ({ user }) => {
 
         const fetchCapsules = async () => {
             try {
-                const token = localStorage.getItem("access_token");
-                if (token) {
-                    console.log(token)
-                    const capsules = await ApiService.getCapsules();
-                    console.log(capsules)
-                    setCapsules(capsules);
-                }
+                const [ownedCapsules, contributorCapsules] = await Promise.all([
+                    ApiService.getCapsules(),
+                    ApiService.getContributorCapsules(),
+                ]);
+
+                console.log("Owned Capsules:", ownedCapsules);
+                console.log("Contributor Capsules:", contributorCapsules);
+
+                setCapsules(ownedCapsules);
+                setContributorCapsules(contributorCapsules);
+                setCombinedCapsules([...ownedCapsules, ...contributorCapsules])
             } catch (error) {
                 console.error('Error fetching capsules:', error);
             }
@@ -62,18 +78,31 @@ const Dashboard = ({ user }) => {
         fetchCapsules();
     }, []);
 
-    // Mock data for demonstration
-    const stats = {
-        totalCapsules: 0,
-        pendingOpen: 0,
-        sharedWithMe: 0,
-        subscribed: 0,
-        subscribing: 0
-    };
+    // Calculate stats whenever capsules or contributorCapsules change
+    useEffect(() => {
+        const combinedCapsules = [...capsules, ...contributorCapsules];
+        console.log("Combined Capsules:", combinedCapsules);
 
+        const pendingOpen = combinedCapsules.filter(capsule => capsule.state === 'WAIT').length;
+        const sharedWithMe = contributorCapsules.length;
+
+        setStats({
+            totalCapsules: combinedCapsules.length,
+            pendingOpen: pendingOpen,
+            sharedWithMe: sharedWithMe,
+            subscribed: 0, // Placeholder
+            subscribing: 0, // Placeholder
+        });
+
+        console.log("Stats Updated:", {
+            totalCapsules: combinedCapsules.length,
+            pendingOpen: pendingOpen,
+            sharedWithMe: sharedWithMe,
+        });
+    }, [capsules, contributorCapsules]);
 
     // Function to filter capsules based on filterStatus and searchQuery
-    const filteredCapsules = capsules.filter((capsule) => {
+    const filteredCapsules = combinedCapsules.filter((capsule) => {
         const matchesStatus = filterStatus === 'ALL' || capsule.state === filterStatus;
         const matchesSearch = capsule.name.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesStatus && matchesSearch;
@@ -182,9 +211,9 @@ const Dashboard = ({ user }) => {
                             <option value="OPEN">Otevřené</option>
                         </select>
                         <button className="bg-blue-900 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-                            onClick={() => {
-                                navigate('/createCapsule');
-                            }}>
+                                onClick={() => {
+                                    navigate('/createCapsule');
+                                }}>
                             <Plus size={20} />
                             <span>Nová kapsle</span>
                         </button>

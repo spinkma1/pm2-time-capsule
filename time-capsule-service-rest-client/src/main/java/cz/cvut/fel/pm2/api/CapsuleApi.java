@@ -91,6 +91,10 @@ public interface CapsuleApi {
 
 
     @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/contributor-capsules")
+    ResponseEntity<List<CapsuleDto>> getUserContributorCapsules(@RequestHeader("Authorization") String authHeader);
+
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{capsuleId}")
     @ResponseBody
     ResponseEntity<CapsuleDto> readyCapsule(@PathVariable String capsuleId, @RequestParam boolean ready);
