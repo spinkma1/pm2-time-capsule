@@ -20,7 +20,7 @@ import CopyLinkButton from '../../components/capsulecreation/CopyLinkButton';
 import InfoBox from '../../components/capsulecreation/InfoBox';
 import DropdownSelect from '../../components/capsulecreation/DropdownSelect';
 import QRGenerator from './QRGenerator';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import InfoSection from '../../components/capsulecreation/InfoSection';
 import Warning from '../../components/capsulecreation/Warning';
 import Confirmation from '../../components/capsulecreation/Confirmation';
@@ -28,66 +28,17 @@ import { format } from 'date-fns';
 import { cs } from 'date-fns/locale';
 import { useParams } from 'react-router-dom';
 import QRCodeScanner from '../../components/QRCodeScanner';
+import {ApiService as api} from "../../api/api.js";
 
 
 const OpenCapsule = () => {
+    const location = useLocation();
     const { id } = useParams();
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [isFirstLoad, setIsFirstLoad] = useState(true);
-    const capsule = [
-        {
-            id: 1,
-            title: "Maturitní vzpomínky 2024",
-            openDate: "2024-11-01",
-            createdDate: "2024-01-01",
-            status: "closed",
-            contributorsAmount: 3,
-            hasGeolocation: true,
-            hasQRCode: true,
-            geolocation: { lat: 50.086451, lng: 14.411482 },
-            thumbnail: null,
-            maxItems: 5,
-            type: "own",
-            contributors: [
-                { id: 1, email: "jan.novak@seznam.cz", avatar: "JN" },
-                { id: 2, email: "m.svoboda@gmail.com", avatar: "MS" },
-                { id: 3, email: "petr.dvorak420@fel.cvut.cz", avatar: "PD" }
-            ],
-            items: [
-                {
-                    id: 1,
-                    type: "image",
-                    title: "tridnifoto.jpg",
-                    addedBy: "Jan Novák",
-                    addedDate: "2024-01-15",
-                    thumbnail: "/api/placeholder/400/300"
-                },
-                {
-                    id: 2,
-                    type: "video",
-                    title: "posledni_zvoneni.mp4",
-                    addedBy: "Marie Svobodová",
-                    addedDate: "2024-01-16",
-                    thumbnail: "/api/placeholder/400/300"
-                },
-                {
-                    id: 3,
-                    type: "text",
-                    title: "vzkaz_pro_budouci_ja.txt",
-                    addedBy: "Petr Dvořák",
-                    addedDate: "2024-01-17"
-                },
-                {
-                    id: 4,
-                    type: "audio",
-                    title: "nase_oblibena_pisnicka.mp3",
-                    addedBy: "Jan Novák",
-                    addedDate: "2024-01-18"
-                }
-            ]
-        }
-    ];
+    const { capsule } = location.state || {};
+
     const [formData, setFormData] = useState({
         hasGeolocation: false,
         hasQRCode: false,
@@ -100,15 +51,29 @@ const OpenCapsule = () => {
 
     const steps = [
         { number: 1, title: 'Čas', condition: true }, // Každý krok bude mít podmínku pro zobrazení
-        { number: 2, title: 'Geolokace', condition: capsule[0].hasGeolocation },
-        { number: 3, title: 'QR kód', condition: capsule[0].hasQRCode },
+        { number: 2, title: 'Geolokace', condition: capsule.unlockMethods.geolocationEnabled }, //
+        { number: 3, title: 'QR kód', condition: capsule.unlockMethods.qrCodeEnabled },
     ].filter(step => step.condition); // Filtrujeme kroky, které mají podmínku "true"
+
+
+    const handleUnlock = async ()=> {
+        try {
+            const response = await api.unlockCapsule(id);
+            if (response) {
+                console.log('Capsule locked successfully:', response);
+            } else {
+                console.error('No response returned from lockCapsule API call');
+            }
+        } catch (error) {
+            console.error('Error while locking the capsule:', error);
+        }
+    };
 
     const validateStep = (currentStep) => {
         const newErrors = {};
 
         if (currentStep === 1) {
-            if (new Date(capsule[0].openDate) > new Date()) {
+            if (new Date(capsule.unlockTime) > new Date()) {
                 newErrors.openDate = 'Datum otevření nesmí být starší než dnešní datum';
             }
         }
@@ -119,13 +84,17 @@ const OpenCapsule = () => {
 
     const handleNext = () => {
         if (validateStep(step)) {
-            setStep(step + 1);
+            const nextStep = steps.find(s => s.number > step)?.number;
+            if (nextStep) {
+                setStep(nextStep);
+            }
         }
     };
 
+
     const handleSubmit = () => {
         if (validateStep(step)) {
-            console.log('Form submitted', formData);
+            handleUnlock();
             navigate('/dashboard');
         }
     };
@@ -143,11 +112,16 @@ const OpenCapsule = () => {
                     lng: position.coords.longitude,
                 };
 
+                const unlockLocation = {
+                    lat: capsule.unlockLat,
+                    lng: capsule.unlockLongit,
+                };
+
                 // Tolerance v kilometrech pro přibližné porovnání
                 const distanceTolerance = 0.1; // cca 100 metrů
 
-                const isCloseEnough = (capsule[0].geolocation &&
-                    calculateDistance(userLocation, capsule[0].geolocation) <= distanceTolerance);
+                const isCloseEnough = (capsule.unlockLat && capsule.unlockLongit &&
+                    calculateDistance(userLocation, unlockLocation) <= distanceTolerance);
 
                 if (isCloseEnough) {
                     setFormData(prev => ({
@@ -200,12 +174,11 @@ const OpenCapsule = () => {
 
 
     const handleBack = () => {
-        if (step === 1) {
-            // If step is 1 (first step), go back to Dashboard
-            navigate('/dashboard');
+        const prevStep = [...steps].reverse().find(s => s.number < step)?.number;
+        if (prevStep) {
+            setStep(prevStep);
         } else {
-            // previous step
-            setStep(step - 1);
+            navigate('/dashboard'); // If there's no previous step, go back to the dashboard
         }
     };
 
@@ -255,16 +228,6 @@ const OpenCapsule = () => {
                         {step === 1 && (
                             <div className="space-y-6">
                                 <h2 className="text-2xl font-bold text-gray-900">Čas</h2>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center">
-                                        <CirclePlus size={20} className="text-gray-400 mr-2" />
-                                        <span className="text-sm text-gray-700">Datum vytvoření</span>
-                                    </div>
-                                    <label className="relative inline-flex items-center">
-                                        {format(new Date(capsule[0].createdDate), 'd. MMMM yyyy', { locale: cs })}
-
-                                    </label>
-                                </div>
 
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center">
@@ -272,7 +235,7 @@ const OpenCapsule = () => {
                                         <span className="text-sm text-gray-700">Datum otevření</span>
                                     </div>
                                     <label className="relative inline-flex items-center">
-                                        {format(new Date(capsule[0].openDate), 'd. MMMM yyyy', { locale: cs })}
+                                        {format(new Date(capsule.unlockTime), 'd. MMMM yyyy', { locale: cs })}
 
                                     </label>
                                 </div>
@@ -287,8 +250,8 @@ const OpenCapsule = () => {
                                         </h2>
                                         <p className="text-gray-700">
                                             Pro pokračování ověříme vaši aktuální polohu. Klikněte na tlačítko níže pro povolení přístupu k vaší GPS.{' '}
-                                            {capsule[0]?.geolocation
-                                                ? `Šířka: ${capsule[0].geolocation.lat}, Délka: ${capsule[0].geolocation.lng}`
+                                            {capsule.unlockLat && capsule.unlockLongit
+                                                ? `Šířka: ${capsule.unlockLat}, Délka: ${capsule.unlockLongit}`
                                                 : 'Geolokace není k dispozici.'}
                                         </p>
 

@@ -168,6 +168,22 @@ export const  ApiService = {
     }
   },
 
+  unlockCapsule: async (capsuleId) => {
+    try {
+      const response = await fetchWithConfig(`/capsules/unlock/${capsuleId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      return response;
+    } catch (error) {
+      console.error('Failed to lock capsule:', error);
+      throw error;
+    }
+  },
+
   earlyOpenCapsule: async (capsuleId) => {
     try {
       const response = await fetchWithConfig(`/capsules/${capsuleId}/unlock-early`, {

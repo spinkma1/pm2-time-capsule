@@ -142,4 +142,8 @@ public class CapsuleApiImpl implements CapsuleApi {
         return ResponseEntity.ok(capsuleService.lockCapsule(capsuleId));
     }
 
+    @Override
+    public ResponseEntity<CapsuleDto> unlockCapsule(String capsuleId) {
+        return ResponseEntity.ok(capsuleService.unlockCapsule(capsuleId));
+    }
 }

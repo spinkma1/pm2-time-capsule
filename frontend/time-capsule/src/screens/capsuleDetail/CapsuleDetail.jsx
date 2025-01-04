@@ -141,25 +141,36 @@ const CapsuleDetail = ({  }) => {
                                 </div>
                             </div>
                         </div>
-                        {capsule.state === 'closed' ? ( //////////////////// NORMAL STATE
+                        {capsule.state === 'closed' ? (
                             <div
                                 className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0"
                             >
                                 <div className="flex items-center justify-center mb-2">
-                                    <Lock size={20} className="text-blue-900" />
+                                    {getTimeRemaining(capsule.unlockTime) === "Otevřít" ? (
+                                        <button
+                                            onClick={() => navigate(`/capsule/open/${capsule.id}`, { state: { capsule } })}
+                                            className="text-blue-900 hover:text-blue-700 flex items-center"
+                                        >
+                                            <Unlock size={20} className="text-blue-900 mr-2" />
+                                            Otevřít
+                                        </button>
+                                    ) : (
+                                        <div className="flex items-center">
+                                            <Lock size={20} className="text-blue-900 mr-2" />
+                                            <span className="text-blue-900">{`Zbývá ${getTimeRemaining(capsule.unlockTime)}`}</span>
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="text-sm font-medium text-blue-900 mb-1">
-                                    {getTimeRemaining(capsule.unlockTime) === "Otevřít"
-                                        ? "Otevřít"
-                                        : `Zbývá ${getTimeRemaining(capsule.unlockTime)}`}
-                                </div>
+                            </div>
+                        ) : (
+                            <></>
+                        )}
 
-                            </div>) : (<></>)}
 
                         {capsule.state === 'opened' ? (
                             <div className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0">
                                 <div className="flex items-center justify-center mb-2">
-                                    <Unlock size={20} className="text-blue-900" />
+                                    <Unlock size={20} className="text-blue-900"/>
                                 </div>
                                 <div className="text-sm font-medium text-blue-900 mb-1">
                                     Otevřeno
@@ -206,7 +217,7 @@ const CapsuleDetail = ({  }) => {
                                 <Users size={20} className="mr-2" />
                                 Pozvat přispěvatele
                             </button>
-                            {capsule.state === 'closed' && (
+                            {capsule.state === 'closed' && getTimeRemaining(capsule.unlockTime) !== "Otevřít" && (
                                 <button
                                     onClick={handleEarlyOpen}
                                     className="px-3 py-1 text-white bg-blue-900 rounded-lg hover:bg-blue-600"
