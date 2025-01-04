@@ -116,7 +116,7 @@ public class CapsuleApiImpl implements CapsuleApi {
     }
 
     @Override
-    public ResponseEntity<CapsuleDto> unlockCapsuleEarly(@RequestParam String capsuleId) {
+    public ResponseEntity<CapsuleDto> unlockCapsuleEarly(String capsuleId) {
         return ResponseEntity.ok(capsuleService.unlockCapsuleEarly(capsuleId));
     }
 

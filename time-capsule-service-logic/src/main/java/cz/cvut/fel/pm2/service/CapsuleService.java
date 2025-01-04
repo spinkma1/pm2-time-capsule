@@ -382,10 +382,11 @@ public class CapsuleService {
     }
 
     public CapsuleDto unlockCapsuleEarly(String capsuleId) {
-        Capsule capsule = capsuleRepository.getCapsuleByName(capsuleId)
+        Capsule capsule = capsuleRepository.getCapsuleById(Long.parseLong(capsuleId))
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 
         capsule.setUnlockTime(LocalDateTime.now());
+        capsule.setState(State.OPEN);
         capsuleRepository.save(capsule);
 
         capsule.getUsers().forEach(user -> {
