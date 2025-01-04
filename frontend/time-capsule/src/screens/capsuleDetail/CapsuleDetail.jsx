@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {
     Lock,
     ArrowLeft,
-    Calendar,
     Users,
     Plus,
     Image,
@@ -21,7 +20,6 @@ import {ApiService as api} from "../../api/api.js";
 const CapsuleDetail = ({  }) => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [showContributors, setShowContributors] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [capsule, setCapsule] = useState(null);
@@ -118,14 +116,6 @@ const CapsuleDetail = ({  }) => {
                         >
                             <ArrowLeft size={20} className="mr-2"/>
                             Zpět na přehled
-                        </button>
-
-        {/*                         TESTING BUTTON                         */}
-                        <button
-                            className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                            onClick={() => console.log(capsule) }>
-                            <Lock size={20} className="mr-2"/>
-                            AHOOOOOOJ
                         </button>
 
                     </div>
