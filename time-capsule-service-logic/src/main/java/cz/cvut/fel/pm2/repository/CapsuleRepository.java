@@ -3,6 +3,8 @@ package cz.cvut.fel.pm2.repository;
 import cz.cvut.fel.pm2.persistence.Capsule;
 import cz.cvut.fel.pm2.persistence.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -50,5 +52,9 @@ public interface CapsuleRepository extends JpaRepository<Capsule, Long> {
      */
     List<Capsule> findByUnlockTimeBetween(LocalDateTime startTime, LocalDateTime endTime);
 
+    @Query("SELECT c FROM Capsule c JOIN c.users u WHERE u.id = :userId AND c.owner.id != :userId")
+    List<Capsule> findCapsulesWhereUserContributes(@Param("userId") Long userId);
 
+    @Query("SELECT c FROM Capsule c JOIN c.users u WHERE u.id = :userId")
+    List<Capsule> findCapsulesByUser(@Param("userId") Long userId);
 }

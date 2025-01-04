@@ -31,13 +31,13 @@ public class Capsule extends AbstractEntity {
     @JsonManagedReference
     private User owner;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "capsule_user",
             joinColumns = @JoinColumn(name = "capsule_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> users =  new ArrayList<>();
+    private List<User>  users =  new ArrayList<>();
 
     @OneToMany(mappedBy = "capsule")
     private List<Notification> notifications;
@@ -70,7 +70,6 @@ public class Capsule extends AbstractEntity {
     @CollectionTable(name = "unlock_methods", joinColumns = @JoinColumn(name = "capsule_id"))
     @Column(nullable = false)
     //time is set true by default, others false
-    // todo zakomentoval jsem to, protoze s tim nejde spustit aplikace. Pred pushem vzdy zkontrolovat clean package run
     private Map<UnlockMethod, UnlockMethodState> unlockMethods = new HashMap<>();
     @Column(name = "unlock_time")
     private LocalDateTime unlockTime;

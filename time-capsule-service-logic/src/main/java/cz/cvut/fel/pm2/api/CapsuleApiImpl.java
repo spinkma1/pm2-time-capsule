@@ -5,7 +5,9 @@ import cz.cvut.fel.pm2.enums.UnlockMethod;
 import cz.cvut.fel.pm2.exceptions.InvalidBodyException;
 import cz.cvut.fel.pm2.exceptions.NotFoundException;
 import cz.cvut.fel.pm2.model.CapsuleDto;
+import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.CapsuleRepository;
+import cz.cvut.fel.pm2.repository.UserRepository;
 import cz.cvut.fel.pm2.service.CapsuleService;
 import cz.cvut.fel.pm2.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,8 @@ public class CapsuleApiImpl implements CapsuleApi {
     private final CapsuleRepository capsuleRepository;
     private final JwtUtil jwtUtil;
     private final UserService userService;
+    private final UserRepository userRepository;
+
 
     @Override
     public ResponseEntity<CapsuleDto> createCapsule(CapsuleDto capsuleDto, @RequestHeader("Authorization") String authHeader) throws NoSuchAlgorithmException {
@@ -50,6 +54,19 @@ public class CapsuleApiImpl implements CapsuleApi {
         }
 
     }
+
+    public ResponseEntity<List<CapsuleDto>> getUserContributorCapsules(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.substring(7);
+            String email = jwtUtil.extractUsername(token);
+            User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
+            List<CapsuleDto> capsules = capsuleService.findCapsulesWhereUserContributes(user.getId());
+            return ResponseEntity.ok(capsules);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @Override
     public ResponseEntity<List<CapsuleDto>> getCapsules(@RequestHeader("Authorization") String authHeader) {
             try {

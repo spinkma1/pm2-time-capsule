@@ -85,7 +85,7 @@ const refreshTokenApi = async (refreshToken) => {
 };
 
 // API functions
-export const ApiService = {
+export const  ApiService = {
   login: async (email, password) => {
     try {
       const response = await fetchWithConfig("/user/login", {
@@ -150,6 +150,7 @@ export const ApiService = {
       throw new Error("CAPSULE_CREATION_FAILED");
     }
   },
+
 
   lockCapsule: async (capsuleId) => {
     try {
@@ -231,6 +232,19 @@ export const ApiService = {
       throw error;
     }
   },
+
+      getContributorCapsules: async () => {
+        try {
+          return await fetchWithConfig("/capsules/contributor-capsules", {
+            method: "GET",
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+        } catch (error) {
+          throw new Error('Failed to fetch contributor capsules');
+        }
+      },
 
   loginWithGoogle: async (token) => {
     try {
