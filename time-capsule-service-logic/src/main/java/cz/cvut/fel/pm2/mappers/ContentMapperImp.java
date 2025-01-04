@@ -27,19 +27,19 @@ public class ContentMapperImp implements ContentMapper {
 
         if ( contentEntity.getDataType() != null ) {
             switch (contentEntity.getDataType()) {
-                case DataType.IMAGE:
+                case IMAGE:
                     dataType = "image";
                     break;
-                case DataType.VIDEO:
+                case VIDEO:
                     dataType = "video";
                     break;
-                case DataType.PLAIN_TEXT:
+                case PLAIN_TEXT:
                     dataType = "text";
                     break;
-                case DataType.AUDIO:
+                case AUDIO:
                     dataType = "audio";
                     break;
-                case DataType.PDF:
+                case PDF:
                     dataType = "pdf";
                     break;
             }

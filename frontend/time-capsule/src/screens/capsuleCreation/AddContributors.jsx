@@ -159,7 +159,7 @@ const AddContributor = ({ capsule, setSelectedCapsule }) => {
 
                             <InfoBox
                                 title="Správa přispěvatelů"
-                                description={`Přispěvatelé mohou přidávat obsah do kapsle až do jejího uzavření. ${capsule ? `Každý přispěvatel může přidat maximálně ${capsule.capsuleSize} souborů.` : ''} Lidé, kterým je přidělen přístup k vaší kapsi, musí být registrováni na této platformě.`}
+                                description={`Přispěvatelé mohou přidávat obsah do kapsle až do jejího uzavření. ${capsule ? `Každý přispěvatel může přidat maximálně ${capsule.capsuleSize} souborů.` : ''} Lidé, kterým je přidělen přístup k vaší kapsi, musí být registrováni na této platformě. Uživatelům, kteří nejou u nás registrovani, přijde email pro registraci. Následně je musíte pozvat znovu.`}
                             />
                         
 

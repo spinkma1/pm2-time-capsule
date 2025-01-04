@@ -153,8 +153,8 @@ const FileUpload = ({ capsule, setSelectedCapsule }) => {
                 // You can make an API call for the message or handle it as needed
             }
 
-            // Success feedback to the user (optional)
             console.log("All files uploaded successfully!");
+            navigate(`/capsuleDetail/${capsule.id}`);
         } catch (error) {
             console.error("Error uploading files:", error);
         }

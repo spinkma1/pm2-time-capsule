@@ -93,14 +93,14 @@ public class CapsuleMapperImp implements CapsuleMapper {
         String state = null;
 
         switch (capsuleEntity.getState()) {
-            case State.EDIT:
-                state = "editing";
+            case EDIT:
+                state = "EDIT";
                 break;
-            case State.WAIT:
-                state = "closed";
+            case WAIT:
+                state = "WAIT";
                 break;
-            case State.OPEN:
-                state = "opened";
+            case OPEN:
+                state = "OPEN";
                 break;
         }
 

@@ -24,6 +24,7 @@ const Dashboard = ({ user }) => {
     const [pendingOpen,setPendingOpen] = useState([]);
     const [contributorCapsules, setContributorCapsules] = useState([]);
     const [combinedCapsules, setCombinedCapsules] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
         totalCapsules: 0,
         pendingOpen: 0,
@@ -48,6 +49,7 @@ const Dashboard = ({ user }) => {
     // Fetch capsules and contributor capsules
     useEffect(() => {
         const fetchUserRole = async () => {
+            setLoading(true);
             try {
                 const response = await ApiService.getUserProfile();
                 setUserRole(response.role);
@@ -71,7 +73,10 @@ const Dashboard = ({ user }) => {
                 setCombinedCapsules([...ownedCapsules, ...contributorCapsules])
             } catch (error) {
                 console.error('Error fetching capsules:', error);
+            } finally {
+                setLoading(false);
             }
+
         };
 
         fetchUserRole();
@@ -222,7 +227,11 @@ const Dashboard = ({ user }) => {
 
                 {/* Capsules List */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredCapsules.length > 0 ? (
+                    {loading ? (
+                        <div className="flex justify-center items-center h-64">
+                            <div className="w-10 h-10 border-4 border-t-blue-900 border-gray-200 rounded-full animate-spin"></div>
+                        </div>
+                    ) : filteredCapsules.length > 0 ? (
                         filteredCapsules.map((capsule) => (
                             <div key={capsule.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
                                 <div className="relative">

@@ -120,13 +120,6 @@ const CapsuleDetail = ({  }) => {
                             Zpět na přehled
                         </button>
 
-        {/*                         TESTING BUTTON                         */}
-                        <button
-                            className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                            onClick={() => console.log(capsule) }>
-                            <Lock size={20} className="mr-2"/>
-                            AHOOOOOOJ
-                        </button>
 
                     </div>
                 </div>
@@ -151,7 +144,7 @@ const CapsuleDetail = ({  }) => {
                                 </div>
                             </div>
                         </div>
-                        {capsule.state === 'closed' ? ( //////////////////// NORMAL STATE
+                        {capsule.state === 'WAIT' ? ( //////////////////// NORMAL STATE
                             <div
                                 className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0"
                             >
@@ -166,7 +159,7 @@ const CapsuleDetail = ({  }) => {
 
                             </div>) : (<></>)}
 
-                        {capsule.state === 'opened' ? (
+                        {capsule.state === 'OPEN' ? (
                             <div className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0">
                                 <div className="flex items-center justify-center mb-2">
                                     <Unlock size={20} className="text-blue-900" />
@@ -178,7 +171,7 @@ const CapsuleDetail = ({  }) => {
                     </div>
 
                     {/* Progress bar */}
-                    {capsule.state === 'closed' ? (
+                    {capsule.state === 'WAIT' ? (
                         <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
                             <div
                                 className="bg-blue-900 rounded-full h-2"
@@ -189,9 +182,9 @@ const CapsuleDetail = ({  }) => {
 
 
                     {/* Action buttons */}
-                    {capsule.state === 'editing' ? (
+                    {capsule.state === 'EDIT' ? (
                         <div className="flex flex-col sm:flex-row sm:space-x-4 mb-6">
-                            {capsule.state === 'editing' && capsule.content.length < capsule.capsuleSize ? (
+                            {capsule.state === 'EDIT' && capsule.content.length < capsule.capsuleSize ? (
                                 <button
                                     className="flex items-center mb-4 sm:mb-0 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
                                     onClick={() => { navigate('/addFiles',{state: {selectedCapsule: capsule}}) }}>
@@ -216,7 +209,7 @@ const CapsuleDetail = ({  }) => {
                                 <Users size={20} className="mr-2" />
                                 Pozvat přispěvatele
                             </button>
-                            {capsule.state === 'closed' && (
+                            {capsule.state === 'WAIT' && (
                                 <button
                                     onClick={handleEarlyOpen}
                                     className="px-3 py-1 text-white bg-blue-900 rounded-lg hover:bg-blue-600"
@@ -229,7 +222,7 @@ const CapsuleDetail = ({  }) => {
                     )}
 
 
-                    {capsule.state === 'closed' ? (
+                    {capsule.state === 'WAIT' ? (
                         <div className="flex justify-center items-center h-64 bg-blue-50 rounded-lg">
                             <Lock size={100} className="text-gray-600" />
                         </div>
@@ -244,9 +237,10 @@ const CapsuleDetail = ({  }) => {
                                             {(item.dataType === 'image' || item.dataType === 'video') && (
                                                 <div className="relative h-48">
                                                     <img
-                                                        // src={item.thumbnail}
-                                                        alt={item.title}
+                                                        src={item.url}
+                                                        alt={item.name || "Obrázek"}
                                                         className="w-full h-full object-cover"
+                                                        onError={(e) => { e.target.src = "/placeholder.png"; }}
                                                     />
                                                     {item.dataType === 'video' && (
                                                         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
@@ -265,8 +259,13 @@ const CapsuleDetail = ({  }) => {
                                                     <h3 className="font-medium">{item.name}</h3>
                                                 </div>
                                                 <div className="flex items-center justify-between text-sm text-gray-600">
-                                                    {/*<span>Přidal(a) {item.addedBy}</span>*/}
-                                                    {/*<span>{new Date(item.addedDate).toLocaleDateString()}</span>*/}
+                                                    <a
+                                                        href={item.url} // URL ke stažení
+                                                        download={item.name} // Název souboru
+                                                        className="text-blue-900 hover:underline"
+                                                    >
+                                                        Stáhnout
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -285,7 +284,7 @@ const CapsuleDetail = ({  }) => {
                             <div key={contributor.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                 <div className="flex items-center">
                                     <div className="w-10 h-10 bg-blue-900 text-white rounded-full flex items-center justify-center mr-3">
-                                        {contributor.avatar}
+                                        {contributor.email.charAt(0).toUpperCase()}
                                     </div>
                                     <div>
                                         <div className="font-medium">{contributor.email}</div>

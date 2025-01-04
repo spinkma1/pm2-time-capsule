@@ -56,16 +56,15 @@ public class CapsuleService {
             List<User> users = new ArrayList<>();
             for (UserDto userDto : capsuleDto.users()) {
                 User user = userRepository.findByEmail(userDto.email())
-                        .orElseThrow(() -> {
-                            mailService.sendEmail(
-                                    owner.getEmail(),
-                                    "Subscription Successful",
-                                    "You have successfully subscribed to the capsule by : " + owner.getEmail() + "Please register to access the capsule. https://time-capsule-phi.vercel.app/"
-                            );
-                            return null;
-                        });
-
-                if (user != null) {
+                        .orElse(null);
+                if (user == null) {
+                    mailService.sendEmail(
+                            userDto.email(),
+                            "Subscription Successful",
+                            "You have successfully subscribed to the capsule by : " + owner.getEmail() + ". Please register to access the capsule. https://time-capsule-phi.vercel.app/"
+                    );
+                }
+                else{
                     users.add(user);
                     if (!user.getCapsules().contains(capsule)) {
                         user.getCapsules().add(capsule);
