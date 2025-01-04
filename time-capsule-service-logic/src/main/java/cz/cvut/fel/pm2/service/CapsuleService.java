@@ -278,7 +278,7 @@ public class CapsuleService {
             throw new InvalidBodyException("Capsule ID or user email cannot be empty");
         }
 
-        Capsule capsule = capsuleRepository.getCapsuleByName(capsuleId)
+        Capsule capsule = capsuleRepository.getCapsuleById(Long.parseLong(capsuleId))
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 
         User user = userRepository.findByEmail(userEmail)

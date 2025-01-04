@@ -186,12 +186,12 @@ const CapsuleDetail = ({  }) => {
                             {capsule.state === 'editing' && capsule.content.length < capsule.capsuleSize ? (
                                 <button
                                     className="flex items-center mb-4 sm:mb-0 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
-                                    onClick={() => { navigate('/addFiles') }}>
+                                    onClick={() => { navigate('/addFiles',{state: {selectedCapsule: capsule}}) }}>
                                     <Plus size={20} className="mr-2" />
                                     Přidat obsah
                                 </button>) : (<></>)}
                             <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                                onClick={() => navigate('/addContributors')}>
+                                    onClick={() => { navigate('/addContributors',{state: {selectedCapsule: capsule}}) }}>
                                 <Users size={20} className="mr-2" />
                                 Pozvat přispěvatele
                             </button>
@@ -204,8 +204,7 @@ const CapsuleDetail = ({  }) => {
                         <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-6">
                             <button
                                 className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                                onClick={() => navigate('/addContributors')}
-                            >
+                                onClick={() => { navigate('/addContributors',{state: {selectedCapsule: capsule}}) }}>
                                 <Users size={20} className="mr-2" />
                                 Pozvat přispěvatele
                             </button>
@@ -270,31 +269,31 @@ const CapsuleDetail = ({  }) => {
                     )}
                 </div>
 
-                {/* Contributors */}
-                {/*<div className="bg-white rounded-lg shadow-sm p-6">*/}
-                {/*    <h2 className="text-xl font-semibold mb-4">Přispěvatelé</h2>*/}
-                {/*    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">*/}
-                {/*        {capsule.contributors.map((contributor) => (*/}
-                {/*            <div key={contributor.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">*/}
-                {/*                <div className="flex items-center">*/}
-                {/*                    <div className="w-10 h-10 bg-blue-900 text-white rounded-full flex items-center justify-center mr-3">*/}
-                {/*                        {contributor.avatar}*/}
-                {/*                    </div>*/}
-                {/*                    <div>*/}
-                {/*                        <div className="font-medium">{contributor.email}</div>*/}
-                {/*                        {contributor.id === 1 && (*/}
-                {/*                            <div className="text-sm text-gray-600">Tvůrce kapsle</div>*/}
-                {/*                        )}*/}
-                {/*                    </div>*/}
-                {/*                </div>*/}
-                {/*                <button className="text-gray-400 hover:text-gray-600"*/}
-                {/*                    onClick={() => handleNavigateToFollower(contributor.id)} >*/}
-                {/*                    <ChevronRight size={16} />*/}
-                {/*                </button>*/}
-                {/*            </div>*/}
-                {/*        ))}*/}
-                {/*    </div>*/}
-                {/*</div>*/}
+                 {/*Contributors*/}
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                    <h2 className="text-xl font-semibold mb-4">Přispěvatelé</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {capsule.users.map((contributor) => (
+                            <div key={contributor.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div className="flex items-center">
+                                    <div className="w-10 h-10 bg-blue-900 text-white rounded-full flex items-center justify-center mr-3">
+                                        {contributor.avatar}
+                                    </div>
+                                    <div>
+                                        <div className="font-medium">{contributor.email}</div>
+                                        {contributor.id === 1 && (
+                                            <div className="text-sm text-gray-600">Tvůrce kapsle</div>
+                                        )}
+                                    </div>
+                                </div>
+                                <button className="text-gray-400 hover:text-gray-600"
+                                    onClick={() => handleNavigateToFollower(contributor.id)} >
+                                    <ChevronRight size={16} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </main >
             {/* Confirm Popup */}
             < ConfirmPopup

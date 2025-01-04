@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { File, Image, Video, FileText, Trash2, ArrowLeft, Upload } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
+import {ApiService as api} from "../../api/api.js";
 
 const FileUpload = ({ capsule, setSelectedCapsule }) => {
     const navigate = useNavigate();
@@ -9,6 +10,14 @@ const FileUpload = ({ capsule, setSelectedCapsule }) => {
     const [dragActive, setDragActive] = useState(false);
     const [message, setMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const location = useLocation();
+    const { selectedCapsule } = location.state || {};
+
+    useEffect(() => {
+        if (selectedCapsule) {
+            setSelectedCapsule(selectedCapsule);
+        }
+    }, [selectedCapsule, setSelectedCapsule]);
 
     // Allowed file types
     const allowedFileTypes = [
@@ -25,7 +34,7 @@ const FileUpload = ({ capsule, setSelectedCapsule }) => {
 
     // Validate maximum item count
     const isWithinMaxItemsLimit = (newFilesCount) => {
-        return capsule.items.length + files.length + newFilesCount <= capsule.maxItems;
+        return capsule.content.length + files.length + newFilesCount <= capsule.capsuleSize;
     };
 
     const handleDrag = (e) => {
@@ -44,7 +53,7 @@ const FileUpload = ({ capsule, setSelectedCapsule }) => {
         const invalidFiles = droppedFiles.filter((file) => !isFileTypeValid(file));
         
         if (!isWithinMaxItemsLimit(validFiles.length)) {
-            setErrorMessage(`Překročen maximální počet položek: ${capsule.maxItems}.`);
+            setErrorMessage(`Překročen maximální počet položek: ${capsule.capsuleSize}.`);
             return;
         }
 
@@ -63,7 +72,7 @@ const FileUpload = ({ capsule, setSelectedCapsule }) => {
         const invalidFiles = selectedFiles.filter((file) => !isFileTypeValid(file));
 
         if (!isWithinMaxItemsLimit(validFiles.length)) {
-            setErrorMessage(`Překročen maximální počet položek: ${capsule.maxItems}.`);
+            setErrorMessage(`Překročen maximální počet položek: ${capsule.capsuleSize}.`);
             return;
         }
 
@@ -95,6 +104,69 @@ const FileUpload = ({ capsule, setSelectedCapsule }) => {
         if (size < 1024) return `${size} B`;
         if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
         return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+    };
+
+    const handleContentSubmit = async () => {
+        if (files.length === 0 && !message) {
+            setErrorMessage("Musíte nahrát soubor");
+            return;
+        }
+
+        const fileToBase64 = (file) =>
+            new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]); // Get base64 content
+                reader.onerror = (error) => reject(error);
+                reader.readAsDataURL(file);
+            });
+
+        try {
+            for (const file of files) {
+                // Convert the file to Base64
+                const base64Data = await fileToBase64(file);
+
+                // Map the file type to DataType (ensure this function is implemented)
+                const dataType = mapToDataType(file.type);
+
+                // Construct the ContentDto object
+                const contentDto = {
+                    dataType,
+                    dateOfUpload: new Date().toISOString(),
+                    name: file.name,
+                    url: "", // Optional if files are stored in the database directly
+                    data: base64Data,
+                };
+
+                // Log the ContentDto to console
+                console.log("Uploading ContentDto:", contentDto);
+
+                // Make the API call to upload the content
+                const response = await api.uploadContentToCapsule(capsule.id, contentDto);
+
+                // Log the response
+                console.log("Response from server:", response);
+            }
+
+            // If a message is provided, handle it separately (optional)
+            if (message) {
+                console.log("Message to include:", message);
+                // You can make an API call for the message or handle it as needed
+            }
+
+            // Success feedback to the user (optional)
+            console.log("All files uploaded successfully!");
+        } catch (error) {
+            console.error("Error uploading files:", error);
+        }
+    };
+
+    const mapToDataType = (fileType) => {
+        if (fileType === "application/pdf") return "PDF";
+        if (fileType.startsWith("video/")) return "VIDEO";
+        if (fileType.startsWith("audio/")) return "AUDIO";
+        if (fileType.startsWith("image/")) return "IMAGE";
+        if (fileType.startsWith("text/plain")) return "PLAIN_TEXT";
+        return null; // Return null or handle unsupported types
     };
 
     const ContentUploadStep = () => (
@@ -188,13 +260,15 @@ const FileUpload = ({ capsule, setSelectedCapsule }) => {
                         <ContentUploadStep />
                         <div className="flex justify-end mt-6">
                             <button
-                                onClick={() => navigate("/capsuleDetail")}
+                                onClick={() => {
+                                    navigate(`/capsuleDetail/${capsule.id}`);
+                                }}
                                 className="px-6 py-2 mx-6 text-base text-center text-black bg-white rounded-lg border border-solid border-neutral-700 hover:bg-gray-200"
                             >
                                 Zpět
                             </button>
                             <button
-                                onClick={() => navigate("/capsuleDetail")}
+                                onClick={() => handleContentSubmit()}
                                 className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
                             >
                                 Pokračovat

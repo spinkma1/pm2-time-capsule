@@ -35,6 +35,7 @@ public class SecurityEndpoints {
             antMatcher(HttpMethod.GET, "/content/{id}"),
             antMatcher(HttpMethod.PUT, "/content/update/{id}"),
             antMatcher(HttpMethod.DELETE, "/content/delete/{id}"),
+            antMatcher(HttpMethod.PUT, "/capsules/{capsuleId}/addContributors/**"),
             antMatcher(HttpMethod.PUT,"/admin/**"),
             antMatcher(HttpMethod.GET,"/admin/**")
     );

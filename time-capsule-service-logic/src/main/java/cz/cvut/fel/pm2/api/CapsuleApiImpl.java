@@ -106,7 +106,7 @@ public class CapsuleApiImpl implements CapsuleApi {
     }
 
     @Override
-    public ResponseEntity<CapsuleDto> subscribeToCapsule(@RequestParam String capsuleId, @RequestParam String userEmail) {
+    public ResponseEntity<CapsuleDto> subscribeToCapsule(String capsuleId, String userEmail) {
         return ResponseEntity.ok(capsuleService.subscribeToCapsule(capsuleId, userEmail));
     }
 

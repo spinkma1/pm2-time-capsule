@@ -184,6 +184,38 @@ export const ApiService = {
     }
   },
 
+  subscribeToCapsule: async (capsuleId, userEmail) => {
+    try {
+      const response = await fetchWithConfig(`/capsules/${capsuleId}/addContributors?userEmail=${encodeURIComponent(userEmail)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      return response;
+    } catch (error) {
+      console.error('Failed to add contributor to capsule:', error);
+      throw error;
+    }
+  },
+
+  uploadContentToCapsule: async (capsuleId, contentDto) => {
+    try {
+      const response = await fetchWithConfig(`/content/upload/${capsuleId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contentDto),
+        credentials: 'include',
+      });
+      return response;
+    } catch (error) {
+      console.error('Failed to upload content:', error);
+      throw error;
+    }
+  },
 
   loginWithGoogle: async (token) => {
     try {

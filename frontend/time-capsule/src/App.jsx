@@ -52,7 +52,7 @@ const App = () => {
                         <Route path="/adminDashboard" element={<AdminDashboard />} />
                         <Route path="/admin/user/:userId" element={<AdminUserDetail />} />
                         <Route path="/admin/capsule/:capsuleId" element={<AdminCapsuleDetail />} />
-                        <Route path="/addContributors" element={<AddContributors capsule={selectedCapsule} />} />
+                        <Route path="/addContributors" element={<AddContributors capsule={selectedCapsule} setSelectedCapsule={setSelectedCapsule} />} />
                         <Route path="/user/:id" element={<User />} />
                         <Route path="/capsule/open/:id" element={<OpenCapsule />} />
                     </Routes>

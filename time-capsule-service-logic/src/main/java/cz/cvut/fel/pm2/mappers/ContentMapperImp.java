@@ -39,6 +39,9 @@ public class ContentMapperImp implements ContentMapper {
                 case DataType.AUDIO:
                     dataType = "audio";
                     break;
+                case DataType.PDF:
+                    dataType = "pdf";
+                    break;
             }
         }
         dateOfUpload = contentEntity.getDateOfUpload();
@@ -75,6 +78,9 @@ public class ContentMapperImp implements ContentMapper {
                     break;
                 case "audio":
                     content.setDataType(DataType.AUDIO);
+                    break;
+                case "pdf":
+                    content.setDataType(DataType.PDF);
                     break;
                 default:
                     throw new IllegalArgumentException("Unsupported data type: " + contentDto.dataType());
