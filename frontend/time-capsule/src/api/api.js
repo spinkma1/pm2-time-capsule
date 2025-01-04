@@ -150,6 +150,89 @@ export const  ApiService = {
       throw new Error("CAPSULE_CREATION_FAILED");
     }
   },
+
+
+  lockCapsule: async (capsuleId) => {
+    try {
+      const response = await fetchWithConfig(`/capsules/lock/${capsuleId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      return response;
+    } catch (error) {
+      console.error('Failed to lock capsule:', error);
+      throw error;
+    }
+  },
+
+  earlyOpenCapsule: async (capsuleId) => {
+    try {
+      const response = await fetchWithConfig(`/capsules/${capsuleId}/unlock-early`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      return response;
+    } catch (error) {
+      console.error('Failed to lock capsule:', error);
+      throw error;
+    }
+  },
+  getCapsuleById: async (capsuleId) => {
+    console.log("fetching capsule with id", capsuleId);
+    try {
+      const response = await fetchWithConfig(`/capsules/${capsuleId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      return response;
+    } catch (error) {
+      console.error('Failed to lock capsule:', error);
+      throw error;
+    }
+  },
+
+  subscribeToCapsule: async (capsuleId, userEmail) => {
+    try {
+      const response = await fetchWithConfig(`/capsules/${capsuleId}/addContributors?userEmail=${encodeURIComponent(userEmail)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      return response;
+    } catch (error) {
+      console.error('Failed to add contributor to capsule:', error);
+      throw error;
+    }
+  },
+
+  uploadContentToCapsule: async (capsuleId, contentDto) => {
+    try {
+      const response = await fetchWithConfig(`/content/upload/${capsuleId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contentDto),
+        credentials: 'include',
+      });
+      return response;
+    } catch (error) {
+      console.error('Failed to upload content:', error);
+      throw error;
+    }
+  },
+
       getContributorCapsules: async () => {
         try {
           return await fetchWithConfig("/capsules/contributor-capsules", {
@@ -162,6 +245,7 @@ export const  ApiService = {
           throw new Error('Failed to fetch contributor capsules');
         }
       },
+
   loginWithGoogle: async (token) => {
     try {
       const response = await fetchWithConfig("/user/login/sso", {

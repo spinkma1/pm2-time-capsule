@@ -110,12 +110,18 @@ public interface CapsuleApi {
     ResponseEntity<CapsuleDto> getCapsuleDetails(@PathVariable String capsuleId);
 
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping(value = "/{capsuleId}/subscribe/{userId}")
+    @PutMapping(value = "/{capsuleId}/addContributors")
     @ResponseBody
-    ResponseEntity<CapsuleDto> subscribeToCapsule(@PathVariable String capsuleId, @PathVariable String userId);
+    ResponseEntity<CapsuleDto> subscribeToCapsule(@PathVariable String capsuleId, @RequestParam String userEmail);
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{capsuleId}/unlock-early")
     @ResponseBody
     ResponseEntity<CapsuleDto> unlockCapsuleEarly(@PathVariable String capsuleId);
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/lock/{capsuleId}")
+    @ResponseBody
+    ResponseEntity<CapsuleDto> lockCapsule(@PathVariable String capsuleId);
+
 }

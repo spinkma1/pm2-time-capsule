@@ -1,5 +1,6 @@
 package cz.cvut.fel.pm2.service;
 
+import cz.cvut.fel.pm2.enums.DataType;
 import cz.cvut.fel.pm2.exceptions.NotFoundException;
 import cz.cvut.fel.pm2.mappers.ContentMapper;
 import cz.cvut.fel.pm2.model.ContentDto;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,14 +48,7 @@ public class ContentService {
     }
 
     public ContentDto updateContent(Long contentId, ContentDto contentDto) {
-        Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new NotFoundException("Content not found with id: " + contentId));
-
-        content.setDataType(contentDto.dataType());
-        content.setDateOfUpload(contentDto.dateOfUpload());
-        content.setData(contentDto.data());
-        content.setName(contentDto.name());
-        content.setUrl(contentDto.url());
+        Content content = updateContentDetails(contentId, contentDto);
 
         contentRepository.save(content);
 
@@ -66,4 +61,47 @@ public class ContentService {
 
         contentRepository.delete(content);
     }
+
+    public Content updateContentDetails(Long contentId, ContentDto contentDto) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new NotFoundException("Content not found with id: " + contentId));
+
+        if (contentDto.dataType() != null) {
+            switch (contentDto.dataType().toLowerCase()) {
+                case "image":
+                    content.setDataType(DataType.IMAGE);
+                    break;
+                case "video":
+                    content.setDataType(DataType.VIDEO);
+                    break;
+                case "text":
+                    content.setDataType(DataType.PLAIN_TEXT);
+                    break;
+                case "audio":
+                    content.setDataType(DataType.AUDIO);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unsupported data type: " + contentDto.dataType());
+            }
+        }
+
+        if (contentDto.dateOfUpload() != null) {
+            content.setDateOfUpload(contentDto.dateOfUpload());
+        }
+
+        if (contentDto.name() != null) {
+            content.setName(contentDto.name());
+        }
+
+        if (contentDto.url() != null) {
+            content.setUrl(contentDto.url());
+        }
+
+        if (contentDto.data() != null) {
+            content.setData(Arrays.copyOf(contentDto.data(), contentDto.data().length));
+        }
+
+        return content;
+    }
+
 }

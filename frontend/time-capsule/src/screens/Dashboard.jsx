@@ -253,7 +253,7 @@ const Dashboard = ({ user }) => {
                                             <>
                                                 <Clock size={16} className="mr-1" />
                                                 <span>
-  Otevření: {new Date(Date.UTC(capsule.unlockTime[0], capsule.unlockTime[1] - 1, capsule.unlockTime[2], capsule.unlockTime[3], capsule.unlockTime[4])).toLocaleDateString()}
+  Otevření: {new Date(capsule.unlockTime).toLocaleDateString()}
 </span>
 
                                             </>

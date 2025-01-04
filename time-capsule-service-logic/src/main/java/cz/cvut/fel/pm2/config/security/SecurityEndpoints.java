@@ -30,10 +30,12 @@ public class SecurityEndpoints {
     final RequestMatcher MEMBER_URLS = new OrRequestMatcher(
             antMatcher(HttpMethod.POST, "/capsules/register"),
             antMatcher(HttpMethod.POST, "/capsules/unregister"),
+            antMatcher(HttpMethod.PUT, "/capsules/lock/{id}"),
             antMatcher(HttpMethod.POST, "/content/upload/{id}"),
             antMatcher(HttpMethod.GET, "/content/{id}"),
             antMatcher(HttpMethod.PUT, "/content/update/{id}"),
             antMatcher(HttpMethod.DELETE, "/content/delete/{id}"),
+            antMatcher(HttpMethod.PUT, "/capsules/{capsuleId}/addContributors/**"),
             antMatcher(HttpMethod.PUT,"/admin/**"),
             antMatcher(HttpMethod.GET,"/admin/**")
     );

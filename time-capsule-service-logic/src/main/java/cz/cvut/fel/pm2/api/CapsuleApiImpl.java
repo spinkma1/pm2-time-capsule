@@ -123,19 +123,23 @@ public class CapsuleApiImpl implements CapsuleApi {
     }
 
     @Override
-    public ResponseEntity<CapsuleDto> subscribeToCapsule(@RequestParam String capsuleId, @RequestParam String userEmail) {
+    public ResponseEntity<CapsuleDto> subscribeToCapsule(String capsuleId, String userEmail) {
         return ResponseEntity.ok(capsuleService.subscribeToCapsule(capsuleId, userEmail));
     }
 
     @Override
-    public ResponseEntity<CapsuleDto> getCapsuleDetails(@RequestParam String capsuleId) {
+    public ResponseEntity<CapsuleDto> getCapsuleDetails(String capsuleId) {
         return ResponseEntity.ok(capsuleService.getCapsuleDetails(capsuleId));
     }
 
     @Override
-    public ResponseEntity<CapsuleDto> unlockCapsuleEarly(@RequestParam String capsuleId) {
+    public ResponseEntity<CapsuleDto> unlockCapsuleEarly(String capsuleId) {
         return ResponseEntity.ok(capsuleService.unlockCapsuleEarly(capsuleId));
     }
 
+    @Override
+    public ResponseEntity<CapsuleDto> lockCapsule(String capsuleId) {
+        return ResponseEntity.ok(capsuleService.lockCapsule(capsuleId));
+    }
 
 }

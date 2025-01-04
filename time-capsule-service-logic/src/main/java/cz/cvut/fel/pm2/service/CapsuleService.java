@@ -11,7 +11,6 @@ import cz.cvut.fel.pm2.enums.UnlockMethod;
 import cz.cvut.fel.pm2.persistence.User;
 import cz.cvut.fel.pm2.repository.CapsuleRepository;
 import cz.cvut.fel.pm2.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -279,7 +278,7 @@ public class CapsuleService {
             throw new InvalidBodyException("Capsule ID or user email cannot be empty");
         }
 
-        Capsule capsule = capsuleRepository.getCapsuleByName(capsuleId)
+        Capsule capsule = capsuleRepository.getCapsuleById(Long.parseLong(capsuleId))
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 
         User user = userRepository.findByEmail(userEmail)
@@ -401,17 +400,18 @@ public class CapsuleService {
             throw new InvalidBodyException("Capsule ID is required");
         }
 
-        Capsule capsule = capsuleRepository.getCapsuleByName(capsuleId)
+        Capsule capsule = capsuleRepository.getCapsuleById(Long.parseLong(capsuleId))
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 
         return capsuleMapper.toDto(capsule);
     }
 
     public CapsuleDto unlockCapsuleEarly(String capsuleId) {
-        Capsule capsule = capsuleRepository.getCapsuleByName(capsuleId)
+        Capsule capsule = capsuleRepository.getCapsuleById(Long.parseLong(capsuleId))
                 .orElseThrow(() -> new NotFoundException("Capsule not found"));
 
         capsule.setUnlockTime(LocalDateTime.now());
+        capsule.setState(State.OPEN);
         capsuleRepository.save(capsule);
 
         capsule.getUsers().forEach(user -> {
@@ -421,6 +421,27 @@ public class CapsuleService {
                     "The time capsule '" + capsule.getName() + "' has been unlocked early!"
             );
         });
+
+        return capsuleMapper.toDto(capsule);
+    }
+
+    public CapsuleDto lockCapsule(String capsuleId) {
+        if (capsuleId == null || capsuleId.isEmpty()) {
+            throw new InvalidBodyException("Capsule ID is required");
+        }
+
+        Capsule capsule = capsuleRepository.getCapsuleById(Long.parseLong(capsuleId))
+                .orElseThrow(() -> new NotFoundException("Capsule not found"));
+
+        capsule.setState(State.WAIT);
+
+        capsuleRepository.save(capsule);
+
+        mailService.sendEmail(
+                capsule.getOwner().getEmail(),
+                "Capsule Locked",
+                "Your capsule '" + capsule.getName() + "' has been locked and is ready to be opened based on its unlock methods."
+        );
 
         return capsuleMapper.toDto(capsule);
     }

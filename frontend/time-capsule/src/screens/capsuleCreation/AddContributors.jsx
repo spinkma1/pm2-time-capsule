@@ -1,27 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import Contributor from "../../components/capsulecreation/Contributor";
 import InfoBox from "../../components/capsulecreation/InfoBox";
+import {ApiService as api} from "../../api/api.js";
 import DropdownSelect from "../../components/capsulecreation/DropdownSelect";
 
-const AddContributor = ({ capsule }) => {
+const AddContributor = ({ capsule, setSelectedCapsule }) => {
     const navigate = useNavigate();
-    console.log(capsule);
     const [emailForm, setEmailForm] = useState({ email: "" });
     const [emailErrors, setEmailErrors] = useState({});
     const [formData, setFormData] = useState({
         contributors: [],
     });
+    const location = useLocation();
+    const { selectedCapsule } = location.state || {};
 
     useEffect(() => {
-        if (capsule?.contributors) {
+        if (selectedCapsule) {
+            setSelectedCapsule(selectedCapsule);
+        }
+        if (capsule?.users) {
             setFormData({
-                contributors: JSON.parse(JSON.stringify(capsule.contributors)),
+                contributors: JSON.parse(JSON.stringify(capsule.users)),
             });
         }
-    }, [capsule]);
-
+    }, [capsule, selectedCapsule, setSelectedCapsule]);
 
     const handleDelete = (id) => {
         const updatedContributors = formData.contributors.filter(contributor => contributor.id !== id);
@@ -52,7 +56,7 @@ const AddContributor = ({ capsule }) => {
             };
             const updatedCapsule = {
                 ...capsule,
-                contributors: [...capsule.contributors, newContributor],
+                contributors: [...capsule.users, newContributor],
             };
             setFormData((prev) => ({
                 ...prev,
@@ -63,11 +67,33 @@ const AddContributor = ({ capsule }) => {
         }
     };
 
-    const handleSubmit = () => {
-        const updatedCapsule = {
-            ...capsule,
-            contributors: formData.contributors,
-        };
+    const handleSubmit = async () => {
+
+        const updatedContributors = formData.contributors;
+        console.log(updatedContributors)
+        try {
+
+            for (const contributor of updatedContributors) {
+                const alreadyAdded = capsule.users.some(user => user.email === contributor.email);
+                if (!alreadyAdded) {
+                    try {
+                        const response = await api.subscribeToCapsule(capsule.id, contributor.email);
+                        console.log('Contributor added:', response.data);
+                    } catch (error) {
+                        console.error('Error adding contributor:', error);
+                    }
+                } else {
+                    console.log(`Contributor with email ${contributor.email} is already in the capsule.`);
+                }
+
+            }
+
+
+            navigate(`/capsuleDetail/${capsule.id}`);
+        } catch (error) {
+            console.error('Error adding contributors:', error);
+            alert('An error occurred while adding contributors. Please try again.');
+        }
     }
 
     return (
@@ -76,7 +102,9 @@ const AddContributor = ({ capsule }) => {
             <header className="bg-white shadow-sm">
                 <div className="container mx-auto px-4 py-4">
                     <button
-                        onClick={() => navigate('/capsuleDetail')}
+                        onClick={() => {
+                            navigate(`/capsuleDetail/${capsule.id}`);
+                        }}
                         className="flex items-center text-gray-600 hover:text-blue-900"
                     >
                         <ArrowLeft size={20} className="mr-2" />
@@ -131,7 +159,7 @@ const AddContributor = ({ capsule }) => {
 
                             <InfoBox
                                 title="Správa přispěvatelů"
-                                description={`Přispěvatelé mohou přidávat obsah do kapsle až do jejího uzavření. Každý přispěvatel může přidat maximálně ${capsule.maxItems} souborů. Lidé, kterým je přidělen přístup k vaší kapsi, musí být registrováni na této platformě.`}
+                                description={`Přispěvatelé mohou přidávat obsah do kapsle až do jejího uzavření. ${capsule ? `Každý přispěvatel může přidat maximálně ${capsule.capsuleSize} souborů.` : ''} Lidé, kterým je přidělen přístup k vaší kapsi, musí být registrováni na této platformě.`}
                             />
                         
 
