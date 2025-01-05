@@ -9,7 +9,7 @@ import {
     Video,
     Music,
     Unlock,
-    ChevronRight
+    ChevronRight, X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ConfirmPopup from './ConfirmPopup';
@@ -100,6 +100,59 @@ const CapsuleDetail = ({  }) => {
             }
         } catch (error) {
             console.error('Error while locking the capsule:', error);
+        }
+    };
+
+    const downloadBase64File = (base64Data, fileName, dataType) => {
+        // Determine the MIME type based on the data type
+        let mimeType = '';
+
+        if (dataType === 'pdf') {
+            mimeType = 'application/pdf';
+        } else if (dataType === 'image') {
+            mimeType = 'image/jpg'; // You can modify this based on your image format (e.g., png, jpg)
+        } else if (dataType === 'audio') {
+            mimeType = 'audio/mp3'; // Modify for your audio format (e.g., mp3, wav)
+        } else if (dataType === 'video') {
+            mimeType = 'video/mp4'; // Modify for your video format (e.g., mp4, webm, ogg)
+        } else if (dataType === 'text') {
+            mimeType = 'text/plain';
+        }
+
+        // Decode the base64 string
+        const byteCharacters = atob(base64Data); // Decode base64 string
+        const byteArrays = [];
+
+        // Convert the base64 string to byte arrays
+        for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+            const slice = byteCharacters.slice(offset, offset + 1024);
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+            byteArrays.push(new Uint8Array(byteNumbers));
+        }
+
+        // Create a Blob from the byte arrays
+        const blob = new Blob(byteArrays, { type: mimeType });
+
+        // Create a temporary link and trigger the download
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob); // Create a URL for the Blob
+        link.download = fileName; // Set the filename
+        link.click(); // Trigger the download
+    };
+
+    const getThumbnail = (item) => {
+        switch (item.dataType) {
+            case 'image':
+                return item.thumbnail ? item.thumbnail : '/ImagePlaceholder.jpg';
+            case 'video':
+                return item.thumbnail ? item.thumbnail : '/VideoPlaceholder.png';
+            case 'pdf':
+                return item.thumbnail ? item.thumbnail : '/PDFPlaceholder.png';
+            default:
+                return '/placeholder.png';
         }
     };
 
@@ -240,38 +293,52 @@ const CapsuleDetail = ({  }) => {
                             <div className="mb-8">
                                 <h2 className="text-xl font-semibold mb-4">Obsah kapsle</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {capsule.content.map((item) => (
-                                        <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-                                            {(item.dataType === 'image' || item.dataType === 'video') && (
-                                                <div className="relative h-48">
-                                                    <img
-                                                        // src={item.thumbnail}
-                                                        alt={item.title}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                    {item.dataType === 'video' && (
-                                                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+                                    {capsule.content.map((item) => {
+                                        const thumbnailSrc = getThumbnail(item);
+                                        return (
+                                            <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+                                                {(item.dataType === 'image' || item.dataType === 'video'|| item.dataType === 'pdf') && (
+                                                    <div className="relative h-48">
+                                                        <img
+                                                            src={thumbnailSrc}
+                                                            alt={item.name}
+                                                            className="w-full h-48 object-cover"
+                                                        />
+                                                        {item.dataType === 'video' && (
+                                                            <div
+                                                                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
                                                             <Video size={40} className="text-white" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                                {(item.dataType === 'text' || item.dataType === 'audio') && (
+                                                    <div className="h-48 bg-gray-100 flex items-center justify-center">
+                                                        {getItemIcon(item.dataType)}
+                                                    </div>
+                                                )}
+                                                <div className="p-4">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <h3 className="font-medium">{item.name}</h3>
+                                                        <div
+                                                            className="flex justify-between items-center text-sm text-gray-600">
+                                                            <button
+                                                                onClick={() => downloadBase64File(item.data, item.name,item.dataType)}
+                                                                className="text-blue-600 hover:underline"
+                                                            >
+                                                                Stáhnout
+                                                            </button>
                                                         </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                            {(item.dataType === 'text' || item.dataType === 'audio') && (
-                                                <div className="h-48 bg-gray-100 flex items-center justify-center">
-                                                    {getItemIcon(item.dataType)}
-                                                </div>
-                                            )}
-                                            <div className="p-4">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <h3 className="font-medium">{item.name}</h3>
-                                                </div>
-                                                <div className="flex items-center justify-between text-sm text-gray-600">
-                                                    {/*<span>Přidal(a) {item.addedBy}</span>*/}
-                                                    {/*<span>{new Date(item.addedDate).toLocaleDateString()}</span>*/}
+                                                    </div>
+                                                    <div
+                                                        className="flex items-center justify-between text-sm text-gray-600">
+                                                        {/*<span>Přidal(a) {item.addedBy}</span>*/}
+                                                        {/*<span>{new Date(item.addedDate).toLocaleDateString()}</span>*/}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </>
