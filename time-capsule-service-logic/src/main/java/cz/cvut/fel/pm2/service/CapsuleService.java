@@ -424,6 +424,25 @@ public class CapsuleService {
         return capsuleMapper.toDto(capsule);
     }
 
+    public CapsuleDto unlockCapsule(String capsuleId) {
+        Capsule capsule = capsuleRepository.getCapsuleById(Long.parseLong(capsuleId))
+                .orElseThrow(() -> new NotFoundException("Capsule not found"));
+
+        capsule.setUnlockTime(LocalDateTime.now());
+        capsule.setState(State.OPEN);
+        capsuleRepository.save(capsule);
+
+        capsule.getUsers().forEach(user -> {
+            mailService.sendEmail(
+                    user.getEmail(),
+                    "Capsule Unlocked",
+                    "The time capsule '" + capsule.getName() + "' has been unlocked!"
+            );
+        });
+
+        return capsuleMapper.toDto(capsule);
+    }
+
     public CapsuleDto lockCapsule(String capsuleId) {
         if (capsuleId == null || capsuleId.isEmpty()) {
             throw new InvalidBodyException("Capsule ID is required");

@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {
     Lock,
     ArrowLeft,
-    Calendar,
     Users,
     Plus,
     Image,
@@ -10,7 +9,7 @@ import {
     Video,
     Music,
     Unlock,
-    ChevronRight
+    ChevronRight, X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ConfirmPopup from './ConfirmPopup';
@@ -21,7 +20,6 @@ import {ApiService as api} from "../../api/api.js";
 const CapsuleDetail = ({  }) => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [showContributors, setShowContributors] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [capsule, setCapsule] = useState(null);
@@ -105,6 +103,59 @@ const CapsuleDetail = ({  }) => {
         }
     };
 
+    const downloadBase64File = (base64Data, fileName, dataType) => {
+        // Determine the MIME type based on the data type
+        let mimeType = '';
+
+        if (dataType === 'pdf') {
+            mimeType = 'application/pdf';
+        } else if (dataType === 'image') {
+            mimeType = 'image/jpg'; // You can modify this based on your image format (e.g., png, jpg)
+        } else if (dataType === 'audio') {
+            mimeType = 'audio/mp3'; // Modify for your audio format (e.g., mp3, wav)
+        } else if (dataType === 'video') {
+            mimeType = 'video/mp4'; // Modify for your video format (e.g., mp4, webm, ogg)
+        } else if (dataType === 'text') {
+            mimeType = 'text/plain';
+        }
+
+        // Decode the base64 string
+        const byteCharacters = atob(base64Data); // Decode base64 string
+        const byteArrays = [];
+
+        // Convert the base64 string to byte arrays
+        for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+            const slice = byteCharacters.slice(offset, offset + 1024);
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+            byteArrays.push(new Uint8Array(byteNumbers));
+        }
+
+        // Create a Blob from the byte arrays
+        const blob = new Blob(byteArrays, { type: mimeType });
+
+        // Create a temporary link and trigger the download
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob); // Create a URL for the Blob
+        link.download = fileName; // Set the filename
+        link.click(); // Trigger the download
+    };
+
+    const getThumbnail = (item) => {
+        switch (item.dataType) {
+            case 'image':
+                return item.thumbnail ? item.thumbnail : '/ImagePlaceholder.jpg';
+            case 'video':
+                return item.thumbnail ? item.thumbnail : '/VideoPlaceholder.png';
+            case 'pdf':
+                return item.thumbnail ? item.thumbnail : '/PDFPlaceholder.png';
+            default:
+                return '/placeholder.png';
+        }
+    };
+
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -119,7 +170,6 @@ const CapsuleDetail = ({  }) => {
                             <ArrowLeft size={20} className="mr-2"/>
                             Zpět na přehled
                         </button>
-
 
                     </div>
                 </div>
@@ -144,25 +194,38 @@ const CapsuleDetail = ({  }) => {
                                 </div>
                             </div>
                         </div>
-                        {capsule.state === 'WAIT' ? ( //////////////////// NORMAL STATE
+
+                        {capsule.state === 'closed' ? (
+
                             <div
                                 className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0"
                             >
                                 <div className="flex items-center justify-center mb-2">
-                                    <Lock size={20} className="text-blue-900" />
+                                    {getTimeRemaining(capsule.unlockTime) === "Otevřít" ? (
+                                        <button
+                                            onClick={() => navigate(`/capsule/open/${capsule.id}`, { state: { capsule } })}
+                                            className="text-blue-900 hover:text-blue-700 flex items-center"
+                                        >
+                                            <Unlock size={20} className="text-blue-900 mr-2" />
+                                            Otevřít
+                                        </button>
+                                    ) : (
+                                        <div className="flex items-center">
+                                            <Lock size={20} className="text-blue-900 mr-2" />
+                                            <span className="text-blue-900">{`Zbývá ${getTimeRemaining(capsule.unlockTime)}`}</span>
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="text-sm font-medium text-blue-900 mb-1">
-                                    {getTimeRemaining(capsule.unlockTime) === "Otevřít"
-                                        ? "Otevřít"
-                                        : `Zbývá ${getTimeRemaining(capsule.unlockTime)}`}
-                                </div>
+                            </div>
+                        ) : (
+                            <></>
+                        )}
 
-                            </div>) : (<></>)}
 
                         {capsule.state === 'OPEN' ? (
                             <div className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0">
                                 <div className="flex items-center justify-center mb-2">
-                                    <Unlock size={20} className="text-blue-900" />
+                                    <Unlock size={20} className="text-blue-900"/>
                                 </div>
                                 <div className="text-sm font-medium text-blue-900 mb-1">
                                     Otevřeno
@@ -209,7 +272,9 @@ const CapsuleDetail = ({  }) => {
                                 <Users size={20} className="mr-2" />
                                 Pozvat přispěvatele
                             </button>
-                            {capsule.state === 'WAIT' && (
+
+                            {capsule.state === 'closed' && getTimeRemaining(capsule.unlockTime) !== "Otevřít" && (
+
                                 <button
                                     onClick={handleEarlyOpen}
                                     className="px-3 py-1 text-white bg-blue-900 rounded-lg hover:bg-blue-600"
@@ -232,44 +297,57 @@ const CapsuleDetail = ({  }) => {
                             <div className="mb-8">
                                 <h2 className="text-xl font-semibold mb-4">Obsah kapsle</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {capsule.content.map((item) => (
-                                        <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-                                            {(item.dataType === 'image' || item.dataType === 'video') && (
-                                                <div className="relative h-48">
-                                                    <img
-                                                        src={item.url}
-                                                        alt={item.name || "Obrázek"}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => { e.target.src = "/placeholder.png"; }}
-                                                    />
-                                                    {item.dataType === 'video' && (
-                                                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+
+                                    {capsule.content.map((item) => {
+                                        const thumbnailSrc = getThumbnail(item);
+                                        return (
+                                            <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+                                                {(item.dataType === 'image' || item.dataType === 'video'|| item.dataType === 'pdf') && (
+                                                    <div className="relative h-48">
+                                                        <img
+                                                            src={thumbnailSrc}
+                                                            alt={item.name}
+                                                            className="w-full h-48 object-cover"
+                                                        />
+                                                        {item.dataType === 'video' && (
+                                                            <div
+                                                                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+
+
                                                             <Video size={40} className="text-white" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                                {(item.dataType === 'text' || item.dataType === 'audio') && (
+                                                    <div className="h-48 bg-gray-100 flex items-center justify-center">
+                                                        {getItemIcon(item.dataType)}
+                                                    </div>
+                                                )}
+                                                <div className="p-4">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <h3 className="font-medium">{item.name}</h3>
+                                                        <div
+                                                            className="flex justify-between items-center text-sm text-gray-600">
+                                                            <button
+                                                                onClick={() => downloadBase64File(item.data, item.name,item.dataType)}
+                                                                className="text-blue-600 hover:underline"
+                                                            >
+                                                                Stáhnout
+                                                            </button>
                                                         </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                            {(item.dataType === 'text' || item.dataType === 'audio') && (
-                                                <div className="h-48 bg-gray-100 flex items-center justify-center">
-                                                    {getItemIcon(item.dataType)}
-                                                </div>
-                                            )}
-                                            <div className="p-4">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <h3 className="font-medium">{item.name}</h3>
-                                                </div>
-                                                <div className="flex items-center justify-between text-sm text-gray-600">
-                                                    <a
-                                                        href={item.url} // URL ke stažení
-                                                        download={item.name} // Název souboru
-                                                        className="text-blue-900 hover:underline"
-                                                    >
-                                                        Stáhnout
-                                                    </a>
+
+                                                    </div>
+                                                    <div
+                                                        className="flex items-center justify-between text-sm text-gray-600">
+                                                        {/*<span>Přidal(a) {item.addedBy}</span>*/}
+                                                        {/*<span>{new Date(item.addedDate).toLocaleDateString()}</span>*/}
+                                                    </div>
+
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </>

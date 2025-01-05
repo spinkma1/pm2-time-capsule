@@ -122,39 +122,34 @@ const FileUpload = ({ capsule, setSelectedCapsule }) => {
 
         try {
             for (const file of files) {
-                // Convert the file to Base64
                 const base64Data = await fileToBase64(file);
 
-                // Map the file type to DataType (ensure this function is implemented)
                 const dataType = mapToDataType(file.type);
 
-                // Construct the ContentDto object
                 const contentDto = {
                     dataType,
                     dateOfUpload: new Date().toISOString(),
                     name: file.name,
-                    url: "", // Optional if files are stored in the database directly
+                    url: "",
                     data: base64Data,
                 };
 
-                // Log the ContentDto to console
                 console.log("Uploading ContentDto:", contentDto);
 
-                // Make the API call to upload the content
                 const response = await api.uploadContentToCapsule(capsule.id, contentDto);
 
-                // Log the response
                 console.log("Response from server:", response);
             }
 
-            // If a message is provided, handle it separately (optional)
             if (message) {
                 console.log("Message to include:", message);
-                // You can make an API call for the message or handle it as needed
+
             }
 
             console.log("All files uploaded successfully!");
-            navigate(`/capsuleDetail/${capsule.id}`);
+
+            navigate(`/capsuleDetail/${capsule.id}`)
+
         } catch (error) {
             console.error("Error uploading files:", error);
         }
@@ -166,7 +161,7 @@ const FileUpload = ({ capsule, setSelectedCapsule }) => {
         if (fileType.startsWith("audio/")) return "AUDIO";
         if (fileType.startsWith("image/")) return "IMAGE";
         if (fileType.startsWith("text/plain")) return "PLAIN_TEXT";
-        return null; // Return null or handle unsupported types
+        return null;
     };
 
     const ContentUploadStep = () => (

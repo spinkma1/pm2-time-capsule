@@ -124,4 +124,9 @@ public interface CapsuleApi {
     @ResponseBody
     ResponseEntity<CapsuleDto> lockCapsule(@PathVariable String capsuleId);
 
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/unlock/{capsuleId}")
+    @ResponseBody
+    ResponseEntity<CapsuleDto> unlockCapsule(@PathVariable String capsuleId);
+
 }

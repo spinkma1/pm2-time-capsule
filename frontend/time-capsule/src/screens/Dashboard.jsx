@@ -88,7 +88,7 @@ const Dashboard = ({ user }) => {
         const combinedCapsules = [...capsules, ...contributorCapsules];
         console.log("Combined Capsules:", combinedCapsules);
 
-        const pendingOpen = combinedCapsules.filter(capsule => capsule.state === 'WAIT').length;
+        const pendingOpen = combinedCapsules.filter(capsule => capsule.state === 'closed').length;
         const sharedWithMe = contributorCapsules.length;
 
         setStats({
@@ -243,11 +243,11 @@ const Dashboard = ({ user }) => {
                                     <div className="absolute top-2 right-2 bg-blue-900 rounded-full p-2">
                                         {(() => {
                                             switch (capsule.state) {
-                                                case 'OPEN':
+                                                case 'opened':
                                                     return <Unlock size={16} color='white' />;
-                                                case 'WAIT':
+                                                case 'closed':
                                                     return <Lock size={16}  color='white'/>;
-                                                case 'EDIT':
+                                                case 'editing':
                                                     return <Pencil size={16} color='white'/>;
                                                 default:
                                                     return <Ban size={16} color='white'/>;
