@@ -6,7 +6,7 @@ services:
   postgres:
     image: postgres:latest
     ports:
-      - '45000:5432'
+      - '8080:8080'
     volumes:
       - ./database:/var/lib/postgresql/data
     environment:

@@ -147,7 +147,9 @@ const FileUpload = ({ capsule, setSelectedCapsule }) => {
             }
 
             console.log("All files uploaded successfully!");
+
             navigate(`/capsuleDetail/${capsule.id}`)
+
         } catch (error) {
             console.error("Error uploading files:", error);
         }

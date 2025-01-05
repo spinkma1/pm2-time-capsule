@@ -194,7 +194,9 @@ const CapsuleDetail = ({  }) => {
                                 </div>
                             </div>
                         </div>
+
                         {capsule.state === 'closed' ? (
+
                             <div
                                 className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0"
                             >
@@ -220,7 +222,7 @@ const CapsuleDetail = ({  }) => {
                         )}
 
 
-                        {capsule.state === 'opened' ? (
+                        {capsule.state === 'OPEN' ? (
                             <div className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0">
                                 <div className="flex items-center justify-center mb-2">
                                     <Unlock size={20} className="text-blue-900"/>
@@ -232,7 +234,7 @@ const CapsuleDetail = ({  }) => {
                     </div>
 
                     {/* Progress bar */}
-                    {capsule.state === 'closed' ? (
+                    {capsule.state === 'WAIT' ? (
                         <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
                             <div
                                 className="bg-blue-900 rounded-full h-2"
@@ -243,9 +245,9 @@ const CapsuleDetail = ({  }) => {
 
 
                     {/* Action buttons */}
-                    {capsule.state === 'editing' ? (
+                    {capsule.state === 'EDIT' ? (
                         <div className="flex flex-col sm:flex-row sm:space-x-4 mb-6">
-                            {capsule.state === 'editing' && capsule.content.length < capsule.capsuleSize ? (
+                            {capsule.state === 'EDIT' && capsule.content.length < capsule.capsuleSize ? (
                                 <button
                                     className="flex items-center mb-4 sm:mb-0 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
                                     onClick={() => { navigate('/addFiles',{state: {selectedCapsule: capsule}}) }}>
@@ -270,7 +272,9 @@ const CapsuleDetail = ({  }) => {
                                 <Users size={20} className="mr-2" />
                                 Pozvat přispěvatele
                             </button>
+
                             {capsule.state === 'closed' && getTimeRemaining(capsule.unlockTime) !== "Otevřít" && (
+
                                 <button
                                     onClick={handleEarlyOpen}
                                     className="px-3 py-1 text-white bg-blue-900 rounded-lg hover:bg-blue-600"
@@ -283,7 +287,7 @@ const CapsuleDetail = ({  }) => {
                     )}
 
 
-                    {capsule.state === 'closed' ? (
+                    {capsule.state === 'WAIT' ? (
                         <div className="flex justify-center items-center h-64 bg-blue-50 rounded-lg">
                             <Lock size={100} className="text-gray-600" />
                         </div>
@@ -293,6 +297,7 @@ const CapsuleDetail = ({  }) => {
                             <div className="mb-8">
                                 <h2 className="text-xl font-semibold mb-4">Obsah kapsle</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
                                     {capsule.content.map((item) => {
                                         const thumbnailSrc = getThumbnail(item);
                                         return (
@@ -307,6 +312,8 @@ const CapsuleDetail = ({  }) => {
                                                         {item.dataType === 'video' && (
                                                             <div
                                                                 className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+
+
                                                             <Video size={40} className="text-white" />
                                                             </div>
                                                         )}
@@ -329,12 +336,14 @@ const CapsuleDetail = ({  }) => {
                                                                 Stáhnout
                                                             </button>
                                                         </div>
+
                                                     </div>
                                                     <div
                                                         className="flex items-center justify-between text-sm text-gray-600">
                                                         {/*<span>Přidal(a) {item.addedBy}</span>*/}
                                                         {/*<span>{new Date(item.addedDate).toLocaleDateString()}</span>*/}
                                                     </div>
+
                                                 </div>
                                             </div>
                                         );
@@ -353,7 +362,7 @@ const CapsuleDetail = ({  }) => {
                             <div key={contributor.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                 <div className="flex items-center">
                                     <div className="w-10 h-10 bg-blue-900 text-white rounded-full flex items-center justify-center mr-3">
-                                        {contributor.avatar}
+                                        {contributor.email.charAt(0).toUpperCase()}
                                     </div>
                                     <div>
                                         <div className="font-medium">{contributor.email}</div>

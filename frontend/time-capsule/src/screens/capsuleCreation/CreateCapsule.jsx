@@ -7,7 +7,7 @@ import {
     MapPin,
     QrCode
 } from 'lucide-react';
-import { GoogleMap, Marker } from '@react-google-maps/api';
+import { GoogleMap, MarkerF } from '@react-google-maps/api';
 import Contributor from '../../components/capsulecreation/Contributor';
 import InfoBox from '../../components/capsulecreation/InfoBox';
 import DropdownSelect from '../../components/capsulecreation/DropdownSelect';
@@ -87,7 +87,8 @@ const CreateCapsule = () => {
                 }
 
                 const capsuleData = {
-                    userId: null,
+                    id:null,
+                    owner: null,
                     name: formData.title,
                     description: formData.description,
                     capsuleSize: formData.contributorsLimit,
@@ -109,7 +110,8 @@ const CreateCapsule = () => {
                         passwordComplete: false,
                     },
                     state: "EDIT",
-                    teamwork: formData.isPrivate
+                    teamwork: formData.isPrivate,
+                    content:null,
                 };
                 console.log("Capsule data:", capsuleData)
                 try {
@@ -400,7 +402,12 @@ const CreateCapsule = () => {
                                             onClick={handleMapClick}
                                             onLoad={handleMapLoad}
                                         >
-                                            <Marker position={formData.geolocation} />
+                                            <MarkerF
+                                                position={formData.geolocation}
+                                                icon="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" // Použití modré ikony
+                                            />
+
+
                                         </GoogleMap>
                                     </div>
                                 )}
