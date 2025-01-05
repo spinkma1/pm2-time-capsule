@@ -5,7 +5,8 @@ const API_CONFIG = {
         : 'http://actual-production-url.com/api',  // Produkční URL
 
      */
-    BASE_URL: 'https://localhost:8080',
+    BASE_URL: 'https://cors-anywhere.herokuapp.com/http://130.61.191.237:8080/',
+    // BASE_URL: 'https://localhost:8080',
 
     ENDPOINTS: {
         HEALTH: '/health',
