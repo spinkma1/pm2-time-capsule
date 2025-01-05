@@ -70,8 +70,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // e
-                .requiresChannel(channel ->
-                        channel.anyRequest().requiresSecure()) // Redirect to HTTPS
+//                .requiresChannel(channel ->
+//                        channel.anyRequest().requiresSecure()) // Redirect to HTTPS
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .requestMatchers(SecurityEndpoints.PUBLIC_URLS).permitAll()
