@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +26,13 @@ public class FollowApiImpl implements FollowApi {
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
+    /**
+     * Follows a user.
+     *
+     * @param authHeader the authorization header containing the JWT token
+     * @param followedId the ID of the user to follow
+     * @return a response entity with no content
+     */
     @Override
     public ResponseEntity<Void> followUser(@RequestHeader("Authorization") String authHeader, @PathVariable Long followedId) {
         try {
@@ -46,6 +54,13 @@ public class FollowApiImpl implements FollowApi {
         }
     }
 
+    /**
+     * Unfollows a user.
+     *
+     * @param authHeader the authorization header containing the JWT token
+     * @param followedId the ID of the user to unfollow
+     * @return a response entity with no content
+     */
     @Override
     public ResponseEntity<Void> unfollowUser(@RequestHeader("Authorization") String authHeader, @PathVariable Long followedId) {
         try {
@@ -65,6 +80,11 @@ public class FollowApiImpl implements FollowApi {
         }
     }
 
+    /**
+     * Retrieves the list of followers for the authenticated user.
+     *
+     * @return a list of user data transfer objects representing the followers
+     */
     @Override
     public ResponseEntity<List<UserDto>> getFollowers() {
         try {
@@ -76,6 +96,11 @@ public class FollowApiImpl implements FollowApi {
         }
     }
 
+    /**
+     * Retrieves the list of users the authenticated user is following.
+     *
+     * @return a list of user data transfer objects representing the following users
+     */
     @Override
     public ResponseEntity<List<UserDto>> getFollowing() {
         try {

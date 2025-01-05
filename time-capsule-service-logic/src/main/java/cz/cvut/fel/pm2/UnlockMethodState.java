@@ -8,7 +8,6 @@ public class UnlockMethodState {
     private boolean enabled;
     private boolean complete;
 
-    // Constructor
 
     public UnlockMethodState() {
         this.enabled = false;
@@ -20,7 +19,6 @@ public class UnlockMethodState {
         this.complete = complete;
     }
 
-    // Getters and Setters
     public boolean isEnabled() {
         return enabled;
     }

@@ -9,6 +9,12 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/**
+ * Main application class for the Time Capsule application.
+ * This class is responsible for bootstrapping the Spring Boot application.
+ * It also enables various Spring features such as caching, Kafka, JPA repositories,
+ * transaction management, and scheduling.
+ */
 @SpringBootApplication(exclude = UserDetailsServiceAutoConfiguration.class)
 @EnableCaching
 @EnableKafka
@@ -16,6 +22,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableScheduling
 public class TimeCapsuleApp {
+    /**
+     * The main method that serves as the entry point for the Spring Boot application.
+     *
+     * @param args command-line arguments passed to the application
+     */
     public static void main(String[] args) {
         SpringApplication.run(TimeCapsuleApp.class, args);
     }

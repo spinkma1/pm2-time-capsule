@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 public class FollowService {
 
     private final UserRepository userRepository;
-    private final UserService userService; // Pro mapování na DTO
     private final UserMapper userMapper;
 
 

@@ -21,6 +21,13 @@ import java.util.List;
 @RequestMapping("/content")
 public interface ContentApi {
 
+    /**
+     * Uploads content to a specific capsule.
+     *
+     * @param capsuleId the ID of the capsule
+     * @param contentDto the content data transfer object
+     * @return the uploaded content data transfer object
+     */
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/upload/{capsuleId}", consumes = "application/json", produces = "application/json")
     @Operation(summary = "Upload content to specific capsule")
@@ -30,18 +37,37 @@ public interface ContentApi {
             @RequestBody ContentDto contentDto
     );
 
+    /**
+     * Retrieves all content for a specific capsule.
+     *
+     * @param capsuleId the ID of the capsule
+     * @return a list of content data transfer objects
+     */
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/{capsuleId}", produces = "application/json")
     @Operation(summary = "Get all content for a specific capsule")
     @ResponseBody
     ResponseEntity<List<ContentDto>> getAllContent(@PathVariable Long capsuleId);
 
+    /**
+     * Updates content by ID.
+     *
+     * @param contentId the ID of the content
+     * @param contentDto the content data transfer object
+     * @return the updated content data transfer object
+     */
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/update/{contentId}", consumes = "application/json", produces = "application/json")
     @Operation(summary = "Update content by ID")
     @ResponseBody
     ResponseEntity<ContentDto> updateContent(@PathVariable Long contentId, @RequestBody ContentDto contentDto);
 
+    /**
+     * Deletes content by ID.
+     *
+     * @param contentId the ID of the content
+     * @return a response entity with no content
+     */
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "/delete/{contentId}")
     @Operation(summary = "Delete content by ID")

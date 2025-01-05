@@ -9,10 +9,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * REST controller for health check API endpoints.
+ */
 @RestController
 @RequestMapping("/api/health")
 public class HealthController {
 
+    /**
+     * Endpoint for checking the health status of the application.
+     *
+     * @return a ResponseEntity containing the health status and current timestamp
+     */
     @GetMapping
     public ResponseEntity<Map<String, Object>> healthCheck() {
         Map<String, Object> response = new HashMap<>();

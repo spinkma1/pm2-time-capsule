@@ -243,11 +243,11 @@ const Dashboard = ({ user }) => {
                                     <div className="absolute top-2 right-2 bg-blue-900 rounded-full p-2">
                                         {(() => {
                                             switch (capsule.state) {
-                                                case 'opened':
+                                                case 'OPEN':
                                                     return <Unlock size={16} color='white' />;
-                                                case 'closed':
+                                                case 'WAIT':
                                                     return <Lock size={16}  color='white'/>;
-                                                case 'editing':
+                                                case 'EDIT':
                                                     return <Pencil size={16} color='white'/>;
                                                 default:
                                                     return <Ban size={16} color='white'/>;

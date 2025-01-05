@@ -5,7 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
-@SuppressWarnings("unused") // used in @PreAuthorize
+@SuppressWarnings("unused")
 public class AdminUtils {
     /**
      * checks if the logged-in user has admin rights.

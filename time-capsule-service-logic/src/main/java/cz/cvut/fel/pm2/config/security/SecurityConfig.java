@@ -35,7 +35,6 @@ import java.util.List;
 public class SecurityConfig {
     private final ClientRegistrationRepository clientRegistrationRepository;
 
-//    private final CustomOAuthSuccessHandler customOAuthSuccessHandler;
     private final JwtRequestFilter jwtRequestFilter;
     private final PreAuthRegisterFilter preAuthRegisterFilter;
 
@@ -48,8 +47,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true); // Required for OAuth
-        // Match all origins dynamically, it is definitely not safe for production.
+        configuration.setAllowCredentials(true);
         configuration.setAllowedOriginPatterns(List.of("*")); // TODO add specific vercel website before PROD release
 //        configuration.setAllowedOriginPatterns(List.of("vercel.app/blabla capsule")) ;
         configuration.setAllowedHeaders(List.of("*"));
@@ -69,7 +67,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // e
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .requiresChannel(channel ->
                         channel.anyRequest().requiresSecure()) // Redirect to HTTPS
                 .authorizeHttpRequests(auth -> auth
@@ -83,7 +81,7 @@ public class SecurityConfig {
 //                        .successHandler(customOAuthSuccessHandler)
                     .loginPage("/oauth2/authorization/google")
                     .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
-                            .oidcUserService(oidcUserService()) // inject your custom user service here
+                            .oidcUserService(oidcUserService())
                     )
                 )
                 .logout(logout -> logout
@@ -107,15 +105,15 @@ public class SecurityConfig {
     @Bean
     public HttpFirewall httpFirewall() {
         StrictHttpFirewall firewall = new StrictHttpFirewall();
-        firewall.setAllowSemicolon(true);  // Allow semicolons in the URL
+        firewall.setAllowSemicolon(true);
         return firewall;
     }
 
-    // Configures logout success handler to revoke Google SSO session
+
     private OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler() {
         OidcClientInitiatedLogoutSuccessHandler successHandler =
                 new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
-        successHandler.setPostLogoutRedirectUri("http://localhost:8080/"); // Redirect URI after logout
+        successHandler.setPostLogoutRedirectUri("http://localhost:8080/");
         return successHandler;
     }
 

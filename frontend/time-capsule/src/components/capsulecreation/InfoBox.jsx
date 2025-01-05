@@ -5,7 +5,7 @@ function InfoBox({ title, description }) {
     return (
       <section className="flex items-center p-4 max-w-4xl bg-blue-50 rounded-lg">
         {/* Icon on the left */}
-        <Info />
+        <Info size={50}/>
         
         {/* Title and description on the same row */}
         <div className="flex flex-col text-sm leading-none text-blue-900 ml-4">

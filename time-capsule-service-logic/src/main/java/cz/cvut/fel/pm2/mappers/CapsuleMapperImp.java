@@ -145,8 +145,6 @@ public class CapsuleMapperImp implements CapsuleMapper {
 
         Capsule capsule = new Capsule();
 
-
-        //capsule.setUsers( userDtoListToUserList( capsuleDto.users() ) );
         capsule.setName( capsuleDto.name() );
         capsule.setDescription( capsuleDto.description());
         capsule.setCapsuleSize( capsuleDto.capsuleSize() );
@@ -203,7 +201,6 @@ public class CapsuleMapperImp implements CapsuleMapper {
             user.setRole( Enum.valueOf( Role.class, userDto.role() ) );
         }
         user.setCapsules( capsuleDtoListToCapsuleList( userDto.capsules() ) );
-       // user.setFollowers( userDtoListToUserList( userDto.followers() ) );
 
         return user;
     }

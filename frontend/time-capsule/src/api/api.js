@@ -52,7 +52,7 @@ const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
         return new Error("Account deleted");
     }
     if (response.status === 204 || response.headers.get("content-length") === "0") {
-      return null; // nebo prázdný objekt {}
+      return null;
     }
     return noBody ? undefined : await response.json();
   } catch (error) {

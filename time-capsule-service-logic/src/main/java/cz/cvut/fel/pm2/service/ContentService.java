@@ -74,7 +74,7 @@ public class ContentService {
                 case "video":
                     content.setDataType(DataType.VIDEO);
                     break;
-                case "text":
+                case "plain_text":
                     content.setDataType(DataType.PLAIN_TEXT);
                     break;
                 case "audio":

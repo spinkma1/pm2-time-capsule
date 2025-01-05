@@ -16,15 +16,6 @@ import java.util.Map;
 @Mapper(componentModel = "spring")
 public interface CapsuleMapper {
 
-//    /**
-//     * Updates a CapsuleEntity with values from a CapsuleDto.
-//     *
-//     * @param capsuleInput  the capsule DTO containing updated values.
-//     * @param capsuleEntity the capsule entity to update.
-//     */
-
-//    CapsuleDto updateEntity(CapsuleDto capsuleInput,  Capsule capsuleEntity);
-
     /**
      * Converts a CapsuleEntity to a CapsuleDto.
      *

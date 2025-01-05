@@ -13,9 +13,15 @@ import java.util.Date;
 @Component
 public class ContentMapperImp implements ContentMapper {
 
+    /**
+     * Converts a Content entity to a ContentDto.
+     *
+     * @param contentEntity the content entity to convert
+     * @return the converted content data transfer object
+     */
     @Override
     public ContentDto toDto(Content contentEntity) {
-        if ( contentEntity == null ) {
+        if (contentEntity == null) {
             return null;
         }
 
@@ -25,7 +31,7 @@ public class ContentMapperImp implements ContentMapper {
         String url = null;
         byte[] data = null;
 
-        if ( contentEntity.getDataType() != null ) {
+        if (contentEntity.getDataType() != null) {
             switch (contentEntity.getDataType()) {
                 case IMAGE:
                     dataType = "image";
@@ -48,15 +54,21 @@ public class ContentMapperImp implements ContentMapper {
         name = contentEntity.getName();
         url = contentEntity.getUrl();
         byte[] data1 = contentEntity.getData();
-        if ( data1 != null ) {
-            data = Arrays.copyOf( data1, data1.length );
+        if (data1 != null) {
+            data = Arrays.copyOf(data1, data1.length);
         }
 
-        ContentDto contentDto = new ContentDto( dataType, dateOfUpload, name, url, data );
+        ContentDto contentDto = new ContentDto(dataType, dateOfUpload, name, url, data);
 
         return contentDto;
     }
 
+    /**
+     * Converts a ContentDto to a Content entity.
+     *
+     * @param contentDto the content data transfer object to convert
+     * @return the converted content entity
+     */
     @Override
     public Content toEntity(ContentDto contentDto) {
         if (contentDto == null) {
@@ -73,7 +85,7 @@ public class ContentMapperImp implements ContentMapper {
                 case "video":
                     content.setDataType(DataType.VIDEO);
                     break;
-                case "text":
+                case "plain_text":
                     content.setDataType(DataType.PLAIN_TEXT);
                     break;
                 case "audio":

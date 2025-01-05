@@ -13,18 +13,32 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    // Convert User entity to UserDto
+    /**
+     * Converts a User entity to a UserDto.
+     *
+     * @param user the user entity to convert
+     * @return the converted user data transfer object
+     */
     @Mapping(source = "followers", target = "followers")
     @Mapping(source = "capsules", target = "capsules")
     UserDto toDto(User user);
 
-    // Convert list of User entities to list of UserDto records
+    /**
+     * Converts a list of User entities to a list of UserDto.
+     *
+     * @param users the list of user entities to convert
+     * @return the list of converted user data transfer objects
+     */
     List<UserDto> toDtoList(List<User> users);
 
-    // Convert UserDto to User entity
+    /**
+     * Converts a UserDto to a User entity.
+     *
+     * @param userDto the user data transfer object to convert
+     * @return the converted user entity
+     */
     @Mapping(source = "followers", target = "followers")
     @Mapping(source = "capsules", target = "capsules")
     User toEntity(UserDto userDto);
-
 
 }

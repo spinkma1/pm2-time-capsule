@@ -13,7 +13,7 @@ import java.util.List;
 public class User extends AbstractEntity {
 
     @Column(name = "google_id", unique = true)
-    private String googleId; // Unique ID for Google SSO users
+    private String googleId;
 
     @Basic(optional = false)
     @Column(name = "email", nullable = false, unique = true)
@@ -40,17 +40,17 @@ public class User extends AbstractEntity {
     )
     private List<User> followers;
 
-    // Constructor for SSO (no password)
+
     public User(String email, String googleId) {
         this.email = email;
         this.googleId = googleId;
         this.role = Role.ROLE_REGISTERED;
     }
 
-    // Default constructor
+
     public User() {}
 
-    // Standard constructor for non-SSO users
+
     public User(String email, String password, Role role) {
         this.email = email;
         this.password = password;

@@ -29,6 +29,7 @@ const CapsuleDetail = ({  }) => {
             try {
                 const response = await api.getCapsuleById(id);
                 setCapsule(response);
+                console.log('Capsule details:', response)
             } catch (error) {
                 console.error("Error fetching capsule details:", error);
             } finally {
@@ -104,17 +105,16 @@ const CapsuleDetail = ({  }) => {
     };
 
     const downloadBase64File = (base64Data, fileName, dataType) => {
-        // Determine the MIME type based on the data type
         let mimeType = '';
 
         if (dataType === 'pdf') {
             mimeType = 'application/pdf';
         } else if (dataType === 'image') {
-            mimeType = 'image/jpg'; // You can modify this based on your image format (e.g., png, jpg)
+            mimeType = 'image/jpg';
         } else if (dataType === 'audio') {
-            mimeType = 'audio/mp3'; // Modify for your audio format (e.g., mp3, wav)
+            mimeType = 'audio/mp3';
         } else if (dataType === 'video') {
-            mimeType = 'video/mp4'; // Modify for your video format (e.g., mp4, webm, ogg)
+            mimeType = 'video/mp4';
         } else if (dataType === 'text') {
             mimeType = 'text/plain';
         }
@@ -133,14 +133,12 @@ const CapsuleDetail = ({  }) => {
             byteArrays.push(new Uint8Array(byteNumbers));
         }
 
-        // Create a Blob from the byte arrays
         const blob = new Blob(byteArrays, { type: mimeType });
 
-        // Create a temporary link and trigger the download
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob); // Create a URL for the Blob
-        link.download = fileName; // Set the filename
-        link.click(); // Trigger the download
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
     };
 
     const getThumbnail = (item) => {
@@ -195,7 +193,7 @@ const CapsuleDetail = ({  }) => {
                             </div>
                         </div>
 
-                        {capsule.state === 'closed' ? (
+                        {capsule.state === 'WAIT' ? (
 
                             <div
                                 className="bg-blue-50 rounded-lg p-4 text-center mt-4 md:mt-0"
@@ -273,7 +271,7 @@ const CapsuleDetail = ({  }) => {
                                 Pozvat přispěvatele
                             </button>
 
-                            {capsule.state === 'closed' && getTimeRemaining(capsule.unlockTime) !== "Otevřít" && (
+                            {capsule.state === 'WAIT' && getTimeRemaining(capsule.unlockTime) !== "Otevřít" && (
 
                                 <button
                                     onClick={handleEarlyOpen}

@@ -8,6 +8,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CachingConfiguration {
 
+    /**
+     * Configures the cache manager with specified cache names.
+     *
+     * @return the cache manager
+     */
     @Bean
     public CacheManager cacheManager() {
         return new ConcurrentMapCacheManager("capsules", "users");

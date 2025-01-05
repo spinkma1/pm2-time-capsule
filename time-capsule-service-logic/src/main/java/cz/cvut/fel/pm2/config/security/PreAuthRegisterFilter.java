@@ -21,70 +21,80 @@ public class PreAuthRegisterFilter extends OncePerRequestFilter {
     private final UserService userService;
     private final UserRepository userRepository;
 
+    /**
+     * Constructs a PreAuthRegisterFilter with the specified JwtUtil, UserService, and UserRepository.
+     *
+     * @param jwtUtil the utility class for handling JWTs
+     * @param userService the service for user-related operations
+     * @param userRepository the repository for user-related database operations
+     */
     public PreAuthRegisterFilter(JwtUtil jwtUtil, UserService userService, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.userService = userService;
         this.userRepository = userRepository;
     }
 
+    /**
+     * Generates a long, secure password.
+     *
+     * @return a URL-safe, base64-encoded string representing the generated password
+     */
     public static String generateLongPassword() {
         SecureRandom secureRandom = new SecureRandom();
         byte[] randomBytes = new byte[64]; // 64 bytes = 512 bits
         secureRandom.nextBytes(randomBytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
-        // URL-safe and compact
     }
 
+    /**
+     * Filters incoming requests to handle pre-authentication registration for SSO.
+     *
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @param filterChain the filter chain
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        //used ONLY FOR SSO REGISTRATION
+        // used ONLY FOR SSO REGISTRATION
 
-            final String authorizationHeader = request.getHeader("Authorization");
-            if(authorizationHeader == null){
-                filterChain.doFilter(request, response);
-                return;
-            }
+        final String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String jwt = authorizationHeader.substring(7);
 
             try {
-
-                // Extract the email or subject from the token
                 String username = jwtUtil.extractUsername(jwt);
 
-                // Check if user exists, and register them if not
+
                 if (userRepository.findByEmail(username).isPresent()) {
-                    // Proceed with the rest of the filter chain
                     filterChain.doFilter(request, response);
                     return;
                 }
 
-                //TODO
-                //user doesn't exist
-                //if password isn't sent in the form (SSO), generate a long password
                 if (request.getParameter("password") == null) {
-
                     String password = generateLongPassword();
                     try {
                         userService.registerUser(password, username);
                     } catch (Exception e) {
-                        // Log and fail gracefully if registration fails
                         logger.error("User registration failed during pre-authentication", e);
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token or user cannot be registered");
                         return;
                     }
-
                 }
             } catch (Exception e) {
-                // Log and fail gracefully if JWT extraction fails
+
                 logger.error("JWT extraction failed during pre-authentication", e);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token or user cannot be registered");
                 return;
             }
 
-            // Proceed with the rest of the filter chain
             filterChain.doFilter(request, response);
         }
     }

@@ -19,17 +19,35 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Filter that processes JWT authentication for incoming requests.
+ */
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserService userService;
 
+    /**
+     * Constructs a JwtRequestFilter with the specified JwtUtil and UserService.
+     *
+     * @param jwtUtil the utility class for handling JWTs
+     * @param userService the service for user-related operations
+     */
     public JwtRequestFilter(JwtUtil jwtUtil, UserService userService) {
         this.jwtUtil = jwtUtil;
         this.userService = userService;
     }
 
+    /**
+     * Filters incoming requests to perform JWT authentication.
+     *
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @param chain the filter chain
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
             throws ServletException, IOException {
@@ -51,7 +69,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         // Handle OAuth2 Authentication Token (Google SSO)
-        if(usedAlgorithm!= null && usedAlgorithm.equals("RS256")){
+        if (usedAlgorithm != null && usedAlgorithm.equals("RS256")) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             // Log the current Authentication details
@@ -79,13 +97,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
 
-
         // Additional logging for decision path based on username and JWT
         if (username != null) {
             logger.info("Extracted username: " + username);
         }
 
-        if (usedAlgorithm!= null && usedAlgorithm.equals("HS256")) {
+        if (usedAlgorithm != null && usedAlgorithm.equals("HS256")) {
             logger.info("Validating JWT for username: " + username);
             UserDetails userDetails = this.userService.loadUserByUsername(username);
 
@@ -100,7 +117,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 logger.info("JWT Token validation failed for: " + username);
                 return;
             }
-        } else if (usedAlgorithm!= null){
+        } else if (usedAlgorithm != null) {
             // Handle OAuth2 (SSO) logic
             logger.info("Processing OAuth2 authentication for: " + username);
             UserDetails userDetails = this.userService.loadUserByUsername(username);
