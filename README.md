@@ -1,6 +1,18 @@
 ## Time Capsules
 Time Capsules je moderní webová aplikace, která uživatelům umožňuje vytvářet, sdílet a objevovat časové kapsle. Uživatelé mohou ke svým kapslím přiřazovat geolokace, zobrazovat je na mapě a interagovat s kapslemi ostatních uživatelů v dynamickém a intuitivním rozhraní.
 
+# Týmová tabulka 
+
+| Člen týmu        | Počet hodin               |
+|------------------|---------------------------|
+| Štěpán Š.        | 21,5                      |
+| Tereza K.        | $${\color{red}7}$$        |
+| Adam Š.          | 42,5                      |
+| Vít N.           | 34,5                      |
+| Martin Š.        | 55,5                      |
+| Martin Č.        | $${\color{green}68,25}$$  |
+| Kevin            | 45                        |
+| Le               | 9                         |
 
 ## Struktura projektu
 Projekt je postaven na moderním technologickém stacku, který zajišťuje škálovatelnost, výkon a snadnou údržbu. Níže je přehled struktury projektu:
