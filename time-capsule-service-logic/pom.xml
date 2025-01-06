@@ -6,7 +6,7 @@
     <parent>
         <groupId>cz.cvut.fel.pm2</groupId>
         <artifactId>time-capsule-service</artifactId>
-        <version>1.0.0-rc2</version>
+        <version>1.0.0-rc3</version>
     </parent>
 
     <artifactId>time-capsule-service-logic</artifactId>
@@ -16,7 +16,7 @@
         <dependency>
             <groupId>cz.cvut.fel.pm2</groupId>
             <artifactId>time-capsule-service-rest-client</artifactId>
-            <version>1.0.0-rc2</version>
+            <version>1.0.0-rc3</version>
         </dependency>
 
         <dependency>
