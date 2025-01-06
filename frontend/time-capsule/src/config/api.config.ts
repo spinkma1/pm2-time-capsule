@@ -1,10 +1,5 @@
 const API_CONFIG = {
-    /*
-    BASE_URL: import.meta.env.MODE === 'development'
-        ? '/api'  // Bude použito s proxy v development módu
-        : 'http://actual-production-url.com/api',  // Produkční URL
 
-     */
     BASE_URL: 'http://130.61.191.237:8080',
     // BASE_URL: 'https://localhost:8080',
 
