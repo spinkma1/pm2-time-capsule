@@ -1,6 +1,5 @@
 describe('Dashboard Page Tests', () => {
     beforeEach(() => {
-        // Mock login and token setup
         cy.intercept('POST', '/user/login', {
             statusCode: 200,
             body: {
@@ -9,6 +8,21 @@ describe('Dashboard Page Tests', () => {
                 token: 'mockedToken',
             },
         }).as('login');
+
+        cy.intercept('GET', '/user/profile', {
+            statusCode: 200,
+            body: {
+                "email": "aaaaaa@a.com",
+                "name": "User",
+                "bio": "This is bio of User",
+                "role": "ROLE_REGISTERED"
+            },
+        }).as('user');
+
+        cy.intercept('GET', '/capsules/contributor-capsules', {
+            statusCode: 200,
+            body: [],
+        }).as('contributor');
 
         cy.intercept('POST', '/capsules/user', {
             statusCode: 200,
@@ -19,7 +33,7 @@ describe('Dashboard Page Tests', () => {
                     description: "A capsule containing memories and files for the future.",
                     createdDate: "2024-12-31T10:00:00.000Z",
                     unlockTime: "2025-12-31T10:00:00.000Z",
-                    state: "editing",
+                    state: "EDIT",
                     users: [
                         { id: "101", name: "Alice", email: "alice@example.com" },
                         { id: "102", name: "Bob", email: "bob@example.com" }
@@ -59,6 +73,23 @@ describe('Dashboard Page Tests', () => {
                         }
                     ],
                     capsuleSize: 10,
+                },
+                {
+                    id: "2",
+                    name: "Time Capsule 2026",
+                    description: "blabla",
+                    createdDate: "2024-3-12T10:00:00.000Z",
+                    unlockTime: "2026-12-31T10:00:00.000Z",
+                    state: "WAIT",
+                    users: [
+                        { id: "101", name: "Alice", email: "alice@example.com" },
+                        { id: "102", name: "Bob", email: "bob@example.com" },
+                        { id: "103", name: "Jan", email: "example@example.com" },
+                        { id: "104", name: "James", email: "example@example.com" },
+                        { id: "105", name: "Beast", email: "example@example.com" }
+                    ],
+                    content: [],
+                    capsuleSize: 10,
                 }
             ],
         }).as('getCapsules');
@@ -74,80 +105,50 @@ describe('Dashboard Page Tests', () => {
     });
 
     it('should display the dashboard statistics and capsules', () => {
-        // Wait for capsules to load
         cy.wait('@getCapsules');
+        cy.wait('@user');
+        cy.wait('@contributor');
 
-        // Check statistics
         cy.contains('Celkem kapslí').should('be.visible');
-        cy.contains('1').should('be.visible'); // Total capsules
+        cy.contains('1').should('be.visible');
         cy.contains('Čeká na otevření').should('be.visible');
-        cy.contains('1').should('be.visible'); // Pending open
-        // cy.contains('Sdíleno se mnou').should('be.visible');
-        // cy.contains('1').should('be.visible'); // Shared with me
-        //
-        // // Check capsules list
-        // cy.contains('Capsule 1').should('be.visible');
-        // cy.contains('Capsule 2').should('be.visible');
-        // cy.contains('Shared Capsule').should('be.visible');
+        cy.contains('1').should('be.visible');
+        cy.contains('Sdíleno se mnou').should('be.visible');
+        cy.contains('1').should('be.visible');
+
+        cy.contains('Time Capsule 2025').should('be.visible');
+        cy.contains('Otevření: 31/12/2025').should('be.visible');
+        cy.contains('2 přispěvatelů').should('be.visible');
+
+        cy.contains('Zobrazit detail').click();
+        cy.url().should('include', '/capsuleDetail/1');
+
+
     });
 
-//     it('should filter capsules by search query', () => {
-//         // Wait for capsules to load
-//         cy.wait('@getCapsules');
+    it('should filter capsules by search query', () => {
+        cy.wait('@getCapsules');
+
+        cy.get('input[placeholder="Hledat kapsle..."]').type('Time Capsule 2025');
+        cy.contains('Time Capsule 2025').should('be.visible');
+        cy.contains('Otevření: 31/12/2025').should('be.visible');
+        cy.contains('2 přispěvatelů').should('be.visible');
+
+        cy.contains('Zobrazit detail').click();
+        cy.url().should('include', '/capsuleDetail/1');
+    });
 //
-//         // Search for a capsule
-//         cy.get('input[placeholder="Hledat kapsle..."]').type('Capsule 1');
-//         cy.contains('Capsule 1').should('be.visible');
-//         cy.contains('Capsule 2').should('not.exist');
-//         cy.contains('Shared Capsule').should('not.exist');
-//     });
-//
-//     it('should filter capsules by status', () => {
-//         // Wait for capsules to load
-//         cy.wait('@getCapsules');
-//
-//         // Filter by "Čekající"
-//         cy.get('select').select('Čekající');
-//         cy.contains('Shared Capsule').should('be.visible');
-//         cy.contains('Capsule 1').should('not.exist');
-//         cy.contains('Capsule 2').should('not.exist');
-//
-//         // Filter by "Uzamčené"
-//         cy.get('select').select('Uzamčené');
-//         cy.contains('Capsule 2').should('be.visible');
-//         cy.contains('Capsule 1').should('not.exist');
-//         cy.contains('Shared Capsule').should('not.exist');
-//     });
-//
-//     it('should display a message when no capsules match the filters', () => {
-//         // Wait for capsules to load
-//         cy.wait('@getCapsules');
-//
-//         // Apply a filter that doesn't match any capsules
-//         cy.get('input[placeholder="Hledat kapsle..."]').type('Nonexistent');
-//         cy.contains('Zatím nemáte žádné kapsle :(').should('be.visible');
-//     });
-//
-//     it('should navigate to capsule detail page when clicking "Zobrazit detail"', () => {
-//         // Wait for capsules to load
-//         cy.wait('@getCapsules');
-//
-//         // Click on "Zobrazit detail" for Capsule 1
-//         cy.contains('Capsule 1')
-//             .parent()
-//             .find('button')
-//             .contains('Zobrazit detail')
-//             .click();
-//
-//         // Assert navigation to capsule detail page
-//         cy.url().should('include', '/capsuleDetail/1');
-//     });
-//
-//     it('should allow creating a new capsule', () => {
-//         // Click on "Nová kapsle"
-//         cy.contains('Nová kapsle').click();
-//
-//         // Assert navigation to create capsule page
-//         cy.url().should('include', '/createCapsule');
-//     });
+    it('should filter capsules by status', () => {
+        cy.wait('@getCapsules');
+
+        cy.get('select').select('Čekající');
+        cy.contains('Time Capsule 2025').should('be.visible');
+        cy.contains('Otevření: 31/12/2025').should('be.visible');
+        cy.contains('2 přispěvatelů').should('be.visible');
+
+        cy.get('select').select('Uzamčené');
+        cy.contains('Time Capsule 2026').should('be.visible');
+        cy.contains('Otevření: 31/12/2026').should('be.visible');
+        cy.contains('5 přispěvatelů').should('be.visible');
+    });
 });
