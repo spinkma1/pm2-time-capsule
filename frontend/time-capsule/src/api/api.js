@@ -3,6 +3,7 @@ import API_CONFIG from "../config/api.config";
 const fetchWithConfig = async (endpoint, options = {}, noBody = false) => {
   const url = `${API_CONFIG.BASE_URL}${endpoint}`;
   const accessToken = localStorage.getItem("access_token");
+  console.log(url)
   console.log(accessToken)
   const headers = {
     ...API_CONFIG.HEADERS,

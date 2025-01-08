@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    image: time-capsule-service:1.0.0-rc5
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "8080:8080"
+    networks:
+      - pm2-network
+
+  frontend:
+    image: pm2-fe
+    build:
+      context: ./frontend/time-capsule
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - pm2-network
+
+networks:
+  pm2-network:
+    driver: bridge
