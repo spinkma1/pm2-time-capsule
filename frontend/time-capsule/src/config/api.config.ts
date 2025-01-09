@@ -1,6 +1,6 @@
 const API_CONFIG = {
     //BASE_URL: 'http://130.61.191.237:8080',
-    BASE_URL: 'localhost:8080',
+    BASE_URL: 'http://localhost:8080',
 //BASE_URL: 'http://130.61.191.237:8080',
     ENDPOINTS: {
         HEALTH: '/health',
