@@ -5,14 +5,14 @@ Time Capsules je moderní webová aplikace, která uživatelům umožňuje vytv�
 
 | Člen týmu        | Počet hodin               |
 |------------------|---------------------------|
-| Štěpán Š.        | 21,5                      |
-| Tereza K.        | $${\color{red}7}$$        |
+| Štěpán Š.        | 18,5                      |
+| Tereza K.        | 26                        |
 | Adam Š.          | 42,5                      |
 | Vít N.           | 34,5                      |
 | Martin Š.        | 55,5                      |
 | Martin Č.        | $${\color{green}68,25}$$  |
 | Kevin            | 45                        |
-| Le               | 9                         |
+| Le               | $${\color{red}9,5}$$      |
 
 ## Struktura projektu
 Projekt je postaven na moderním technologickém stacku, který zajišťuje škálovatelnost, výkon a snadnou údržbu. Níže je přehled struktury projektu:
